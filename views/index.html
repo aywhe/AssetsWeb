@@ -74,6 +74,7 @@
       .catch(error => console.error('获取图片失败:', error));
 
     function initSlideshow() {
+      console.log('start initSlideshow');
       const wrapper = document.getElementById('slideshowWrapper');
       wrapper.innerHTML = '';
 
@@ -86,6 +87,8 @@
 
       // 初始化 Swiper
       new Swiper('.swiper-container', {
+        lazy: true,
+        lazyLoadInAdvance: 10,
         loop: true,
         autoplay: {
           delay: 6000,
