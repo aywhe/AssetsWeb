@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>全屏图片轮播</title>
+
+  <!-- Swiper CSS -->
+  <link rel="stylesheet" href="css/swiper-bundle.min.css" />
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .swiper-container {
+      width: 100%;
+      height: 100%;
+    }
+
+    .swiper-slide {
+      text-align: center;
+      font-size: 18px;
+      background: #000;
+    }
+
+    .swiper-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    /* 按钮样式 */
+    .swiper-button-next,
+    .swiper-button-prev {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .swiper-button-next:hover,
+    .swiper-button-prev:hover {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <!-- 全屏轮播容器 -->
+  <div class="swiper-container">
+    <div class="swiper-wrapper" id="slideshowWrapper"></div>
+
+    <!-- 左右按钮 -->
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
+  </div>
+
+  <!-- Swiper JS -->
+  <script src="js/swiper-bundle.min.js"></script>
+
+  <!-- 自定义脚本 -->
+  <script>
+    // 获取图片列表
+    let allImages = [];
+
+    fetch('/api/all-images')
+      .then(response => response.json())
+      .then(data => {
+        allImages = data.images;
+        initSlideshow();
+      })
+      .catch(error => console.error('获取图片失败:', error));
+
+    function initSlideshow() {
+      const wrapper = document.getElementById('slideshowWrapper');
+      wrapper.innerHTML = '';
+
+      allImages.forEach((imageUrl, index) => {
+        const slide = document.createElement('div');
+        slide.className = 'swiper-slide';
+        slide.innerHTML = `<img src="${imageUrl}" alt="轮播图片 ${index + 1}">`;
+        wrapper.appendChild(slide);
+      });
+
+      // 初始化 Swiper
+      new Swiper('.swiper-container', {
+        loop: true,
+        autoplay: {
+          delay: 6000,
+          disableOnInteraction: false,
+        },
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+      });
+    }
+  </script>
+</body>
+</html>
