@@ -64,6 +64,8 @@
   <script>
     // 获取图片列表
     let allImages = [];
+    let allImagesEndIdx = 5;
+    let autoPlayDelay = 6000;
 
     fetch('/api/all-images')
       .then(response => response.json())
@@ -73,25 +75,42 @@
       })
       .catch(error => console.error('获取图片失败:', error));
 
+    function restoreSlideOntime(){
+      if(allImagesEndIdx >= allImages.length) return;
+      //console.log("autoplay callback, allImagesEndIdx: " + allImagesEndIdx);
+      const imageUrl = allImages[allImagesEndIdx];
+      const index = allImagesEndIdx;
+      allImagesEndIdx = allImagesEndIdx + 1;
+      const slide = document.createElement('div');
+      slide.className = 'swiper-slide';
+      slide.innerHTML = `<img src="${imageUrl}" alt="轮播图片 ${index + 1}">`;
+      var wrapper = new Swiper('.swiper-container');
+      wrapper.removeSlide(0);//(wrapper.firstElementChild);
+      wrapper.appendSlide(slide);
+    }
+
     function initSlideshow() {
       console.log('start initSlideshow');
       const wrapper = document.getElementById('slideshowWrapper');
       wrapper.innerHTML = '';
-
-      allImages.forEach((imageUrl, index) => {
+      if(allImagesEndIdx > allImages.length) allImagesEndIdx = allImages.length;
+      for(let i = 0; i < allImagesEndIdx; i++){
+        const imageUrl = allImages[i];
+        const index = i;
         const slide = document.createElement('div');
         slide.className = 'swiper-slide';
         slide.innerHTML = `<img src="${imageUrl}" alt="轮播图片 ${index + 1}">`;
         wrapper.appendChild(slide);
-      });
-
+      }
+      //allImages.forEach((imageUrl, index) => { });
+    
       // 初始化 Swiper
       new Swiper('.swiper-container', {
         lazy: true,
         lazyLoadInAdvance: 10,
         loop: true,
         autoplay: {
-          delay: 6000,
+          delay: autoPlayDelay,
           disableOnInteraction: false,
         },
         navigation: {
@@ -99,6 +118,7 @@
           prevEl: '.swiper-button-prev',
         },
       });
+      setInterval(restoreSlideOntime, autoPlayDelay);
     }
   </script>
 </body>
