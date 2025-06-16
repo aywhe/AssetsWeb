@@ -1,20 +1,30 @@
-1. ���⣺��������У���nodejs���ú�����������ܷ��ʣ�����ͬ�����������ֻ��Ͳ��ܷ��ʡ�
-������
-    1�� ʹ���Ž�ģʽ��vmnet0�����������ֱ�ӱ�¶���������У��������豸һ��ʹ��һ������ 192.168.1.*���������Թ������С�
-    2�� ʹ��NATģʽ��vmnet8������Ҳ�������ƽʱ�õ�������ʽ��ֻ��Ҫ������һ�¾Ϳ����ˡ�
-        1�� �༭�������ѡ��vmnet8��ѡ��nat���ã��˿�ת�������ӡ�
-            ������Խ������Ķ˿�ӳ�䵽������Ķ˿ڣ������ֻ����������Ķ˿�ʱ���ͻ�ӳ�䵽������С�
-            �����ҵ������� 9998��tcp, 192.168.162.128:9998, ���������˿���9998���������վ�˿�Ҳ��9998��������������ڵ�nat�����ַ�� 192.168.162.128��
-        2�� ����Ҫ����������ǽ��Ϊ 9998 �˿ڿ��š�ѡ��߼���ȫ Windows Defender ����ǽ��ѡ����վ�����½����򣬶˿ڣ��ض����ض˿ڣ�tcp��.....
-            ���������ֻ��������� 192.168.1.101:9998 �ͻᱻӳ�䵽�������
-    ��ɡ�
-2. ���⣺�� swiper �ؼ�ʵ������ҳ�д�����ͼƬ���ֲ���ʾ���ֲ�һ���������ҳ������
-        ��Ϊ html �ļ��аѷ�����·��Ĵ���ͼƬ·����һʱ���뵽 slide �� src ���棬
-        ���� swiper �����зǳ���� slide Ԫ�ء�
-   ������
-       1�� ��ʼ��ʱ��ֻ�� swiper �������� slide��
-       2�� ��һ����ʱ��������һ�����䣬ɾ�� swiper �ĵ�һ�� slide����������ͼƬ slide ��β�������ƹ��� swiper �� slide ������
-           ʹ�õ��Ĵ���:
+1. 问题：在虚拟机中，用nodejs配置后，外面的主机能访问，但是同样局域网的手机就不能访问。
+方法：
+    1） 使用桥接模式（vmnet0），将虚拟机直接暴露到局域网中，与其他设备一起使用一个网段 192.168.1.*。但是我试过，不行。
+    2） 使用NAT模式（vmnet8），这也是虚拟机平时用的联网方式，只需要在配置一下就可以了。
+        1） 编辑虚拟机，选择vmnet8，选择nat设置，端口转发，添加。
+            这里可以将主机的端口映射到虚拟机的端口，这样手机访问主机的端口时，就会映射到虚拟机中。
+            这里我的配置是 9998，tcp, 192.168.162.128:9998, 主机开发端口是9998，虚拟机网站端口也是9998，虚拟机在主机内的nat网络地址是 192.168.162.128。
+        2） 还需要在主机防火墙中为 9998 端口开放。选择高级安全 Windows Defender 防火墙，选择入站规则，新建规则，端口，特定本地端口，tcp，.....
+            这样，用手机访问主机 192.168.1.101:9998 就会被映射到虚拟机中
+    完成。
+2. 问题：用 swiper 控件实现在网页中大量的图片的轮播显示，轮播一段世间后，网页崩溃，
+        因为 html 文件中把服务端下发的大量图片路径都一时加入到 slide 的 src 里面，
+        导致 swiper 里面有非常多的 slide 元素。
+   方法：
+       1） 初始的时候，只给 swiper 添加少量 slide。
+       2） 做一个定时函数，隔一段世间，删除 swiper 的第一个 slide，添加另个图片 slide 到尾部，控制管理 swiper 的 slide 数量。
+           使用到的代码:
            var wrapper = new Swiper('.swiper-container');
            wrapper.removeSlide(0);//(wrapper.firstElementChild);
            wrapper.appendSlide(slide);
+3. 问题： 在调试 index.html 时，发现每次 swiper 的更改，都会自动生成一个 <span>，导致 swiper 自动播放一段时间后，网页上非常多的这个 <span> 元素。
+        <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
+        查找到 swiper-bundle.min.js 里面，原来是这一段代码在作怪：
+        i("beforeInit",(()=>{l=v("span",t.params.a11y.notificationClass),l.setAttribute("aria-live","assertive"),l.setAttribute("aria-atomic","true")}))
+    方法：
+        问了 AI 助手这段代码的功能，主要是在初始化 Swiper 对象时会触发。
+        原来是我在上次修改 swiper 的 slide 的数量时，每次都重新 new Swiper()，都会触发生成 <span>，
+        所以我将 Swiper 对象做成全局变量了，就不用每次都 new 一个新的的了。
+        代码：
+        if(g_wrapper === null){g_wrapper = new Swiper('.swiper-container');}

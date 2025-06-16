@@ -74,7 +74,8 @@
         initSlideshow();
       })
       .catch(error => console.error('获取图片失败:', error));
-
+    
+    var g_wrapper = null;
     function restoreSlideOntime(){
       if(allImagesEndIdx >= allImages.length) return;
       //console.log("autoplay callback, allImagesEndIdx: " + allImagesEndIdx);
@@ -84,9 +85,10 @@
       const slide = document.createElement('div');
       slide.className = 'swiper-slide';
       slide.innerHTML = `<img src="${imageUrl}" alt="轮播图片 ${index + 1}">`;
-      var wrapper = new Swiper('.swiper-container');
-      wrapper.removeSlide(0);//(wrapper.firstElementChild);
-      wrapper.appendSlide(slide);
+      if(g_wrapper === null){g_wrapper = new Swiper('.swiper-container');}
+      g_wrapper.removeSlide(0);//(wrapper.firstElementChild);
+      g_wrapper.appendSlide(slide);
+      g_wrapper.update();
     }
 
     function initSlideshow() {
