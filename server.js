@@ -231,7 +231,7 @@ app.get('/api/all-images', (req, res) => {
 // 主页路由
 app.get('/imageshow', (req, res) => {
   allImages = shuffleArray(allImages);
-  res.sendFile(path.join(__dirname, 'views', 'index.html'));
+  res.sendFile(path.join(__dirname, 'views', 'imageshow.html'));
 });
 
 // 启动服务器

@@ -1,0 +1,5 @@
+{
+"PicturePath" : "D:/Users/aywhe/Pictures/Pictures",
+"VideoPathArr" : ["D:/Users/aywhe/Videos", "E:/电影", "E:/电视剧", "E:/动漫", "E:/纪录片", "E:/视频教程", "E:/Games/Videos"],
+"VideoPathVisualArr" : ["/DVideos", "/EVideos", "/ETelevision", "/EAnime", "/EDocumentary", "/ETutorialVideos", "/EGameVideos"]
+}
