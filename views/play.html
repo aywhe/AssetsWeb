@@ -6,10 +6,10 @@
 <link rel="stylesheet" href="css/play.css" />
 </head>
 <body>
+    <script src="js/flv.min.js"></script>
     <script>
         const videoExtMap = new Map([
             ['mp4','video/mp4'],
-            ['flv','video/flv'],
         ]);
         var queryString = window.location.search;
         var urlParams = new URLSearchParams(queryString);
@@ -28,6 +28,17 @@
     var videoSourceElement = document.getElementById("video_source");
     videoSourceElement.src = fullPath;
     videoSourceElement.type = videoExtMap.get(ext);
+    // flv
+    if('flv' === ext && flvjs.isSupported()){
+        const video = document.getElementById('video');
+        const flvPlayer = flvjs.createPlayer({
+            type: 'flv',
+            url: fullPath
+        });
+        flvPlayer.attachMediaElement(video);
+        flvPlayer.load();
+        flvPlayer.play();
+    }
 </script>
 
 </body>

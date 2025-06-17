@@ -188,32 +188,7 @@ app.get('/videos/:type', (req, res) => {
 
 // 播放页面
 app.get('/play', (req, res) => {
-  const fullPath = req.query.path;
-  if (!fullPath) return res.status(400).send('缺少路径参数');
-
-  const videoUrlPath = fullPath; // URL 路径保持使用 /
-  var ext = fullPath.substring(fullPath.lastIndexOf('.')+1);
-    const html = `
-      <!DOCTYPE html>
-      <html lang="zh">
-      <head>
-        <meta charset="UTF-8" />
-        <title>正在播放 ${fullPath}</title>
-        <link rel="stylesheet" href="css/play.css" />
-      </head>
-      <body>
-        <div>
-          <h2>正在播放：${fullPath}</h2>
-          <video controls autoplay>
-            <source src="${videoUrlPath}" type="video/${ext}">
-            您的浏览器不支持视频播放。
-          </video>
-        </div>
-      </body>
-      </html>
-    `;
-  
-  res.send(html);
+  res.sendFile(path.join(__dirname, 'views','play.html'));
 });
 
 /**
