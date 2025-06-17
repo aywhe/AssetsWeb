@@ -1,4 +1,3 @@
-// version 1.0 wwy 20250616
 // server.js
 const express = require('express');
 const fs = require('fs');
@@ -8,28 +7,21 @@ const app = express();
 //////////////////////// global datas ///////////////////////////////////
 const PORT = 3000;
 const PicturePath = 'D:/Users/aywhe/Pictures/Pictures'; // 图片位置
-const VideoPathArr = ['D:/Users/aywhe/Videos', 'E:/电影']; // 不同视频位置
-const VideoPathVisualArr = ['/DVideos', '/EVideos']; // 不同视频位置的虚拟目录
-const VideoPathTag = ['DV', 'EV']; // 不同视频位置有不同的标记名称
+const VideoPathArr = ['D:/Users/aywhe/Videos', 'E:/电影', 'E:/电视剧', 'E:/动漫', 'E:/纪录片', 'E:/视频教程']; // 不同视频位置
+const VideoPathVisualArr = ['/DVideos', '/EVideos', '/ETelevision', '/EAnime', '/EDocumentary', '/ETutorialVideos']; // 不同视频位置的虚拟目录
 const VideoFilter = ['.mp4','.flv','.mkv','.rmvb'];
+const ImageExts = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', 'webp'];
 
 let allImages = []; // 存储所有图片路径
-var VideoPathNum = 1; // 视频位置数量
-var VideoNameList = []; // 视频文件名列表
+var VideoNameList = new Map(); // 视频文件名列表
 var VideoPathTagMap = new Map(); // 不同视频位置有不同的标记名称
 
 //////////////////////// tool functions /////////////////////////////////
 
 // 检验文件名的后缀是否符合
 function matchFilterName(name, filter){
-  name = name.toLowerCase();
-  for(let i = 0; i < filter.length; i++){
-      item = filter[i].toLowerCase();
-      if(item.length < name.length && item === name.slice(-item.length)){
-          return true;
-      }
-  };
-  return false;
+  const ext = path.extname(name).toLowerCase();
+  return filter.includes(ext);
 }
 
 // 获取文件及其子文件的文件名
@@ -74,35 +66,29 @@ function shuffleArray(arr){
 ////////////////////////// 运行脚本 //////////////////////////////////////
 // 初始化工作
 function initDatas(){
-  assert(VideoPathVisualArr.length == VideoPathArr.length && VideoPathArr.length == VideoPathTag.length,'目录数量必需相同');
-  VideoPathNum = VideoPathVisualArr.length;
-  for(let i = 0; i < VideoPathNum; i++){
-    if (!fs.existsSync(VideoPathArr[i])) {
-      VideoPathNum = i;
-      break;
+  assert(VideoPathVisualArr.length == VideoPathArr.length,'目录数量必需相同');
+  
+  for(let i = 0; i < VideoPathArr.length; i++){
+    if (fs.existsSync(VideoPathArr[i])) {
+      VideoPathTagMap.set(VideoPathVisualArr[i], VideoPathArr[i]);
     }
   }
-  assert(VideoPathNum > 0, "必需有视频目录存在");
+
   assert(fs.existsSync(PicturePath), "图片目录不存在");
 
   // 设置静态资源目录
   app.use(express.static('public'));
   app.use('/images', express.static(PicturePath));  
   // app use
-  for(let i = 0; i < VideoPathNum; i++){
-    app.use(VideoPathVisualArr[i], express.static(VideoPathArr[i]));
-  }
+  VideoPathTagMap.forEach((val, key) => {app.use(key, express.static(val));});
 
   // 调用函数读取指定目录
-  for(let i = 0; i < VideoPathNum; i++){
-    const videolist = getFilesAndFoldersInDir(VideoPathArr[i],VideoFilter);
-    VideoNameList.push(videolist);
+  VideoPathTagMap.forEach((val, key) => {
+    const videolist = getFilesAndFoldersInDir(val, VideoFilter);
+    VideoNameList.set(key, videolist);
+    console.log(val);
     console.log(JSON.stringify(videolist, null, 2));
-  }
-  // 不同目录的索引位置
-  for(let i = 0; i < VideoPathNum; i++){
-    VideoPathTagMap.set(VideoPathTag[i], i);
-  }
+  });
 }
 // 初始化工作
 initDatas();
@@ -123,10 +109,10 @@ function buildTreeHtml(nodes, pathTag, currentPath = []) {
           `;
         } else {
           // 文件节点，生成带完整路径的链接
-          const fullPath = newPath.join('/');
+          var fullPath = pathTag + '/' + newPath.join('/');
           return `
             <li>
-              <a href="/play?pathTag=${pathTag}&path=${encodeURIComponent(fullPath)}">${node.name}</a>
+              <a href="/play?path=${encodeURIComponent(fullPath)}">${node.name}</a>
             </li>
           `;
         }
@@ -136,7 +122,7 @@ function buildTreeHtml(nodes, pathTag, currentPath = []) {
 }
 
 function makeVideoTreeHtml(pathTag){
-  const videoList = VideoNameList[VideoPathTagMap.get(pathTag)];
+  const videoList = VideoNameList.get(pathTag);
   const treesHtml = videoList.map((node, index) => `
     <div class="tree-root">
       <h3>${index + 1}: ${node.name} (${node.type})</h3>
@@ -149,16 +135,10 @@ function makeVideoTreeHtml(pathTag){
     <head>
       <meta charset="UTF-8" />
       <title>视频列表</title>
-      <style>
-        ul { list-style-type: none; padding-left: 20px; }
-        li { margin: 5px 0; }
-        a { text-decoration: none; color: blue; cursor: pointer; }
-        .tree-root { margin-bottom: 2em; border: 1px solid #ddd; padding: 1em; border-radius: 8px; background: #f9f9f9; }
-        h3 { margin-top: 0; color: #333; }
-      </style>
+      <link rel="stylesheet" href="css/assert-tree.css" />
     </head>
     <body>
-      <h1>树状结构 - 视频播放器</h1>
+      <h1>文件列表</h1>
       ${treesHtml}
     </body>
     </html>
@@ -166,11 +146,41 @@ function makeVideoTreeHtml(pathTag){
   return html;
 }
 
-// 主页 - 展示树结构
+//
+app.get('/', (req, res) => {
+  var lis = [];
+  VideoPathTagMap.forEach((val, key) => {
+    var li = '<li>'+ '<a href="/videos' + key + '">' + key + '</a></li>';
+    lis.push(li);
+  });
+  const treesHtml = '<ul>' + lis.join('') + '</ul>';
+  const html = `
+    <!DOCTYPE html>
+    <html lang="zh">
+    <head>
+      <meta charset="UTF-8" />
+      <title>位置列表</title>
+      <link rel="stylesheet" href="css/assert-tree.css" />
+    </head>
+    <body>
+      <h1>位置列表</h1>
+      ${treesHtml}
+    </body>
+    </html>
+  `;
+  res.send(html);
+});
+
 app.get('/videos', (req, res) => {
-  var pathTag = VideoPathTag[0];
-  if(VideoPathTagMap.has(req.query.pathTag)){
-    pathTag = req.query.pathTag;
+  res.redirect('/videos'+VideoPathVisualArr[0]);
+});
+
+// 主页 - 展示树结构
+app.get('/videos/:type', (req, res) => {
+  const { type } = req.params;
+  var pathTag = VideoPathVisualArr[0];
+  if(VideoPathTagMap.has('/'+type)){
+    pathTag = '/'+type;
   }
   var html = makeVideoTreeHtml(pathTag);
   res.send(html);
@@ -179,21 +189,9 @@ app.get('/videos', (req, res) => {
 // 播放页面
 app.get('/play', (req, res) => {
   const fullPath = req.query.path;
-  const pathTag = req.query.pathTag;
   if (!fullPath) return res.status(400).send('缺少路径参数');
-  if (!pathTag) return res.status(400).send('缺少位置参数');
-  if(!VideoPathTagMap.has(pathTag)) return res.status(400).send('位置参数错误');
-  // 将路径转换为实际的文件系统路径
-  const pathIdx = VideoPathTagMap.get(pathTag);
-  const videoFilePath = path.join(VideoPathArr[pathIdx], fullPath);//.replace(/\//g, '\\')); // 将 / 替换为 \
 
-  // 检查文件是否存在
-  const fs = require('fs');
-  if (!fs.existsSync(videoFilePath)) {
-    return res.status(404).send('文件不存在');
-  }
-
-  const videoUrlPath = `${VideoPathVisualArr[pathIdx]}/${fullPath}`; // URL 路径保持使用 /
+  const videoUrlPath = fullPath; // URL 路径保持使用 /
   var ext = fullPath.substring(fullPath.lastIndexOf('.')+1);
     const html = `
       <!DOCTYPE html>
@@ -201,10 +199,7 @@ app.get('/play', (req, res) => {
       <head>
         <meta charset="UTF-8" />
         <title>正在播放 ${fullPath}</title>
-        <style>
-          body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #111; color: white; }
-          video { width: 80%; max-width: 800px; }
-        </style>
+        <link rel="stylesheet" href="css/play.css" />
       </head>
       <body>
         <div>
@@ -238,7 +233,7 @@ function readImagesFromDir(dirPath) {
     } else {
       // 只添加图片文件
       const ext = path.extname(file).toLowerCase();
-      if (['.jpg', '.jpeg', '.png', '.gif', '.bmp'].includes(ext)) {
+      if (ImageExts.includes(ext)) {
         // 添加相对URL路径
         const relativePath = path.relative(PicturePath, filePath)
           .replace(/\\/g, '/'); // Windows兼容
