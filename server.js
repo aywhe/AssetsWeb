@@ -6,11 +6,13 @@ const app = express();
 
 //////////////////////// global datas ///////////////////////////////////
 const PORT = 3000;
-const PicturePath = 'D:/Users/aywhe/Pictures/Pictures'; // 图片位置
-const VideoPathArr = ['D:/Users/aywhe/Videos', 'E:/电影', 'E:/电视剧', 'E:/动漫', 'E:/纪录片', 'E:/视频教程']; // 不同视频位置
-const VideoPathVisualArr = ['/DVideos', '/EVideos', '/ETelevision', '/EAnime', '/EDocumentary', '/ETutorialVideos']; // 不同视频位置的虚拟目录
+const ConfigFilePath = 'assets_config.json';
 const VideoFilter = ['.mp4','.flv','.mkv','.rmvb'];
 const ImageExts = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', 'webp'];
+
+var PicturePath = 'D:/Users/aywhe/Pictures/Pictures'; // 图片位置
+var VideoPathArr = ['D:/Users/aywhe/Videos']; // 不同视频位置
+var VideoPathVisualArr = ['/DVideos']; // 不同视频位置的虚拟目录
 
 let allImages = []; // 存储所有图片路径
 var VideoNameList = new Map(); // 视频文件名列表
@@ -63,9 +65,30 @@ function shuffleArray(arr){
   return arr;
 }
 
-////////////////////////// 运行脚本 //////////////////////////////////////
+
+////////////////////////// running functions //////////////////////////////////////
+
+// 读取配置文件信息
+function initConfig(){
+  if(fs.existsSync(ConfigFilePath)){
+    try{
+      console.log('reading config from ' + ConfigFilePath);
+      const content = fs.readFileSync(ConfigFilePath, 'utf8');
+      console.log(content);
+      const data = JSON.parse(content);
+      PicturePath = data.PicturePath; // 图片位置
+      VideoPathArr = data.VideoPathArr; // 不同视频位置
+      VideoPathVisualArr = data.VideoPathVisualArr; // 不同视频位置的虚拟目录
+    }catch (err) {
+      console.error('读取配置信息失败', err);
+    }
+  }else{
+    console.log('config file ' + ConfigFilePath + 'is not found, use default config.');
+  }
+}
 // 初始化工作
 function initDatas(){
+
   assert(VideoPathVisualArr.length == VideoPathArr.length,'目录数量必需相同');
   
   for(let i = 0; i < VideoPathArr.length; i++){
@@ -86,12 +109,11 @@ function initDatas(){
   VideoPathTagMap.forEach((val, key) => {
     const videolist = getFilesAndFoldersInDir(val, VideoFilter);
     VideoNameList.set(key, videolist);
-    console.log(val);
-    console.log(JSON.stringify(videolist, null, 2));
+    console.log(' ' + key + ' => ' + val);
+    //console.log(JSON.stringify(videolist, null, 2));
   });
 }
-// 初始化工作
-initDatas();
+
 
 
 // 递归生成 HTML 树结构
@@ -219,9 +241,6 @@ function readImagesFromDir(dirPath) {
   });
 }
 
-// 初始化时读取所有图片
-readImagesFromDir(PicturePath);
-
 
 // 获取所有图片列表接口（用于slideshow）
 app.get('/api/all-images', (req, res) => {
@@ -233,9 +252,14 @@ app.get('/imageshow', (req, res) => {
   allImages = shuffleArray(allImages);
   res.sendFile(path.join(__dirname, 'views', 'imageshow.html'));
 });
-
+////////////////////////// 运行脚本 ////////////////////////////////////
+// 初始化工作
+initConfig();
+initDatas();
+// 初始化时读取所有图片
+readImagesFromDir(PicturePath);
 // 启动服务器
 app.listen(PORT, () => {
   console.log(`服务器运行在 http://localhost:${PORT}`);
-  console.log(`找到 ${allImages.length} 张图片`);
+  console.log(`${PicturePath} 找到 ${allImages.length} 张图片`);
 });
