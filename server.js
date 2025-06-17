@@ -80,7 +80,7 @@ function initConfig(){
       VideoPathArr = data.VideoPathArr; // 不同视频位置
       VideoPathVisualArr = data.VideoPathVisualArr; // 不同视频位置的虚拟目录
     }catch (err) {
-      console.error('读取配置信息失败', err);
+      console.error('读取配置信息失败，将使用默认配置', err);
     }
   }else{
     console.log('config file ' + ConfigFilePath + 'is not found, use default config.');
