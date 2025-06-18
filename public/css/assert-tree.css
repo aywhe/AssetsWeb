@@ -1,27 +1,55 @@
-ul {
-    list-style-type: none;
-    padding-left: 20px;
-}
-
-li {
-    margin: 5px 0;
-}
-
 a {
     text-decoration: none;
     color: blue;
     cursor: pointer;
 }
 
-.tree-root {
-    margin-bottom: 2em;
-    border: 1px solid #ddd;
-    padding: 1em;
-    border-radius: 8px;
-    background: #f9f9f9;
-}
-
 h3 {
     margin-top: 0;
     color: #333;
+}
+
+/* 外层容器 */
+.tree-root {
+    font-family: Arial, sans-serif;
+    margin: 20px auto;
+    justify-content: left;
+}
+
+/* 主列表样式 */
+.tree-root ul {
+    list-style: none;
+    /* 去掉默认小圆点 */
+    padding: 0;
+    margin: 0;
+}
+
+/* 列表项基础样式 */
+.tree-root li {
+    padding: 10px 15px;
+    margin: 4px 0;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+/* 悬停效果 */
+.tree-root li:hover {
+    background-color: #e0e0e0;
+}
+
+/* 子列表缩进 */
+.tree-root li ul {
+    margin-top: 6px;
+    margin-left: 20px;
+    /* 缩进表示层级 */
+    padding-left: 10px;
+    border-left: 2px solid #ccc;
+    /* 可选：加个边框更清晰 */
+}
+
+/* 子列表项的小调整 */
+.tree-root li ul li {
+    background-color: #fbfbfb;
 }

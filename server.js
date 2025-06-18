@@ -226,11 +226,13 @@ function makeVideoTreeHtml(pathTag, videoList){
     <head>
       <meta charset="UTF-8" />
       <title>视频列表</title>
-      <link rel="stylesheet" href="css/assert-tree.css" />
+      <link rel="stylesheet" href="../css/assert-tree.css" />
     </head>
     <body>
+    <div class="tree-root">
       <h1>文件列表</h1>
       ${treesHtml}
+    </div>
     </body>
     </html>
   `;
@@ -254,8 +256,10 @@ app.get('/videos', (req, res) => {
       <link rel="stylesheet" href="css/assert-tree.css" />
     </head>
     <body>
+    <div class="tree-root">
       <h1>位置列表</h1>
       ${treesHtml}
+    </div>
     </body>
     </html>
   `;

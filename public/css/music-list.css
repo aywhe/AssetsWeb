@@ -56,7 +56,7 @@ audio {
     display: flex;
     justify-content: left;
     margin: 20px 0;
-    
+    flex-wrap: wrap;
 }
 
 .pagination button {
