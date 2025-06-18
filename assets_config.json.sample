@@ -1,4 +1,11 @@
 {
+    "AudioPathTagMap" : {
+        "vpic": "playaudio.jpg",
+        "paths":[
+            {"path":"E:/音乐", "vpath":"/eaudios"},
+            {"path":"D:/Users/aywhe/Music", "vpath":"/daudios"}
+        ]
+    },
     "PicturePathTagMap" : {
         "vpic": "imageshow.jpg",
         "paths":[

@@ -9,20 +9,27 @@ const PORT = 3000;
 const ConfigFilePath = 'assets_config.json';
 const VideoFilter = ['.mp4','.flv','.mkv','.rmvb'];
 const ImageExts = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', 'webp'];
+const AudioExts = ['.mp3', '.wma'];
 
-
+// 图片
 var PicturePathTagMap = {
   images:[], // 存储所有图片路径
   vpic: 'imageshow.jpg', // 图片位置的虚拟目录中卡片图片位置
-  paths: [{path: 'D:/Users/aywhe/Pictures/Pictures', vpath: 'dimages'}]
-}; // 不同视频位置有不同的标记名称
+  paths: [{path: 'D:/Users/aywhe/Pictures/Pictures', vpath: 'dimages'}] // 不同位置有不同的标记名称
+}; 
 
-
-//let allImages = []; // 存储所有图片路径
+// 视频
 var VideoNameList = new Map(); // 视频文件名列表
 var VideoPathTagMap = new Map([
   ['DVideos', {path: 'D:/Users/aywhe/Videos', vpath: 'DVideos', vpic: 'DVideos.png'}]
 ]); // 不同视频位置有不同的标记名称
+
+// 音频
+var AudioPathTagMap = {
+  audios:[], // 存储所有路径
+  vpic: 'playaudio.jpg', // 音频位置的虚拟目录中卡片图片位置
+  paths: [{path: 'D:/Users/aywhe/Music', vpath: 'daudios'}] // 不同位置有不同的标记名称
+}; 
 
 //////////////////////// tool functions /////////////////////////////////
 
@@ -78,14 +85,15 @@ function shuffleArray(arr){
  */
 function readVpathFileFromDir(dirPath, exts, vpath, vroot) {
   const files = fs.readdirSync(dirPath);
-  
+  var data = [];
   files.forEach(file => {
     const filePath = path.join(dirPath, file);
     const stat = fs.statSync(filePath);
     
     if (stat.isDirectory()) {
       // 如果是子目录，递归处理
-      readVpathFileFromDir(filePath, exts, vpath, vroot);
+      var indata = readVpathFileFromDir(filePath, exts, vpath, vroot);
+      Array.prototype.push.apply(data, indata);
     } else {
       // 只添加图片文件
       const ext = path.extname(file).toLowerCase();
@@ -94,10 +102,11 @@ function readVpathFileFromDir(dirPath, exts, vpath, vroot) {
         const relativePath = path.relative(vroot, filePath)
           .replace(/\\/g, '/'); // Windows兼容
         
-          PicturePathTagMap.images.push(`${vpath}/${relativePath}`);
+          data.push(`${vpath}/${relativePath}`);
       }
     }
   });
+  return data;
 }
 
 ////////////////////////// running functions //////////////////////////////////////
@@ -112,6 +121,8 @@ function initConfig(){
       const data = JSON.parse(content);
       PicturePathTagMap = data.PicturePathTagMap;
       PicturePathTagMap.images = [];
+      AudioPathTagMap = data.AudioPathTagMap;
+      AudioPathTagMap.audios = [];
       VideoPathTagMap = new Map(Object.entries(data.VideoPathTagMap));
     }catch (err) {
       console.error('读取配置信息失败，将使用默认配置', err);
@@ -141,10 +152,24 @@ function initDatas(){
       app.use(val.vpath, express.static(val.path));  
       // 初始化时读取所有图片
       console.log(val.path);
-      readVpathFileFromDir(val.path, ImageExts, val.vpath, val.path);
+      const indata = readVpathFileFromDir(val.path, ImageExts, val.vpath, val.path);
+      Array.prototype.push.apply(PicturePathTagMap.images, indata);
     }
   });
   console.log('找到 ' + PicturePathTagMap.images.length + ' 张图片');
+
+  // 读取音频文件名
+  console.log('use audio paths bellow: ')
+  AudioPathTagMap.paths.forEach((val) => {
+    if(fs.existsSync(val.path)){
+      app.use(val.vpath, express.static(val.path));  
+      // 初始化时读取所有图片
+      console.log(val.path);
+      const indata = readVpathFileFromDir(val.path, AudioExts, val.vpath, val.path);
+      Array.prototype.push.apply(AudioPathTagMap.audios, indata);
+    }
+  });
+  console.log('找到 ' + AudioPathTagMap.audios.length + ' 个音频文件');
 
   // app use
   VideoPathTagMap.forEach((val, key) => {app.use(val.vpath, express.static(val.path));});
@@ -243,6 +268,11 @@ app.get('/api/server-content', (req, res) => {
     let PicContent = {uri:'/imageshow', imguri:'/images/' + PicturePathTagMap.vpic, til:'/imageshow'};
     content.push(PicContent);
   }
+  if(AudioPathTagMap.audios.length > 0){
+    let PicContent = {uri:'/music', imguri:'/images/' + AudioPathTagMap.vpic, til:'/playmusic'};
+    content.push(PicContent);
+  }
+  
   VideoPathTagMap.forEach((val, key) => {
     const ele = {uri:'/videos/' + key, imguri:'/images/' + val.vpic, til: '/' + key};
     content.push(ele);
@@ -267,11 +297,38 @@ app.get('/videos/:type', (req, res) => {
   }
 });
 
-// 播放页面
+// 播放视频页面
 app.get('/play', (req, res) => {
   res.sendFile(path.join(__dirname, 'views','play.html'));
 });
 
+app.get('/music',(req, res) => {
+  if(AudioPathTagMap.audios.length > 0){
+    res.sendFile(path.join(__dirname, 'views', 'music.html'));
+  }else{
+    res.send('没有音频可以播放');
+  }
+});
+
+app.get('/api/page-music', (req, res) => {
+  if(AudioPathTagMap.audios.length > 0){
+    const total = AudioPathTagMap.audios.length;
+    const page = parseInt(req.query.page);
+    const pageSize = parseInt(req.query.pageSize);
+    if(page <= 0) {page = 1;}
+    if(pageSize <=0) {pageSize = 10;}
+    var startId = (page - 1) * pageSize;
+    if(startId < 0 || startId >= total) {startId = 0;}
+    var endId = startId + pageSize;
+    if(endId <= 0 || endId > total) {endId = total;}
+    //console.log(page + ',' + pageSize + ',' + startId + ',' + endId);
+    var sendData = AudioPathTagMap.audios.slice(startId, endId);
+    //console.log('send ' + sendData.length + ' audios')
+    res.json({audios: sendData, total: total});
+  }else{
+    res.send('没有音频可以播放');
+  }  
+});
 
 
 // 获取所有图片列表接口（用于slideshow）

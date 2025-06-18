@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>播放音乐</title>
+    <link rel="stylesheet" href="css/music-list.css" />
+</head>
+
+<body>
+
+    <h1>播放音乐</h1>
+
+    <!-- 音频播放器 -->
+    <div><audio id="audioPlayer" controls></audio></div>
+
+    <!-- 音乐列表 -->
+    <div class="music-list" id="musicList"></div>
+
+    <!-- 分页按钮 -->
+    <div class="pagination" id="pagination"></div>
+    <script>
+        function getFileName(filePath) {
+            var lastSlashIndex = filePath.lastIndexOf('/');
+            if (lastSlashIndex == -1) { lastSlashIndex = filePath.lastIndexOf('\\'); }
+            if (lastSlashIndex == -1) { return filePath; }
+            return filePath.substring(lastSlashIndex + 1);
+        }        
+    </script>
+    <script>
+        let currentPage = 1;
+        let totalPage = 1;
+        let totalItems = 10; // 总条目数
+        const itemsPerPage = 10; // 每页显示条目数
+        const visiblePages = 10; // 可见页码数量
+
+        //获取音乐数据
+        async function fetchMusic(page = 1) {
+            try {
+                const res = await fetch(`/api/page-music?page=${page}&pageSize=${itemsPerPage}`);
+                const data = await res.json();
+                totalItems = data.total;
+                renderMusicList(data.audios);
+                renderPagination();
+            } catch (err) {
+                console.error("获取音乐数据失败:", err);
+            }
+        }
+
+        // 渲染音乐列表
+        function renderMusicList(musicArray) {
+            const musicListEl = document.getElementById('musicList');
+            musicListEl.innerHTML = '';
+            let ul = document.createElement('ul');
+            musicArray.forEach(music => {
+                const li = document.createElement('li');
+                li.className = 'music-item';
+                li.innerHTML = getFileName(music);
+                li.onclick = () => {
+                    try{
+                        playMusic(music);
+                    }catch(error){
+                        console.log(error.message, error);
+                        alert('播放失败，可能是不支持的格式');
+                    }
+                };
+                ul.appendChild(li);
+            });
+            musicListEl.appendChild(ul);
+        }
+
+        // 播放音乐
+        function playMusic(url) {
+            const audioPlayer = document.getElementById('audioPlayer');
+            audioPlayer.src = url;
+            audioPlayer.play();
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const paginationContainer = document.getElementById('pagination');
+            paginationContainer.innerHTML = '';
+
+            // 计算起始页码和结束页码
+            let startPage = Math.max(currentPage - Math.floor(visiblePages / 2), 1);
+            let endPage = Math.min(startPage + visiblePages - 1, totalPages);
+
+            // 如果总页数少于可见页码数，则从第一页开始显示
+            if (totalPages <= visiblePages) {
+                startPage = 1;
+                endPage = totalPages;
+            }
+
+            // 添加“首页”按钮
+            if (currentPage > 1) {
+                addPaginationButton(1, '<<', () => gotoPage(1));
+            } else {
+                addPaginationButton(1, '<<', null, true);
+            }
+
+            // 添加“上一页”按钮
+            if (currentPage > 1) {
+                addPaginationButton(currentPage - 1, '<', () => gotoPage(currentPage - 1));
+            } else {
+                addPaginationButton(currentPage - 1, '<', null, true);
+            }
+
+            // 添加省略号（如果需要）
+            if (startPage > 2) {
+                addPaginationButton(null, '...', null, true);
+            }
+
+            // 添加页码按钮
+            for (let i = startPage; i <= endPage; i++) {
+                addPaginationButton(i, i, () => gotoPage(i), i === currentPage);
+            }
+
+            // 添加省略号（如果需要）
+            if (endPage < totalPages - 1) {
+                addPaginationButton(null, '...', null, true);
+            }
+
+            // 添加“下一页”按钮
+            if (currentPage < totalPages) {
+                addPaginationButton(currentPage + 1, '>', () => gotoPage(currentPage + 1));
+            } else {
+                addPaginationButton(currentPage + 1, '>', null, true);
+            }
+
+            // 添加“末页”按钮
+            if (currentPage < totalPages) {
+                addPaginationButton(totalPages, '>>', () => gotoPage(totalPages));
+            } else {
+                addPaginationButton(totalPages, '>>', null, true);
+            }            
+        }
+
+        function addPaginationButton(page, text, onClick, disabled = false) {
+            const button = document.createElement('button');
+            button.textContent = text;
+            if (disabled) {
+                button.classList.add('disabled');
+            } else {
+                button.addEventListener('click', onClick);
+            }
+            if (page === currentPage) {
+                button.classList.add('active');
+            }
+            document.getElementById('pagination').appendChild(button);
+        }
+
+        function gotoPage(page) {
+            currentPage = page;
+            fetchMusic(page);
+        }
+
+        // 初始化加载第一页
+        gotoPage(currentPage);
+    </script>
+</body>
+
+</html>
