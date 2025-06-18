@@ -1,5 +1,6 @@
 {
     "PicturePath" : "D:/Users/aywhe/Pictures/Pictures",
+    "PicturePathPic" : "imageshow.jpg",
     "VideoPathTagMap" : {
         "DVideos":{
             "path" : "D:/Users/aywhe/Videos", "vpath" : "/DVideos", "vpic" : "DVideos.png"

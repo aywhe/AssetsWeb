@@ -11,6 +11,8 @@ const VideoFilter = ['.mp4','.flv','.mkv','.rmvb'];
 const ImageExts = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', 'webp'];
 
 var PicturePath = 'D:/Users/aywhe/Pictures/Pictures'; // 图片位置
+var PictureVisualPath = '/ImageShow'; // 图片位置的虚拟目录
+var PicturePathPic = 'imageshow.jpg'; // 图片位置的虚拟目录中卡片图片位置
 
 let allImages = []; // 存储所有图片路径
 var VideoNameList = new Map(); // 视频文件名列表
@@ -76,8 +78,9 @@ function initConfig(){
       const content = fs.readFileSync(ConfigFilePath, 'utf8');
       console.log(content);
       const data = JSON.parse(content);
-      VideoPathTagMap = new Map(Object.entries(data.VideoPathTagMap));
       PicturePath = data.PicturePath; // 图片位置
+      PicturePathPic = data.PicturePathPic;
+      VideoPathTagMap = new Map(Object.entries(data.VideoPathTagMap));
     }catch (err) {
       console.error('读取配置信息失败，将使用默认配置', err);
     }
@@ -98,7 +101,7 @@ function initDatas(){
 
   // 设置静态资源目录
   app.use(express.static('public'));
-  app.use('/images', express.static(PicturePath));  
+  app.use(PictureVisualPath, express.static(PicturePath));  
   // app use
   VideoPathTagMap.forEach((val, key) => {app.use(val.vpath, express.static(val.path));});
 
@@ -192,10 +195,10 @@ app.get('/videos', (req, res) => {
 
 app.get('/api/server-content', (req, res) => {
   let content = [];
-  let PicContent = {uri:'/imageshow', imguri:'/images/pic_card.png', til:'/imageshow'};
+  let PicContent = {uri:'/imageshow', imguri:'/images/' + PicturePathPic, til:'/imageshow'};
   content.push(PicContent);
   VideoPathTagMap.forEach((val, key) => {
-    const ele = {uri:'/videos/' + key, imguri:'/images/pic_card.png', til: '/' + key};
+    const ele = {uri:'/videos/' + key, imguri:'/images/' + val.vpic, til: '/' + key};
     content.push(ele);
   });
   res.json(content);
@@ -245,7 +248,7 @@ function readImagesFromDir(dirPath) {
         const relativePath = path.relative(PicturePath, filePath)
           .replace(/\\/g, '/'); // Windows兼容
         
-        allImages.push(`/images/${relativePath}`);
+        allImages.push(`${PictureVisualPath}/${relativePath}`);
       }
     }
   });
