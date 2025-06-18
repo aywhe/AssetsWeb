@@ -97,11 +97,15 @@ function initDatas(){
     }
   }
 
-  assert(fs.existsSync(PicturePath), "图片目录不存在");
+  //assert(fs.existsSync(PicturePath), "图片目录不存在");
 
   // 设置静态资源目录
   app.use(express.static('public'));
-  app.use(PictureVisualPath, express.static(PicturePath));  
+  if(!PicturePath === ''){
+    app.use(PictureVisualPath, express.static(PicturePath));  
+    // 初始化时读取所有图片
+    readImagesFromDir(PicturePath);
+  }
   // app use
   VideoPathTagMap.forEach((val, key) => {app.use(val.vpath, express.static(val.path));});
 
@@ -195,8 +199,10 @@ app.get('/videos', (req, res) => {
 
 app.get('/api/server-content', (req, res) => {
   let content = [];
-  let PicContent = {uri:'/imageshow', imguri:'/images/' + PicturePathPic, til:'/imageshow'};
-  content.push(PicContent);
+  if(allImages.length > 0){
+    let PicContent = {uri:'/imageshow', imguri:'/images/' + PicturePathPic, til:'/imageshow'};
+    content.push(PicContent);
+  }
   VideoPathTagMap.forEach((val, key) => {
     const ele = {uri:'/videos/' + key, imguri:'/images/' + val.vpic, til: '/' + key};
     content.push(ele);
@@ -262,15 +268,17 @@ app.get('/api/all-images', (req, res) => {
 
 // 主页路由
 app.get('/imageshow', (req, res) => {
-  allImages = shuffleArray(allImages);
-  res.sendFile(path.join(__dirname, 'views', 'imageshow.html'));
+  if(!PicturePath === ''){
+    allImages = shuffleArray(allImages);
+    res.sendFile(path.join(__dirname, 'views', 'imageshow.html'));
+  }else{
+    res.send('没有图片可以显示');
+  }
 });
 ////////////////////////// 运行脚本 ////////////////////////////////////
 // 初始化工作
 initConfig();
 initDatas();
-// 初始化时读取所有图片
-readImagesFromDir(PicturePath);
 // 启动服务器
 app.listen(PORT, () => {
   console.log(`服务器运行在 http://localhost:${PORT}`);
