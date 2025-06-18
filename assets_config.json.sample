@@ -1,5 +1,26 @@
 {
-"PicturePath" : "D:/Users/aywhe/Pictures/Pictures",
-"VideoPathArr" : ["D:/Users/aywhe/Videos", "E:/电影", "E:/电视剧", "E:/动漫", "E:/纪录片", "E:/视频教程", "E:/Games/Videos"],
-"VideoPathVisualArr" : ["/DVideos", "/EVideos", "/ETelevision", "/EAnime", "/EDocumentary", "/ETutorialVideos", "/EGameVideos"]
+    "PicturePath" : "D:/Users/aywhe/Pictures/Pictures",
+    "VideoPathTagMap" : {
+        "DVideos":{
+            "path" : "D:/Users/aywhe/Videos", "vpath" : "/DVideos", "vpic" : "DVideos.png"
+        },
+        "EVideos":{
+            "path" : "E:/电影", "vpath" : "/EVideos", "vpic" : "EVideos.png"
+        },
+        "ETelevision":{
+            "path" : "E:/电视剧", "vpath" : "/ETelevision", "vpic" : "ETelevision.png"
+        },
+        "EAnime":{
+            "path" : "E:/动漫", "vpath" : "/EAnime", "vpic" : "EAnime.png"
+        },
+        "EDocumentary":{
+            "path" : "E:/纪录片", "vpath" : "/EDocumentary", "vpic" : "EDocumentary.png"
+        },
+        "ETutorialVideos":{
+            "path" : "E:/视频教程", "vpath" : "/ETutorialVideos", "vpic" : "ETutorialVideos.png"
+        },
+        "EGameVideos":{
+            "path" : "E:/Games/Videos", "vpath" : "/EGameVideos", "vpic" : "EGameVideos.png"
+        }
+    }
 }

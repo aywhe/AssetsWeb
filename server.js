@@ -11,12 +11,12 @@ const VideoFilter = ['.mp4','.flv','.mkv','.rmvb'];
 const ImageExts = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', 'webp'];
 
 var PicturePath = 'D:/Users/aywhe/Pictures/Pictures'; // 图片位置
-var VideoPathArr = ['D:/Users/aywhe/Videos']; // 不同视频位置
-var VideoPathVisualArr = ['/DVideos']; // 不同视频位置的虚拟目录
 
 let allImages = []; // 存储所有图片路径
 var VideoNameList = new Map(); // 视频文件名列表
-var VideoPathTagMap = new Map(); // 不同视频位置有不同的标记名称
+var VideoPathTagMap = new Map([
+  ['DVideos', {path: 'D:/Users/aywhe/Videos', vpath: 'DVideos', vpic: 'DVideos.png'}]
+]); // 不同视频位置有不同的标记名称
 
 //////////////////////// tool functions /////////////////////////////////
 
@@ -76,9 +76,8 @@ function initConfig(){
       const content = fs.readFileSync(ConfigFilePath, 'utf8');
       console.log(content);
       const data = JSON.parse(content);
+      VideoPathTagMap = new Map(Object.entries(data.VideoPathTagMap));
       PicturePath = data.PicturePath; // 图片位置
-      VideoPathArr = data.VideoPathArr; // 不同视频位置
-      VideoPathVisualArr = data.VideoPathVisualArr; // 不同视频位置的虚拟目录
     }catch (err) {
       console.error('读取配置信息失败，将使用默认配置', err);
     }
@@ -88,12 +87,10 @@ function initConfig(){
 }
 // 初始化工作
 function initDatas(){
-
-  assert(VideoPathVisualArr.length == VideoPathArr.length,'目录数量必需相同');
-  
-  for(let i = 0; i < VideoPathArr.length; i++){
-    if (fs.existsSync(VideoPathArr[i])) {
-      VideoPathTagMap.set(VideoPathVisualArr[i], VideoPathArr[i]);
+  // 删除无效的视频目录
+  for(let [key, val] of VideoPathTagMap){
+    if (!fs.existsSync(val.path)) {
+      VideoPathTagMap.delete(key);
     }
   }
 
@@ -103,13 +100,14 @@ function initDatas(){
   app.use(express.static('public'));
   app.use('/images', express.static(PicturePath));  
   // app use
-  VideoPathTagMap.forEach((val, key) => {app.use(key, express.static(val));});
+  VideoPathTagMap.forEach((val, key) => {app.use(val.vpath, express.static(val.path));});
 
   // 调用函数读取指定目录
+  console.log('use videos bellow: ')
   VideoPathTagMap.forEach((val, key) => {
-    const videolist = getFilesAndFoldersInDir(val, VideoFilter);
+    const videolist = getFilesAndFoldersInDir(val.path, VideoFilter);
     VideoNameList.set(key, videolist);
-    console.log(' ' + key + ' => ' + val);
+    console.log('' + key + ' => ' + val.path);
     //console.log(JSON.stringify(videolist, null, 2));
   });
 }
@@ -143,8 +141,7 @@ function buildTreeHtml(nodes, pathTag, currentPath = []) {
   `;
 }
 
-function makeVideoTreeHtml(pathTag){
-  const videoList = VideoNameList.get(pathTag);
+function makeVideoTreeHtml(pathTag, videoList){
   const treesHtml = videoList.map((node, index) => `
     <div class="tree-root">
       <h3>${index + 1}: ${node.name} (${node.type})</h3>
@@ -169,10 +166,10 @@ function makeVideoTreeHtml(pathTag){
 }
 
 //
-app.get('/', (req, res) => {
+app.get('/videos', (req, res) => {
   var lis = [];
   VideoPathTagMap.forEach((val, key) => {
-    var li = '<li>'+ '<a href="/videos' + key + '">' + key + '</a></li>';
+    var li = '<li>'+ '<a href="/videos/' + key + '">' + val.vpath + '</a></li>';
     lis.push(li);
   });
   const treesHtml = '<ul>' + lis.join('') + '</ul>';
@@ -193,19 +190,32 @@ app.get('/', (req, res) => {
   res.send(html);
 });
 
-app.get('/videos', (req, res) => {
-  res.redirect('/videos'+VideoPathVisualArr[0]);
+app.get('/api/server-content', (req, res) => {
+  let content = [];
+  let PicContent = {uri:'/imageshow', imguri:'/images/pic_card.png', til:'/imageshow'};
+  content.push(PicContent);
+  VideoPathTagMap.forEach((val, key) => {
+    const ele = {uri:'/videos/' + key, imguri:'/images/pic_card.png', til: '/' + key};
+    content.push(ele);
+  });
+  res.json(content);
+});
+
+app.get('/',(req, res) => {
+  res.sendFile(path.join(__dirname, 'views','index.html'));
 });
 
 // 主页 - 展示树结构
 app.get('/videos/:type', (req, res) => {
   const { type } = req.params;
-  var pathTag = VideoPathVisualArr[0];
-  if(VideoPathTagMap.has('/'+type)){
-    pathTag = '/'+type;
+  if(VideoPathTagMap.has(type)){
+    const videoList = VideoNameList.get(type);
+    var html = makeVideoTreeHtml(VideoPathTagMap.get(type).vpath, videoList);
+    res.send(html);
   }
-  var html = makeVideoTreeHtml(pathTag);
-  res.send(html);
+  else{
+    res.redirect('/videos');
+  }
 });
 
 // 播放页面

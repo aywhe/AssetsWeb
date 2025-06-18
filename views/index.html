@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8" />
+    <title>内容卡片</title>
+    <link rel="stylesheet" href="css/card.css" />
+</head>
+<body>
+    <h1>位置列表</h1><br/>
+    <div id="card_container"></div>
+    <script>
+        function getServerContent(){
+            fetch('/api/server-content')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('card_container');
+                    data.forEach((val, idx) => {
+                        const ele = document.createElement('div');
+                        ele.className = 'card';
+                        ele.innerHTML = `
+                            <a href="${val.uri}">
+                            <img src="${val.imguri}" alt="${val.imguri}">
+                            <div class="ribbon">${val.til}</div>
+                            </a>`;
+                        container.appendChild(ele);
+                    });
+                })
+                .catch(error => console.log(error.message,error));
+        }
+        // 获取列表
+        getServerContent();
+    </script>    
+</body>
+</html>
