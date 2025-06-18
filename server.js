@@ -285,7 +285,7 @@ app.get('/api/server-content', (req, res) => {
 });
 
 app.get('/',(req, res) => {
-  res.sendFile(path.join(__dirname, 'views','index.html'));
+  res.sendFile(path.join(__dirname, 'views','cards.html'));
 });
 
 // 主页 - 展示树结构
