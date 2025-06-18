@@ -10,9 +10,7 @@ body {
 
   .container{
     flex-wrap: wrap;
-    /* white-space: nowrap; */
-    padding: 40px;
-
+    padding: 20px;
   }
 
   .card {

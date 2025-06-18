@@ -1,5 +1,27 @@
-ul { list-style-type: none; padding-left: 20px; }
-li { margin: 5px 0; }
-a { text-decoration: none; color: blue; cursor: pointer; }
-.tree-root { margin-bottom: 2em; border: 1px solid #ddd; padding: 1em; border-radius: 8px; background: #f9f9f9; }
-h3 { margin-top: 0; color: #333; }
+ul {
+    list-style-type: none;
+    padding-left: 20px;
+}
+
+li {
+    margin: 5px 0;
+}
+
+a {
+    text-decoration: none;
+    color: blue;
+    cursor: pointer;
+}
+
+.tree-root {
+    margin-bottom: 2em;
+    border: 1px solid #ddd;
+    padding: 1em;
+    border-radius: 8px;
+    background: #f9f9f9;
+}
+
+h3 {
+    margin-top: 0;
+    color: #333;
+}

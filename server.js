@@ -10,11 +10,15 @@ const ConfigFilePath = 'assets_config.json';
 const VideoFilter = ['.mp4','.flv','.mkv','.rmvb'];
 const ImageExts = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', 'webp'];
 
-var PicturePath = 'D:/Users/aywhe/Pictures/Pictures'; // 图片位置
-var PictureVisualPath = '/ImageShow'; // 图片位置的虚拟目录
-var PicturePathPic = 'imageshow.jpg'; // 图片位置的虚拟目录中卡片图片位置
 
-let allImages = []; // 存储所有图片路径
+var PicturePathTagMap = {
+  images:[], // 存储所有图片路径
+  vpic: 'imageshow.jpg', // 图片位置的虚拟目录中卡片图片位置
+  paths: [{path: 'D:/Users/aywhe/Pictures/Pictures', vpath: 'dimages'}]
+}; // 不同视频位置有不同的标记名称
+
+
+//let allImages = []; // 存储所有图片路径
 var VideoNameList = new Map(); // 视频文件名列表
 var VideoPathTagMap = new Map([
   ['DVideos', {path: 'D:/Users/aywhe/Videos', vpath: 'DVideos', vpic: 'DVideos.png'}]
@@ -68,6 +72,34 @@ function shuffleArray(arr){
 }
 
 
+/**
+ * 递归读取图片目录
+ * @param {string} dirPath - 当前目录路径
+ */
+function readVpathFileFromDir(dirPath, exts, vpath, vroot) {
+  const files = fs.readdirSync(dirPath);
+  
+  files.forEach(file => {
+    const filePath = path.join(dirPath, file);
+    const stat = fs.statSync(filePath);
+    
+    if (stat.isDirectory()) {
+      // 如果是子目录，递归处理
+      readVpathFileFromDir(filePath, exts, vpath, vroot);
+    } else {
+      // 只添加图片文件
+      const ext = path.extname(file).toLowerCase();
+      if (exts.includes(ext)) {
+        // 添加相对URL路径
+        const relativePath = path.relative(vroot, filePath)
+          .replace(/\\/g, '/'); // Windows兼容
+        
+          PicturePathTagMap.images.push(`${vpath}/${relativePath}`);
+      }
+    }
+  });
+}
+
 ////////////////////////// running functions //////////////////////////////////////
 
 // 读取配置文件信息
@@ -78,8 +110,8 @@ function initConfig(){
       const content = fs.readFileSync(ConfigFilePath, 'utf8');
       console.log(content);
       const data = JSON.parse(content);
-      PicturePath = data.PicturePath; // 图片位置
-      PicturePathPic = data.PicturePathPic;
+      PicturePathTagMap = data.PicturePathTagMap;
+      PicturePathTagMap.images = [];
       VideoPathTagMap = new Map(Object.entries(data.VideoPathTagMap));
     }catch (err) {
       console.error('读取配置信息失败，将使用默认配置', err);
@@ -101,16 +133,24 @@ function initDatas(){
 
   // 设置静态资源目录
   app.use(express.static('public'));
-  if(fs.existsSync(PicturePath)){
-    app.use(PictureVisualPath, express.static(PicturePath));  
-    // 初始化时读取所有图片
-    readImagesFromDir(PicturePath);
-  }
+
+  // 读取图片文件名
+  console.log('use picture paths bellow: ')
+  PicturePathTagMap.paths.forEach((val) => {
+    if(fs.existsSync(val.path)){
+      app.use(val.vpath, express.static(val.path));  
+      // 初始化时读取所有图片
+      console.log(val.path);
+      readVpathFileFromDir(val.path, ImageExts, val.vpath, val.path);
+    }
+  });
+  console.log('找到 ' + PicturePathTagMap.images.length + ' 张图片');
+
   // app use
   VideoPathTagMap.forEach((val, key) => {app.use(val.vpath, express.static(val.path));});
 
   // 调用函数读取指定目录
-  console.log('use videos bellow: ')
+  console.log('use video paths bellow: ')
   VideoPathTagMap.forEach((val, key) => {
     const videolist = getFilesAndFoldersInDir(val.path, VideoFilter);
     VideoNameList.set(key, videolist);
@@ -199,8 +239,8 @@ app.get('/videos', (req, res) => {
 
 app.get('/api/server-content', (req, res) => {
   let content = [];
-  if(allImages.length > 0){
-    let PicContent = {uri:'/imageshow', imguri:'/images/' + PicturePathPic, til:'/imageshow'};
+  if(PicturePathTagMap.images.length > 0){
+    let PicContent = {uri:'/imageshow', imguri:'/images/' + PicturePathTagMap.vpic, til:'/imageshow'};
     content.push(PicContent);
   }
   VideoPathTagMap.forEach((val, key) => {
@@ -232,44 +272,17 @@ app.get('/play', (req, res) => {
   res.sendFile(path.join(__dirname, 'views','play.html'));
 });
 
-/**
- * 递归读取图片目录
- * @param {string} dirPath - 当前目录路径
- */
-function readImagesFromDir(dirPath) {
-  const files = fs.readdirSync(dirPath);
-  
-  files.forEach(file => {
-    const filePath = path.join(dirPath, file);
-    const stat = fs.statSync(filePath);
-    
-    if (stat.isDirectory()) {
-      // 如果是子目录，递归处理
-      readImagesFromDir(filePath);
-    } else {
-      // 只添加图片文件
-      const ext = path.extname(file).toLowerCase();
-      if (ImageExts.includes(ext)) {
-        // 添加相对URL路径
-        const relativePath = path.relative(PicturePath, filePath)
-          .replace(/\\/g, '/'); // Windows兼容
-        
-        allImages.push(`${PictureVisualPath}/${relativePath}`);
-      }
-    }
-  });
-}
 
 
 // 获取所有图片列表接口（用于slideshow）
 app.get('/api/all-images', (req, res) => {
-  res.json({ images: allImages });
+  res.json({ images: PicturePathTagMap.images });
 });
 
 // 主页路由
 app.get('/imageshow', (req, res) => {
-  if(allImages.length > 0){
-    allImages = shuffleArray(allImages);
+  if(PicturePathTagMap.images.length > 0){
+    PicturePathTagMap.images = shuffleArray(PicturePathTagMap.images);
     res.sendFile(path.join(__dirname, 'views', 'imageshow.html'));
   }else{
     res.send('没有图片可以显示');
@@ -282,5 +295,4 @@ initDatas();
 // 启动服务器
 app.listen(PORT, () => {
   console.log(`服务器运行在 http://localhost:${PORT}`);
-  console.log(`${PicturePath} 找到 ${allImages.length} 张图片`);
 });
