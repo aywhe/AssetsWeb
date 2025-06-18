@@ -101,7 +101,7 @@ function initDatas(){
 
   // 设置静态资源目录
   app.use(express.static('public'));
-  if(!PicturePath === ''){
+  if(fs.existsSync(PicturePath)){
     app.use(PictureVisualPath, express.static(PicturePath));  
     // 初始化时读取所有图片
     readImagesFromDir(PicturePath);
@@ -268,7 +268,7 @@ app.get('/api/all-images', (req, res) => {
 
 // 主页路由
 app.get('/imageshow', (req, res) => {
-  if(!PicturePath === ''){
+  if(allImages.length > 0){
     allImages = shuffleArray(allImages);
     res.sendFile(path.join(__dirname, 'views', 'imageshow.html'));
   }else{
