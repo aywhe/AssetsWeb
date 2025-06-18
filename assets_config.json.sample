@@ -1,6 +1,12 @@
 {
-    "PicturePath" : "D:/Users/aywhe/Pictures/Pictures",
-    "PicturePathPic" : "imageshow.jpg",
+    "PicturePathTagMap" : {
+        "vpic": "imageshow.jpg",
+        "paths":[
+            {"path":"D:/Users/aywhe/Pictures/Pictures/llz", "vpath":"/llz"},
+            {"path":"D:/Users/aywhe/Pictures/Pictures/icons", "vpath":"/icons"},
+            {"path":"D:/Users/aywhe/Pictures/Pictures/Uc", "vpath":"/Uc"}
+        ]
+    },
     "VideoPathTagMap" : {
         "DVideos":{
             "path" : "D:/Users/aywhe/Videos", "vpath" : "/DVideos", "vpic" : "DVideos.png"
