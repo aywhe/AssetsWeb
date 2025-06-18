@@ -1,40 +1,42 @@
 {
     "AudioPathTagMap" : {
-        "vpic": "playaudio.jpg",
+        "tag": "音乐",
+        "vpic": "playmusic.jpg",
         "paths":[
             {"path":"E:/音乐", "vpath":"/eaudios"},
+            {"path":"E:/Games/Audios/Deemo", "vpath":"edeemo"},
             {"path":"D:/Users/aywhe/Music", "vpath":"/daudios"}
         ]
     },
     "PicturePathTagMap" : {
+        "tag": "图片",
         "vpic": "imageshow.jpg",
         "paths":[
-            {"path":"D:/Users/aywhe/Pictures/Pictures/llz", "vpath":"/llz"},
-            {"path":"D:/Users/aywhe/Pictures/Pictures/icons", "vpath":"/icons"},
-            {"path":"D:/Users/aywhe/Pictures/Pictures/Uc", "vpath":"/Uc"}
+            {"path":"E:/图片", "vpath":"/eimages"},
+            {"path":"D:/Users/aywhe/Pictures/Pictures", "vpath":"/dimages"}
         ]
     },
     "VideoPathTagMap" : {
         "DVideos":{
-            "path" : "D:/Users/aywhe/Videos", "vpath" : "/DVideos", "vpic" : "DVideos.png"
+            "path" : "D:/Users/aywhe/Videos", "vpath" : "/DVideos", "vpic" : "DVideos.png", "tag":"电影"
         },
         "EVideos":{
-            "path" : "E:/电影", "vpath" : "/EVideos", "vpic" : "EVideos.png"
+            "path" : "E:/电影", "vpath" : "/EVideos", "vpic" : "EVideos.png", "tag": "电影"
         },
         "ETelevision":{
-            "path" : "E:/电视剧", "vpath" : "/ETelevision", "vpic" : "ETelevision.png"
+            "path" : "E:/电视剧", "vpath" : "/ETelevision", "vpic" : "ETelevision.png", "tag":"电视剧"
         },
         "EAnime":{
-            "path" : "E:/动漫", "vpath" : "/EAnime", "vpic" : "EAnime.png"
+            "path" : "E:/动漫", "vpath" : "/EAnime", "vpic" : "EAnime.png", "tag": "动漫"
         },
         "EDocumentary":{
-            "path" : "E:/纪录片", "vpath" : "/EDocumentary", "vpic" : "EDocumentary.png"
+            "path" : "E:/纪录片", "vpath" : "/EDocumentary", "vpic" : "EDocumentary.png", "tag": "纪录片"
         },
         "ETutorialVideos":{
-            "path" : "E:/视频教程", "vpath" : "/ETutorialVideos", "vpic" : "ETutorialVideos.png"
+            "path" : "E:/视频教程", "vpath" : "/ETutorialVideos", "vpic" : "ETutorialVideos.png", "tag": "视频教程"
         },
         "EGameVideos":{
-            "path" : "E:/Games/Videos", "vpath" : "/EGameVideos", "vpic" : "EGameVideos.png"
+            "path" : "E:/Games/Videos", "vpath" : "/EGameVideos", "vpic" : "EGameVideos.png", "tag": "游戏视频"
         }
     }
 }

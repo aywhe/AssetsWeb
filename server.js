@@ -269,16 +269,16 @@ app.get('/videos', (req, res) => {
 app.get('/api/server-content', (req, res) => {
   let content = [];
   if(PicturePathTagMap.images.length > 0){
-    let PicContent = {uri:'/imageshow', imguri:'/images/' + PicturePathTagMap.vpic, til:'/imageshow'};
+    let PicContent = {uri:'/imageshow', imguri:'/images/' + PicturePathTagMap.vpic, til: PicturePathTagMap.tag};
     content.push(PicContent);
   }
   if(AudioPathTagMap.audios.length > 0){
-    let PicContent = {uri:'/music', imguri:'/images/' + AudioPathTagMap.vpic, til:'/playmusic'};
+    let PicContent = {uri:'/music', imguri:'/images/' + AudioPathTagMap.vpic, til: AudioPathTagMap.tag};
     content.push(PicContent);
   }
   
   VideoPathTagMap.forEach((val, key) => {
-    const ele = {uri:'/videos/' + key, imguri:'/images/' + val.vpic, til: '/' + key};
+    const ele = {uri:'/videos/' + key, imguri:'/images/' + val.vpic, til: val.tag};
     content.push(ele);
   });
   res.json(content);
