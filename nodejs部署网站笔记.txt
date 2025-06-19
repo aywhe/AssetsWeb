@@ -28,3 +28,5 @@
         所以我将 Swiper 对象做成全局变量了，就不用每次都 new 一个新的的了。
         代码：
         if(g_wrapper === null){g_wrapper = new Swiper('.swiper-container');}
+4. 问题： 在<video>中不能播放mkv格式视频。
+   方法： 将 <video><source></video> 中的 <source> 中的type设置为空。因为mkv只是容器，具体编码未知，所以让解码器自己判断。

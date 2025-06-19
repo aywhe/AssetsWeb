@@ -1,50 +1,82 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
-<meta charset="UTF-8" />
-<title>播放视频</title>
-<link rel="stylesheet" href="css/play.css" />
+    <meta charset="UTF-8" />
+    <title>播放视频</title>
+    <link rel="stylesheet" href="css/play.css" />
 </head>
+
 <body>
     <script src="js/flv.min.js"></script>
     <script>
         const videoExtMap = new Map([
-            ['mp4','video/mp4'],
+            ['rmvb', ''],
+            ['mkv', ''], // mkv格式，给的格式要为空，因为mkv只是容器，具体编码未知，有的mkv能播放有的不能
+            ['mp4', 'video/mp4'],
         ]);
         var queryString = window.location.search;
         var urlParams = new URLSearchParams(queryString);
         var fullPath = urlParams.get('path');
     </script>
-<div class="video-container">
-    <h2>正在播放 <script>document.write(fullPath)</script></h2>
-    <video id="video" controls autoplay >
-    <source id="video_source" src="" type="">
-    您的浏览器不支持视频播放。
-    </video>
-</div>
+    <div class="video-container">
+        <h2 id="til">
+            </script>
+        </h2>
+        <video id="video" controls autoplay>
+            <source id="video_source" src="" type="">
 
-<script>
-    var ext = fullPath.substring(fullPath.lastIndexOf('.')+1).toLowerCase();
-    var videoSourceElement = document.getElementById("video_source");
-    videoSourceElement.src = fullPath;
-    videoSourceElement.type = videoExtMap.get(ext);
-    // flv
-    if('flv' === ext && flvjs.isSupported()){
-        try{
-            const video = document.getElementById('video');
-            const flvPlayer = flvjs.createPlayer({
-                type: 'flv',
-                url: fullPath
-            });
-            flvPlayer.attachMediaElement(video);
-            flvPlayer.load();
-            flvPlayer.play();
-        }catch(error){
-            console.error('flv 出错：', error);
-            warning(error.message);
+            您的浏览器不支持视频播放。
+        </video>
+    </div>
+
+    <script>
+        async function init() {
+            var ext = fullPath.substring(fullPath.lastIndexOf('.') + 1).toLowerCase();
+            var videoSourceElement = document.getElementById("video_source");
+            videoSourceElement.src = fullPath;
+            videoSourceElement.type = videoExtMap.get(ext);
+            document.getElementById("til").innerHTML = '正在播放 ' + fullPath;
+            // 尝试添加字幕
+            fetch('/api/lookfor-subtitle?path=' + fullPath)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.subtitles.length > 0) {
+                        const subtitles = data.subtitles;
+                        const video = document.getElementById('video');
+                        subtitles.forEach((val, ind) => {
+                            var track = document.createElement('track');
+                            track.src = val;
+                            track.kind = "subtitles";
+                            track.srclang = "zh"; // 暂时都写zh吧
+                            track.label = "" + ind;
+                            if (ind == 0) { track.setAttribute('default', '') };
+                            video.appendChild(track);
+                        });
+                    }
+                })
+                .catch(error => console.error('获取字幕失败:', error));
+            // flv
+            if ('flv' === ext && flvjs.isSupported()) {
+                try {
+                    const video = document.getElementById('video');
+                    const flvPlayer = flvjs.createPlayer({
+                        type: 'flv',
+                        url: fullPath
+                    });
+                    flvPlayer.attachMediaElement(video);
+                    flvPlayer.load();
+                    flvPlayer.play();
+                } catch (error) {
+                    console.error('flv 出错', error);
+                    warning(error.message);
+                }
+            }
         }
-    }
-</script>
+
+        init();
+    </script>
 
 </body>
+
 </html>
