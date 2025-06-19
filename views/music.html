@@ -10,7 +10,8 @@
 
 <body>
 
-    <h1>播放音乐</h1>
+    <h1 id="title" style="cursor:pointer" title="点击切换自动播放" onclick="onSwitchAutoPlay()">播放音乐</h1><hr>
+    <h3 id="musicName"></h3>
 
     <!-- 音频播放器 -->
     <div><audio id="audioPlayer" controls></audio></div>
@@ -29,11 +30,26 @@
         }        
     </script>
     <script>
+        let flagAutoPlay = false;
+        let flagAutoPlayAfterFetch = false;
         let currentPage = 1;
         let totalPage = 1;
         let totalItems = 10; // 总条目数
         const itemsPerPage = 10; // 每页显示条目数
         const visiblePages = 10; // 可见页码数量
+
+        // 音乐列表获取结束后的额外工作
+        function afterFetch(){
+            // 是否要随机播放
+            if(flagAutoPlay && flagAutoPlayAfterFetch){
+                flagAutoPlayAfterFetch = false; // 这个标记只作用一次
+                const musicListEl = document.getElementById('musicList');
+                const musicListUl = musicListEl.getElementsByTagName('ul')[0];
+                const musicListItems = musicListUl.getElementsByTagName('li');
+                const sel = Math.floor(Math.random()*(musicListItems.length - 0.5));
+                musicListItems[sel].click();
+            }
+        }
 
         //获取音乐数据
         async function fetchMusic(page = 1) {
@@ -41,8 +57,9 @@
                 const res = await fetch(`/api/page-music?page=${page}&pageSize=${itemsPerPage}`);
                 const data = await res.json();
                 totalItems = data.total;
-                renderMusicList(data.audios);
-                renderPagination();
+                renderMusicList(data.audios); // 显示音乐列表
+                renderPagination(); // 显示导航按钮
+                afterFetch(); // 其他额外操作
             } catch (err) {
                 console.error("获取音乐数据失败:", err);
             }
@@ -55,15 +72,13 @@
             let ul = document.createElement('ul');
             musicArray.forEach(music => {
                 const li = document.createElement('li');
+                const musicName = getFileName(music);
                 li.className = 'music-item';
-                li.innerHTML = getFileName(music);
+                li.innerHTML = musicName;
                 li.onclick = () => {
-                    try{
-                        playMusic(music);
-                    }catch(error){
-                        console.log(error.message, error);
-                        alert('播放失败，可能是不支持的格式');
-                    }
+                    const musicNameEle = document.getElementById("musicName");
+                    musicNameEle.innerHTML = musicName;
+                    playMusic(music);
                 };
                 ul.appendChild(li);
             });
@@ -150,13 +165,47 @@
             document.getElementById('pagination').appendChild(button);
         }
 
+        // switch auto play
+        function onSwitchAutoPlay(){
+            const h1 = document.getElementById("title");
+            flagAutoPlay = !flagAutoPlay;
+            if(flagAutoPlay){
+                h1.innerHTML = '自动播放音乐';
+                const audioPlayer = document.getElementById('audioPlayer');
+                if(audioPlayer.ended || audioPlayer.paused){
+                    audioPlayer.dispatchEvent(new Event('ended')); // 触发结束事件
+                }
+            }
+            else{
+                h1.innerHTML = '播放音乐';
+            }
+        }
+
         function gotoPage(page) {
             currentPage = page;
             fetchMusic(page);
         }
 
-        // 初始化加载第一页
-        gotoPage(currentPage);
+        function prepareAutoPlay(){
+            const audioPlayer = document.getElementById('audioPlayer');
+            audioPlayer.addEventListener('ended', ()=>{
+                if(!flagAutoPlay) return;
+                const totalPages = Math.ceil(totalItems / itemsPerPage);
+                const page = Math.floor(Math.random()*(totalPages - 0.5)) + 1;
+                flagAutoPlayAfterFetch = true; // fetch 是异步的，这里设置标记，fetch结束后根据这个标记判断是否自动播放
+                gotoPage(page); // 跳转到随机页面
+            });
+        }
+        
+
+        function init(){
+            // 初始化加载第一页
+            gotoPage(currentPage);
+            prepareAutoPlay(); 
+        }
+
+        // 初始化
+        init(); 
     </script>
 </body>
 

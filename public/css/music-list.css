@@ -41,6 +41,9 @@ body {
     background-color: #f0f0f0;
     transform: scale(1.02);
 }
+.music-list ul li:active {
+    background-color: #e0e0e0;
+}
 
 .music-item img {
     width: 100%;

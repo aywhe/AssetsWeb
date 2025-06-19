@@ -229,7 +229,7 @@ function makeVideoTreeHtml(pathTag, videoList){
       <link rel="stylesheet" href="../css/assert-tree.css" />
     </head>
     <body>
-    <div class="tree-root">
+    <div>
       <h1>文件列表</h1>
       ${treesHtml}
     </div>
