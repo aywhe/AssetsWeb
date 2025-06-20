@@ -10,7 +10,7 @@ const ConfigFilePath = 'assets_config.json';
 const VideoFilter = ['.mp4', '.flv', '.mkv', '.rmvb'];
 const ImageExts = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', 'webp'];
 const AudioExts = ['.mp3', '.wma'];
-const SubtitleExts = ['.srt','.vtt', '.ass'];
+//const SubtitleExts = ['.srt','.vtt', '.ass'];
 
 // 图片
 var PicturePathTagMap = {
@@ -370,6 +370,7 @@ app.get('/api/page-music', (req, res) => {
 // 获取字幕文件
 app.get('/api/lookfor-subtitle', (req, res) => {
   const vitualPath = req.query.path;
+  const subtitleExts = JSON.parse(req.query.subtitleExts);
   var realdir = '';
   var vpath = '';
   // 获取实际目录和文件名
@@ -382,7 +383,7 @@ app.get('/api/lookfor-subtitle', (req, res) => {
   }
   var realPath = path.join(realdir, vitualPath.substring(vpath.length));
   // 寻找字幕文件
-  var srtFiles = findOtherExtFiles(realPath, SubtitleExts);
+  var srtFiles = findOtherExtFiles(realPath, subtitleExts);
   srtFiles.sort();
   // 修改字幕文件到虚拟目录
   var subtitles = [];

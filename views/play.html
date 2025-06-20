@@ -10,12 +10,12 @@
 <body>
     <script src="js/flv.min.js"></script>
     <script>
+        const subtileExts = ['.vtt'];
         const videoExtMap = new Map([
-            ['rmvb', ''],
-            ['mkv', ''], // mkv格式，给的格式要为空，因为mkv只是容器，具体编码未知，有的mkv能播放有的不能
-            ['mp4', 'video/mp4'],
+            ['.rmvb', ''],
+            ['.mkv', ''], // mkv格式，给的格式要为空，因为mkv只是容器，具体编码未知，有的mkv能播放有的不能
+            ['.mp4', 'video/mp4'],
         ]);
-        var subtitles = [];
         var queryString = window.location.search;
         var urlParams = new URLSearchParams(queryString);
         var fullPath = (urlParams.get('path'));
@@ -32,27 +32,35 @@
     </div>
 
     <script>
+        function getFilePathExt2(filepath, defaultVal = ''){            
+            var lang = defaultVal;
+            var arr = filepath.split(".");
+            if(arr.length >=3){
+                lang = arr[arr.length - 2];
+            }
+            return lang;
+        }
         async function init() {
-            var ext = fullPath.substring(fullPath.lastIndexOf('.') + 1).toLowerCase();
+            var ext = fullPath.substring(fullPath.lastIndexOf('.')).toLowerCase();
             var videoSourceElement = document.getElementById("video_source");
             videoSourceElement.src = fullPath;
             videoSourceElement.type = videoExtMap.get(ext);
             document.getElementById("til").innerHTML = '正在播放 ' + fullPath;
-            console.log(fullPath);
+            //console.log(fullPath);
             // 尝试添加字幕
-            fetch('/api/lookfor-subtitle?path=' + encodeURIComponent(fullPath))
+            fetch('/api/lookfor-subtitle?path=' + encodeURIComponent(fullPath) + '&subtitleExts=' + encodeURIComponent(JSON.stringify(subtileExts)))
                 .then(response => response.json())
                 .then(data => {
                     if (data.subtitles.length > 0) {
-                        subtitles = data.subtitles;
+                        var subtitles = data.subtitles;
                         const video = document.getElementById('video');
                         subtitles.forEach((val, ind) => {
+                            var lab = getFilePathExt2(val);
                             var track = document.createElement('track');
                             track.src = val;
-                            track.kind = "subtitles";
-                            track.srclang = "zh"; // 暂时都写zh吧
-                            track.label = "" + ind;
-                            if (ind == 0) { track.setAttribute('default', '') };
+                            track.kind = "captions";
+                            track.srclang = lab; // 暂时都写zh吧
+                            track.label = lab;
                             video.appendChild(track);
                         });
                     }
