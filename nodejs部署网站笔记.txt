@@ -34,3 +34,8 @@
    方法： 似乎是因为浏览器不支持这些文件的音频解码。
 6. 问题： 使用 <video><track></video> 添加 srt 格式字幕，但是不起作用。
    方法： 似乎是因为浏览器不支持 srt，而是支持 vtt 格式。
+7. 问题： play.html 中 fetch('/api/lookfor-subtitle?path=' + (fullPath))，
+        服务端app.get('/api/lookfor-subtitle', (req, res) => {const vitualPath = req.query.path;})
+        发现 fullPath 中的 + 字符在vitualPath变成了空格字符
+   方法： 改为  fetch('/api/lookfor-subtitle?path=' + encodeURIComponent(fullPath))，
+        因为 + 字符本来就是空格字符的 URI encode，所以解码的时候解码成了空格字符。
