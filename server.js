@@ -77,7 +77,9 @@ function findOtherExtFiles(fullPath, exts) {
     const stats = fs.statSync(itemPath);
     if (!stats.isDirectory()) {
       if(prefix === item.substring(0,prefix.length) && exts.includes(ext)){
-        foundFiles.push(item);
+        var label = item.substring(prefix.length + 1).split(".")[0];
+        console.log(label);
+        foundFiles.push({file:item,label:label});
       }
     }
   });
@@ -368,7 +370,7 @@ app.get('/api/page-music', (req, res) => {
 
 
 // 获取字幕文件
-app.get('/api/lookfor-subtitle', (req, res) => {
+app.get('/api/lookfor-subtitles', (req, res) => {
   const vitualPath = req.query.path;
   const subtitleExts = JSON.parse(req.query.subtitleExts);
   var realdir = '';
@@ -383,14 +385,14 @@ app.get('/api/lookfor-subtitle', (req, res) => {
   }
   var realPath = path.join(realdir, vitualPath.substring(vpath.length));
   // 寻找字幕文件
-  var srtFiles = findOtherExtFiles(realPath, subtitleExts);
-  srtFiles.sort();
+  var subtitleFiles = findOtherExtFiles(realPath, subtitleExts);
+ 
   // 修改字幕文件到虚拟目录
   var subtitles = [];
   var dirName = path.dirname(vitualPath);
-  srtFiles.forEach((val, ind) => {
-    var tmp = path.join(dirName, val).replace(/\\/g,'/');
-    subtitles.push(tmp);
+  subtitleFiles.forEach((val, ind) => {
+    var tmp = path.join(dirName, val.file).replace(/\\/g,'/');
+    subtitles.push({file:tmp,label:val.label});
   });
   res.json({ subtitles: subtitles });
 });

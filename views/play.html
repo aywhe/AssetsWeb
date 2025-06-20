@@ -48,19 +48,18 @@
             document.getElementById("til").innerHTML = '正在播放 ' + fullPath;
             //console.log(fullPath);
             // 尝试添加字幕
-            fetch('/api/lookfor-subtitle?path=' + encodeURIComponent(fullPath) + '&subtitleExts=' + encodeURIComponent(JSON.stringify(subtileExts)))
+            fetch('/api/lookfor-subtitles?path=' + encodeURIComponent(fullPath) + '&subtitleExts=' + encodeURIComponent(JSON.stringify(subtileExts)))
                 .then(response => response.json())
                 .then(data => {
                     if (data.subtitles.length > 0) {
                         var subtitles = data.subtitles;
                         const video = document.getElementById('video');
                         subtitles.forEach((val, ind) => {
-                            var lab = getFilePathExt2(val);
                             var track = document.createElement('track');
-                            track.src = val;
+                            track.src = val.file;
                             track.kind = "captions";
-                            track.srclang = lab; // 暂时都写zh吧
-                            track.label = lab;
+                            track.srclang = val.label;
+                            track.label = val.label;
                             video.appendChild(track);
                         });
                     }
