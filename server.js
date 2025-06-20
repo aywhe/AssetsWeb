@@ -78,7 +78,6 @@ function findOtherExtFiles(fullPath, exts) {
     if (!stats.isDirectory()) {
       if(prefix === item.substring(0,prefix.length) && exts.includes(ext)){
         var label = item.substring(prefix.length + 1).split(".")[0];
-        console.log(label);
         foundFiles.push({file:item,label:label});
       }
     }
