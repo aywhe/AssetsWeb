@@ -15,9 +15,10 @@
             ['mkv', ''], // mkv格式，给的格式要为空，因为mkv只是容器，具体编码未知，有的mkv能播放有的不能
             ['mp4', 'video/mp4'],
         ]);
+        var subtitles = [];
         var queryString = window.location.search;
         var urlParams = new URLSearchParams(queryString);
-        var fullPath = urlParams.get('path');
+        var fullPath = (urlParams.get('path'));
     </script>
     <div class="video-container">
         <h2 id="til">
@@ -37,12 +38,13 @@
             videoSourceElement.src = fullPath;
             videoSourceElement.type = videoExtMap.get(ext);
             document.getElementById("til").innerHTML = '正在播放 ' + fullPath;
+            console.log(fullPath);
             // 尝试添加字幕
-            fetch('/api/lookfor-subtitle?path=' + fullPath)
+            fetch('/api/lookfor-subtitle?path=' + encodeURIComponent(fullPath))
                 .then(response => response.json())
                 .then(data => {
                     if (data.subtitles.length > 0) {
-                        const subtitles = data.subtitles;
+                        subtitles = data.subtitles;
                         const video = document.getElementById('video');
                         subtitles.forEach((val, ind) => {
                             var track = document.createElement('track');
