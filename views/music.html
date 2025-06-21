@@ -10,8 +10,11 @@
 
 <body>
 
-    <h1 id="title" style="cursor:pointer" title="点击切换自动播放" onclick="onSwitchAutoPlay()">播放音乐</h1><hr>
-    <h3 id="musicName"></h3>
+    <div><h1 id="title" class="hidden-click-able" title="点击切换自动播放" onclick="onSwitchAutoPlay()">播放音乐</h1></div>
+    <hr>
+    <div>
+        <h3 id="musicName" class="music-name hidden-click-able" title="点击筛选歌曲" onclick="onFilterFiles()">点击筛选歌曲</h3>
+    </div>
 
     <!-- 音频播放器 -->
     <div><audio id="audioPlayer" controls></audio></div>
@@ -30,9 +33,10 @@
         }        
     </script>
     <script>
-        let flagAutoPlay = false;
-        let flagAutoPlayAfterFetch = false;
-        let currentPage = 1;
+        let fetchFilter = ''; // 文件名筛选
+        let flagAutoPlay = false; // 自动播放标记
+        let flagAutoPlayAfterFetch = false; // fetch后是否自动播放
+        let currentPage = 1; // 当前页码
         let totalPage = 1;
         let totalItems = 10; // 总条目数
         const itemsPerPage = 10; // 每页显示条目数
@@ -52,9 +56,12 @@
         }
 
         //获取音乐数据
-        async function fetchMusic(page = 1) {
+        async function fetchMusic(page = 1, filter = '') {
             try {
-                const res = await fetch(`/api/page-music?page=${page}&pageSize=${itemsPerPage}`);
+                const params = 'page=' + page 
+                        +'&pageSize=' + itemsPerPage
+                        +'&filter=' + encodeURIComponent(filter.trim());
+                const res = await fetch('/api/page-music?' + params);
                 const data = await res.json();
                 totalItems = data.total;
                 renderMusicList(data.audios); // 显示音乐列表
@@ -180,10 +187,23 @@
                 h1.innerHTML = '播放音乐';
             }
         }
+        // 筛选歌曲
+        function onFilterFiles(){
+            var filter = prompt("输入要查找的文件信息",'');
+            fetchFilter = filter.trim();
+            var musicNameEle = document.getElementById('musicName');
+            if(fetchFilter.length > 0){
+                musicNameEle.classList.add('music-name-aft-filter');
+            }
+            else{
+                musicNameEle.classList.remove('music-name-aft-filter');
+            }
+            gotoPage(1);
+        }
 
         function gotoPage(page) {
             currentPage = page;
-            fetchMusic(page);
+            fetchMusic(page,fetchFilter);
         }
 
         function prepareAutoPlay(){

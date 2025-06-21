@@ -3,6 +3,22 @@ body {
     padding: 20px;
 }
 
+
+.music-name-aft-filter{
+    border-bottom-right-radius: 8px;
+    border-top-right-radius: 8px;
+    background-color: #f0f0f0;
+}
+
+.hidden-click-able{
+    cursor:pointer;
+    transition: transform 0.2s ease;
+}
+
+.hidden-click-able:hover{
+    transform: scale(0.98);
+}
+
 .music-list {
     display: flex;
     flex-wrap: wrap;

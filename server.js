@@ -9,7 +9,7 @@ const PORT = 3000;
 const ConfigFilePath = 'assets_config.json';
 const VideoFilter = ['.mp4', '.flv', '.mkv', '.rmvb'];
 const ImageExts = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', 'webp'];
-const AudioExts = ['.mp3', '.wma'];
+const AudioExts = ['.mp3', '.wma', '.ogg','.wav'];
 //const SubtitleExts = ['.srt','.vtt', '.ass'];
 
 // 图片
@@ -347,10 +347,29 @@ app.get('/music', (req, res) => {
 });
 
 app.get('/api/page-music', (req, res) => {
+  const page = parseInt(req.query.page);
+  const pageSize = parseInt(req.query.pageSize);
+  //
   if (AudioPathTagMap.audios.length > 0) {
-    const total = AudioPathTagMap.audios.length;
-    const page = parseInt(req.query.page);
-    const pageSize = parseInt(req.query.pageSize);
+    var filter = req.query.filter;
+    var audios = [];
+    //
+    if (undefined === filter || null === filter || '' === filter.trim()){
+      audios = AudioPathTagMap.audios;
+    }else{
+      audios = [];
+      filter = filter.trim();
+      AudioPathTagMap.audios.forEach((val,ind)=>{
+        if(val.includes(filter)){
+          audios.push(val);
+        }
+      });
+    }
+  }
+  const total = audios.length;
+
+  if(total > 0){
+    // 
     if (page <= 0) { page = 1; }
     if (pageSize <= 0) { pageSize = 10; }
     var startId = (page - 1) * pageSize;
@@ -358,7 +377,7 @@ app.get('/api/page-music', (req, res) => {
     var endId = startId + pageSize;
     if (endId <= 0 || endId > total) { endId = total; }
     //console.log(page + ',' + pageSize + ',' + startId + ',' + endId);
-    var sendData = AudioPathTagMap.audios.slice(startId, endId);
+    var sendData = audios.slice(startId, endId);
     //console.log('send ' + sendData.length + ' audios')
     res.json({ audios: sendData, total: total });
   } else {
