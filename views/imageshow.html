@@ -64,7 +64,7 @@
   <script>
     // 获取图片列表
     let allImages = [];
-    let allImagesEndIdx = 5;
+    let allImagesEndIdx = 10;
     let autoPlayDelay = 6000;
 
     fetch('/api/all-images')
@@ -108,7 +108,7 @@
       //allImages.forEach((imageUrl, index) => { });
     
       // 初始化 Swiper
-      new Swiper('.swiper-container', {
+      g_wrapper = new Swiper('.swiper-container', {
         lazy: true,
         lazyLoadInAdvance: 10,
         loop: true,
