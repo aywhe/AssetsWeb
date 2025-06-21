@@ -258,7 +258,7 @@ function makeVideoTreeHtml(pathTag, videoList) {
     <head>
       <meta charset="UTF-8" />
       <title>视频列表</title>
-      <link rel="stylesheet" href="../css/assert-tree.css" />
+      <link rel="stylesheet" href="../css/asset-tree.css" />
     </head>
     <body>
     <div>
@@ -285,7 +285,7 @@ app.get('/videos', (req, res) => {
     <head>
       <meta charset="UTF-8" />
       <title>位置列表</title>
-      <link rel="stylesheet" href="css/assert-tree.css" />
+      <link rel="stylesheet" href="css/asset-tree.css" />
     </head>
     <body>
     <div class="tree-root">
