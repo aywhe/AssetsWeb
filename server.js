@@ -360,7 +360,7 @@ app.get('/api/page-music', (req, res) => {
       audios = [];
       filter = filter.trim();
       AudioPathTagMap.audios.forEach((val,ind)=>{
-        if(val.includes(filter)){
+        if(path.basename(val).includes(filter)){
           audios.push(val);
         }
       });
