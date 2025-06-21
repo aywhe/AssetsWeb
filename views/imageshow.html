@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,63 +8,10 @@
 
   <!-- Swiper CSS -->
   <link rel="stylesheet" href="css/swiper-bundle.min.css" />
+  <link rel="stylesheet" href="css/imageshow.css" />
 
-  <style>
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    .swiper-container {
-      width: 100%;
-      height: 100%;
-    }
-
-    .swiper-slide {
-      text-align: center;
-      font-size: 18px;
-      background: #000;
-    }
-
-    .swiper-slide img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-
-    /* 按钮样式 */
-    .swiper-button-next,
-    .swiper-button-prev {
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .swiper-button-next:hover,
-    .swiper-button-prev:hover {
-      opacity: 1;
-    }
-
-    #clickTip{
-      position: fixed;
-      transform: translateX(-50%);
-      background-color: #555;
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 5px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-      z-index: 9999;
-    }
-
-    #clickTip.show-tip{
-      opacity: 1;
-    }
-  </style>
 </head>
+
 <body>
   <!-- 全屏轮播容器 -->
   <div class="swiper-container">
@@ -88,7 +36,7 @@
     let isPaused = false;
     var g_wrapper = null;
 
-    
+
     fetch('/api/all-images')
       .then(response => response.json())
       .then(data => {
@@ -96,9 +44,9 @@
         initSlideshow();
       })
       .catch(error => console.error('获取图片失败:', error));
-    
-    function restoreSlideOntime(){
-      if(isPaused || allImagesEndIdx >= allImages.length) return;
+
+    function restoreSlideOntime() {
+      if (isPaused || allImagesEndIdx >= allImages.length) return;
       //console.log("autoplay callback, allImagesEndIdx: " + allImagesEndIdx);
       const imageUrl = allImages[allImagesEndIdx];
       const index = allImagesEndIdx;
@@ -106,19 +54,19 @@
       const slide = document.createElement('div');
       slide.className = 'swiper-slide';
       slide.innerHTML = `<img src="${imageUrl}" alt="轮播图片 ${index + 1}">`;
-      if(g_wrapper === null){g_wrapper = new Swiper('.swiper-container');}
+      if (g_wrapper === null) { g_wrapper = new Swiper('.swiper-container'); }
       g_wrapper.removeSlide(0);//(wrapper.firstElementChild);
       g_wrapper.appendSlide(slide);
       g_wrapper.update();
     }
 
     function initSlideshow() {
-      if(!Array.isArray(allImages)||allImages.length == 0) return;
+      if (!Array.isArray(allImages) || allImages.length == 0) return;
       console.log('start initSlideshow');
       const wrapper = document.getElementById('slideshowWrapper');
       wrapper.innerHTML = '';
-      if(allImagesEndIdx > allImages.length) allImagesEndIdx = allImages.length;
-      for(let i = 0; i < allImagesEndIdx; i++){
+      if (allImagesEndIdx > allImages.length) allImagesEndIdx = allImages.length;
+      for (let i = 0; i < allImagesEndIdx; i++) {
         const imageUrl = allImages[i];
         const index = i;
         const slide = document.createElement('div');
@@ -127,7 +75,7 @@
         wrapper.appendChild(slide);
       }
       //allImages.forEach((imageUrl, index) => { });
-    
+
       // 初始化 Swiper
       g_wrapper = new Swiper('.swiper-container', {
         lazy: true,
@@ -143,24 +91,24 @@
         },
       });
       //
-      document.getElementById("slideshowWrapper").addEventListener('click',function(e){
+      document.getElementById("slideshowWrapper").addEventListener('click', function (e) {
         isPaused = !isPaused;
-        if(g_wrapper != null){
-          if(!isPaused){
+        if (g_wrapper != null) {
+          if (!isPaused) {
             g_wrapper.autoplay.start();
           }
-          else{
+          else {
             g_wrapper.autoplay.stop();
           }
         }
         const tip = document.getElementById("clickTip");
         var tipText = '';
-        if(isPaused){tipText = '停止播放';}else{tipText = '继续播放';}
+        if (isPaused) { tipText = '停止播放'; } else { tipText = '继续播放'; }
         tip.innerHTML = tipText;
         tip.style.left = e.pageX + 'px';
         tip.style.top = e.pageY + 'px';
         tip.classList.add('show-tip');
-        setTimeout(()=>{
+        setTimeout(() => {
           tip.classList.remove('show-tip');
         }, 1500);
       })
@@ -169,4 +117,5 @@
     }
   </script>
 </body>
+
 </html>
