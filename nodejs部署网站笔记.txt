@@ -41,3 +41,5 @@
         因为 + 字符本来就是空格字符的 URI encode，所以解码的时候解码成了空格字符。
 8. 补充： 关于视频内嵌字幕和多音轨的问题，放弃自己在 JavaScript 上自定义提取，还是去找功能更强大的网页播放器更靠谱。
         外挂字幕现在只是默认支持 VTT 格式的，要支持其他格式，也是去找其他播放器更靠谱。
+9. 问题： onclick="onClickFunction()"，出现错误 onClickFunction undefined。
+   方法： function onClickFunction(){} 要放在 fetch 等异步函数操作的前面，反正就是要尽快加载 onClickFunction()
