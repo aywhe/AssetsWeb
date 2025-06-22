@@ -37,8 +37,8 @@
         let flagAutoPlay = false; // 自动播放标记
         let flagAutoPlayAfterFetch = false; // fetch后是否自动播放
         let currentPage = 1; // 当前页码
-        let totalPage = 1;
-        let totalItems = 10; // 总条目数
+        let totalPage = 0;
+        let totalItems = 0; // 总条目数
         const itemsPerPage = 10; // 每页显示条目数
         const visiblePages = 10; // 可见页码数量
 
@@ -47,11 +47,13 @@
             // 是否要随机播放
             if(flagAutoPlay && flagAutoPlayAfterFetch){
                 flagAutoPlayAfterFetch = false; // 这个标记只作用一次
-                const musicListEl = document.getElementById('musicList');
-                const musicListUl = musicListEl.getElementsByTagName('ul')[0];
-                const musicListItems = musicListUl.getElementsByTagName('li');
-                const sel = Math.floor(Math.random()*(musicListItems.length - 0.5));
-                musicListItems[sel].click();
+                if(totalItems > 0){
+                    const musicListEl = document.getElementById('musicList');
+                    const musicListUl = musicListEl.getElementsByTagName('ul')[0];
+                    const musicListItems = musicListUl.getElementsByTagName('li');
+                    const sel = Math.floor(Math.random()*(musicListItems.length - 0.5));
+                    musicListItems[sel].click();
+                }
             }
         }
 

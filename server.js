@@ -367,7 +367,7 @@ app.get('/api/page-music', (req, res) => {
     }
   }
   const total = audios.length;
-
+  var sendData = [];
   if(total > 0){
     // 
     if (page <= 0) { page = 1; }
@@ -377,12 +377,10 @@ app.get('/api/page-music', (req, res) => {
     var endId = startId + pageSize;
     if (endId <= 0 || endId > total) { endId = total; }
     //console.log(page + ',' + pageSize + ',' + startId + ',' + endId);
-    var sendData = audios.slice(startId, endId);
-    //console.log('send ' + sendData.length + ' audios')
-    res.json({ audios: sendData, total: total });
-  } else {
-    res.send('没有音频可以播放');
+    sendData = audios.slice(startId, endId);
   }
+    //console.log('send ' + sendData.length + ' audios')
+  res.json({ audios: sendData, total: total });
 });
 
 
