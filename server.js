@@ -9,7 +9,7 @@ const PORT = 3000;
 const ConfigFilePath = 'assets_config.json';
 const VideoFilter = ['.mp4', '.flv', '.mkv', '.rmvb'];
 const ImageExts = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', 'webp'];
-const AudioExts = ['.mp3', '.wma', '.ogg','.wav'];
+const AudioExts = ['.mp3', '.wma', '.ogg', '.wav'];
 //const SubtitleExts = ['.srt','.vtt', '.ass'];
 
 // 图片
@@ -67,7 +67,7 @@ function findOtherExtFiles(fullPath, exts) {
   const dirName = path.dirname(fullPath);
   const baseName = path.basename(fullPath);
   const parts = baseName.split(".");
-  var prefix = parts.slice(0,-1).join(".");
+  var prefix = parts.slice(0, -1).join(".");
   var foundFiles = [];
 
   const items = fs.readdirSync(dirName);
@@ -76,21 +76,21 @@ function findOtherExtFiles(fullPath, exts) {
     const ext = path.extname(item).toLowerCase();
     const stats = fs.statSync(itemPath);
     if (!stats.isDirectory()) {
-      if(prefix === item.substring(0,prefix.length) && exts.includes(ext)){
+      if (prefix === item.substring(0, prefix.length) && exts.includes(ext)) {
         var label = item.substring(prefix.length + 1).split(".")[0];
-        foundFiles.push({file:item,label:label});
+        foundFiles.push({ file: item, label: label });
       }
     }
   });
   return foundFiles;
 
-/*   const pattern = path.join(dirName, `${prefix}*{${exts.join(',')}}`);
-  glob.glob(pattern, { nocase: true }, (err, files) => {
-    foundFiles = files;
-    if (err) {
-      console.error('查找文件出错',error);
-    }
-  }); */
+  /*   const pattern = path.join(dirName, `${prefix}*{${exts.join(',')}}`);
+    glob.glob(pattern, { nocase: true }, (err, files) => {
+      foundFiles = files;
+      if (err) {
+        console.error('查找文件出错',error);
+      }
+    }); */
 
   return foundFiles;
 }
@@ -227,7 +227,7 @@ function buildTreeHtml(nodes, pathTag, currentPath = []) {
     if (node.children) {
       return `
             <li>
-              ${node.name}
+              <div class='li-til'>${node.name}</div>
               ${buildTreeHtml(node.children, pathTag, newPath)}
             </li>
           `;
@@ -244,60 +244,8 @@ function buildTreeHtml(nodes, pathTag, currentPath = []) {
     </ul>
   `;
 }
-
-function makeVideoTreeHtml(pathTag, videoList) {
-  const treesHtml = videoList.map((node, index) => `
-    <div class="tree-root">
-      <h3>${index + 1}: ${node.name} (${node.type})</h3>
-      ${buildTreeHtml([node], pathTag)}
-    </div>
-  `).join('');
-  const html = `
-    <!DOCTYPE html>
-    <html lang="zh">
-    <head>
-      <meta charset="UTF-8" />
-      <title>视频列表</title>
-      <link rel="stylesheet" href="../css/asset-tree.css" />
-    </head>
-    <body>
-    <div>
-      <h1>文件列表</h1>
-      ${treesHtml}
-    </div>
-    </body>
-    </html>
-  `;
-  return html;
-}
-
-//
-app.get('/videos', (req, res) => {
-  var lis = [];
-  VideoPathTagMap.forEach((val, key) => {
-    var li = '<li>' + '<a href="/videos/' + key + '">' + val.vpath + '</a></li>';
-    lis.push(li);
-  });
-  const treesHtml = '<ul>' + lis.join('') + '</ul>';
-  const html = `
-    <!DOCTYPE html>
-    <html lang="zh">
-    <head>
-      <meta charset="UTF-8" />
-      <title>位置列表</title>
-      <link rel="stylesheet" href="css/asset-tree.css" />
-    </head>
-    <body>
-    <div class="tree-root">
-      <h1>位置列表</h1>
-      ${treesHtml}
-    </div>
-    </body>
-    </html>
-  `;
-  res.send(html);
-});
-
+///////////////////////////////////////////////////////////
+// 列举服务项目
 app.get('/api/server-content', (req, res) => {
   let content = [];
   if (PicturePathTagMap.images.length > 0) {
@@ -310,42 +258,38 @@ app.get('/api/server-content', (req, res) => {
   }
 
   VideoPathTagMap.forEach((val, key) => {
-    const ele = { uri: '/videos/' + key, imguri: '/images/' + val.vpic, til: val.tag };
+    const ele = { uri: '/videos?key=' + encodeURIComponent(key), imguri: '/images/' + val.vpic, til: val.tag };
     content.push(ele);
   });
   res.json(content);
 });
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'cards.html'));
-});
-
-// 主页 - 展示树结构
-app.get('/videos/:type', (req, res) => {
-  const { type } = req.params;
-  if (VideoPathTagMap.has(type)) {
-    const videoList = VideoNameList.get(type);
-    var html = makeVideoTreeHtml(VideoPathTagMap.get(type).vpath, videoList);
-    res.send(html);
+// 获取视频目录结构
+app.get('/api/video-tree', (req, res) => {
+  const key = req.query.key;
+  var treesHtml = '';
+  if ((!(undefined === key)) && (!('' === key)) && VideoPathTagMap.has(key)) {
+    const videoList = VideoNameList.get(key);
+    const vpath = VideoPathTagMap.get(key).vpath;
+    treesHtml = videoList.map((node, index) => `
+    <div class="tree-root">
+      <h3>${index + 1}: ${node.name} (${node.type})</h3>
+      ${buildTreeHtml([node], vpath)}
+    </div>
+  `).join('');
   }
   else {
-    res.redirect('/videos');
+    var lis = [];
+    VideoPathTagMap.forEach((val, ikey) => {
+      var li = '<li>' + '<a href="/videos?key=' + encodeURIComponent(ikey) + '">' + val.vpath + '</a></li>';
+      lis.push(li);
+    });
+    treesHtml = '<div class="tree-root"><ul>' + lis.join('') + '</ul></div>';
   }
+  res.send(treesHtml);
 });
 
-// 播放视频页面
-app.get('/play', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'play.html'));
-});
-
-app.get('/music', (req, res) => {
-  if (AudioPathTagMap.audios.length > 0) {
-    res.sendFile(path.join(__dirname, 'views', 'music.html'));
-  } else {
-    res.send('没有音频可以播放');
-  }
-});
-
+// 获取音乐文件信息
 app.get('/api/page-music', (req, res) => {
   const page = parseInt(req.query.page);
   const pageSize = parseInt(req.query.pageSize);
@@ -354,13 +298,13 @@ app.get('/api/page-music', (req, res) => {
     var filter = req.query.filter;
     var audios = [];
     //
-    if (undefined === filter || null === filter || '' === filter.trim()){
+    if (undefined === filter || null === filter || '' === filter.trim()) {
       audios = AudioPathTagMap.audios;
-    }else{
+    } else {
       audios = [];
       filter = filter.trim();
-      AudioPathTagMap.audios.forEach((val,ind)=>{
-        if(path.basename(val).includes(filter)){
+      AudioPathTagMap.audios.forEach((val, ind) => {
+        if (path.basename(val).includes(filter)) {
           audios.push(val);
         }
       });
@@ -368,7 +312,7 @@ app.get('/api/page-music', (req, res) => {
   }
   const total = audios.length;
   var sendData = [];
-  if(total > 0){
+  if (total > 0) {
     // 
     if (page <= 0) { page = 1; }
     if (pageSize <= 0) { pageSize = 10; }
@@ -379,11 +323,9 @@ app.get('/api/page-music', (req, res) => {
     //console.log(page + ',' + pageSize + ',' + startId + ',' + endId);
     sendData = audios.slice(startId, endId);
   }
-    //console.log('send ' + sendData.length + ' audios')
+  //console.log('send ' + sendData.length + ' audios')
   res.json({ audios: sendData, total: total });
 });
-
-
 
 // 获取字幕文件
 app.get('/api/lookfor-subtitles', (req, res) => {
@@ -392,8 +334,8 @@ app.get('/api/lookfor-subtitles', (req, res) => {
   var realdir = '';
   var vpath = '';
   // 获取实际目录和文件名
-  for(const [key,val] of VideoPathTagMap){
-    if(val.vpath === vitualPath.substring(0,val.vpath.length)){
+  for (const [key, val] of VideoPathTagMap) {
+    if (val.vpath === vitualPath.substring(0, val.vpath.length)) {
       realdir = val.path;
       vpath = val.vpath;
       break;
@@ -402,24 +344,24 @@ app.get('/api/lookfor-subtitles', (req, res) => {
   var realPath = path.join(realdir, vitualPath.substring(vpath.length));
   // 寻找字幕文件
   var subtitleFiles = findOtherExtFiles(realPath, subtitleExts);
- 
+
   // 修改字幕文件到虚拟目录
   var subtitles = [];
   var dirName = path.dirname(vitualPath);
   subtitleFiles.forEach((val, ind) => {
-    var tmp = path.join(dirName, val.file).replace(/\\/g,'/');
-    subtitles.push({file:tmp,label:val.label});
+    var tmp = path.join(dirName, val.file).replace(/\\/g, '/');
+    subtitles.push({ file: tmp, label: val.label });
   });
   res.json({ subtitles: subtitles });
 });
 
-
-// 获取所有图片列表接口（用于slideshow）
+// 获取所有图片列表（用于slideshow）
 app.get('/api/all-images', (req, res) => {
   res.json({ images: PicturePathTagMap.images });
 });
 
-// 主页路由
+/////////////////////////////////////////////////////////////////////////
+// 图片轮播页面
 app.get('/imageshow', (req, res) => {
   if (PicturePathTagMap.images.length > 0) {
     PicturePathTagMap.images = shuffleArray(PicturePathTagMap.images);
@@ -428,6 +370,31 @@ app.get('/imageshow', (req, res) => {
     res.send('没有图片可以显示');
   }
 });
+
+// 播放视频页面
+app.get('/play', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'play.html'));
+});
+
+// 播放音乐页面
+app.get('/music', (req, res) => {
+  if (AudioPathTagMap.audios.length > 0) {
+    res.sendFile(path.join(__dirname, 'views', 'music.html'));
+  } else {
+    res.send('没有音频可以播放');
+  }
+});
+
+// 视频列表页面
+app.get('/videos', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'treeinfos.html'));
+});
+
+// 主页面
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'cards.html'));
+});
+
 ////////////////////////// 运行脚本 ////////////////////////////////////
 // 初始化工作
 initConfig();

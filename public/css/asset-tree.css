@@ -37,6 +37,10 @@ h3 {
     cursor: pointer;
 }
 
+.hidden-ul{
+    display: none;
+}
+
 /* 悬停效果 */
 .tree-root li:hover {
     background-color: #d0d0d0;

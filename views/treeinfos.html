@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>文件列表</title>
+    <link rel="stylesheet" href="css/asset-tree.css" />
+</head>
+
+<body>
+    <div id="video-list">
+        <h1>文件列表</h1>
+    </div>
+</body>
+<script>
+    var queryString = window.location.search;
+    var urlParams = new URLSearchParams(queryString);
+    var key = (urlParams.get('key'));
+    // 
+    function setClickOptions() {
+        // 设置点击函数
+        document.querySelectorAll('.li-til').forEach(div => {
+            div.addEventListener('click', function () {
+                // 下一个ul节点
+                let nextEle = this.nextElementSibling;
+                if (nextEle && nextEle.tagName === 'UL') {
+                    const isHidden = nextEle.classList.contains('hidden-ul');
+                    nextEle.classList.toggle('hidden-ul', !isHidden);
+                    if (!isHidden) {
+                        this.textContent = this.textContent + ' ...';
+                    }
+                    else {
+                        this.textContent = this.textContent.substr(0,this.textContent.length - 4);
+                    }
+                }
+            });
+        });
+    }
+    // 获取信息
+    fetch('/api/video-tree?key=' + encodeURIComponent(key))
+        .then(response => response.text())
+        .then(text => {
+            var videoList = document.getElementById('video-list');
+            videoList.innerHTML = videoList.innerHTML + text;
+            setClickOptions();
+        })
+        .catch(error => console.error('获取视频列表失败:', error));
+
+</script>
+
+</html>
