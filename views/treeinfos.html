@@ -20,6 +20,7 @@
     function setClickOptions() {
         // 设置点击函数
         document.querySelectorAll('.li-til').forEach(div => {
+            div.title = '点击收起列表';
             div.addEventListener('click', function () {
                 // 下一个ul节点
                 let nextEle = this.nextElementSibling;
@@ -28,9 +29,11 @@
                     nextEle.classList.toggle('hidden-ul', !isHidden);
                     if (!isHidden) {
                         this.textContent = this.textContent + ' ...';
+                        this.title = '点击展开列表';
                     }
                     else {
                         this.textContent = this.textContent.substr(0,this.textContent.length - 4);
+                        this.title = '点击收起列表'
                     }
                 }
             });

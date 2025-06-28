@@ -37,6 +37,10 @@ h3 {
     cursor: pointer;
 }
 
+.tree-root .li-til{
+    cursor: pointer;
+}
+
 .hidden-ul{
     display: none;
 }
