@@ -4,7 +4,7 @@
         "vpic": "playmusic.jpg",
         "paths":[
             {"path":"E:/音乐", "vpath":"/eaudios"},
-            {"path":"E:/Games/Audios/Deemo", "vpath":"edeemo"},
+            {"path":"E:/Games/Audios/Deemo", "vpath":"/edeemo"},
             {"path":"D:/Users/aywhe/Music", "vpath":"/daudios"}
         ]
     },
@@ -38,5 +38,9 @@
         "EGameVideos":{
             "path" : "E:/Games/Videos", "vpath" : "/EGameVideos", "vpic" : "EGameVideos.png", "tag": "游戏视频"
         }
-    }
+    },
+    "ServerPort": 3000,
+    "VideoFilter": [".mp4", ".flv", ".mkv", ".rmvb"],
+    "ImageExts": [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"],
+    "AudioExts": [".mp3", ".wma", ".ogg", ".wav"]
 }

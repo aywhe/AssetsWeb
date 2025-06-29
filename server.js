@@ -5,31 +5,31 @@ const path = require('path');
 const app = express();
 
 //////////////////////// global datas ///////////////////////////////////
-const PORT = 3000;
 const ConfigFilePath = 'assets_config.json';
-const VideoFilter = ['.mp4', '.flv', '.mkv', '.rmvb'];
-const ImageExts = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', 'webp'];
-const AudioExts = ['.mp3', '.wma', '.ogg', '.wav'];
+var PORT = 3000;
+var VideoFilter = ['.mp4', '.flv', '.mkv', '.rmvb'];
+var ImageExts = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
+var AudioExts = ['.mp3', '.wma', '.ogg', '.wav'];
 //const SubtitleExts = ['.srt','.vtt', '.ass'];
 
 // 图片
 var PicturePathTagMap = {
   images: [], // 存储所有图片路径
   vpic: 'imageshow.jpg', // 图片位置的虚拟目录中卡片图片位置
-  paths: [{ path: 'D:/Users/aywhe/Pictures/Pictures', vpath: 'dimages' }] // 不同位置有不同的标记名称
+  paths: [{ path: 'D:/Users/aywhe/Pictures/Pictures', vpath: '/dimages' }] // 不同位置有不同的标记名称
 };
 
 // 视频
 var VideoNameList = new Map(); // 视频文件名列表
 var VideoPathTagMap = new Map([
-  ['DVideos', { path: 'D:/Users/aywhe/Videos', vpath: 'DVideos', vpic: 'DVideos.png' }]
+  ['DVideos', { path: 'D:/Users/aywhe/Videos', vpath: '/DVideos', vpic: 'DVideos.png' }]
 ]); // 不同视频位置有不同的标记名称
 
 // 音频
 var AudioPathTagMap = {
   audios: [], // 存储所有路径
   vpic: 'playaudio.jpg', // 音频位置的虚拟目录中卡片图片位置
-  paths: [{ path: 'D:/Users/aywhe/Music', vpath: 'daudios' }] // 不同位置有不同的标记名称
+  paths: [{ path: 'D:/Users/aywhe/Music', vpath: '/daudios' }] // 不同位置有不同的标记名称
 };
 
 //////////////////////// tool functions /////////////////////////////////
@@ -151,6 +151,12 @@ function initConfig() {
       const content = fs.readFileSync(ConfigFilePath, 'utf8');
       console.log(content);
       const data = JSON.parse(content);
+      //
+      PORT = data.ServerPort;//3000;
+      VideoFilter = data.VideoFilter;//['.mp4', '.flv', '.mkv', '.rmvb'];
+      ImageExts = data.ImageExts;//['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
+      AudioExts = data.AudioExts;//['.mp3', '.wma', '.ogg', '.wav'];
+      //
       PicturePathTagMap = data.PicturePathTagMap;
       PicturePathTagMap.images = [];
       AudioPathTagMap = data.AudioPathTagMap;
