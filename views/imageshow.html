@@ -29,6 +29,11 @@
 
   <!-- 自定义脚本 -->
   <script>
+    // 获取参数
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const subDir = urlParams.has('subDir')?urlParams.get('subDir'):'';
+
     // 获取图片列表
     let allImages = [];
     let allImagesEndIdx = 10;
@@ -37,7 +42,7 @@
     var g_wrapper = null;
 
 
-    fetch('/api/all-images')
+    fetch('/api/all-images?subDir='+encodeURIComponent(subDir))
       .then(response => response.json())
       .then(data => {
         allImages = data.images;

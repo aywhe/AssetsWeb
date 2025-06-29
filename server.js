@@ -357,7 +357,20 @@ app.get('/api/lookfor-subtitles', (req, res) => {
 
 // 获取所有图片列表（用于slideshow）
 app.get('/api/all-images', (req, res) => {
-  res.json({ images: PicturePathTagMap.images });
+  const subDir = req.query.subDir;
+  if (undefined === subDir || null === subDir || '' === subDir.trim()){
+    res.json({ images: PicturePathTagMap.images });    
+  }else{
+    var subDirs = PicturePathTagMap.paths.map((val)=>{
+      return path.join(val.vpath,subDir).replace(/\\/g,'/');
+    });
+    var images = PicturePathTagMap.images.filter((item)=>{
+      return subDirs.some((val)=>{
+        return item.includes(val);
+      });
+    });
+    res.json({images: images});
+  }
 });
 
 /////////////////////////////////////////////////////////////////////////
