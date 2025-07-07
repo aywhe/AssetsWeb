@@ -223,33 +223,6 @@ function initDatas() {
 }
 
 
-
-// 递归生成 HTML 树结构
-function buildTreeHtml(nodes, pathTag, currentPath = []) {
-  return `
-    <ul>
-      ${nodes.map(node => {
-    const newPath = [...currentPath, node.name];
-    if (node.children) {
-      return `
-            <li>
-              <div class='li-til'>${node.name}</div>
-              ${buildTreeHtml(node.children, pathTag, newPath)}
-            </li>
-          `;
-    } else {
-      // 文件节点，生成带完整路径的链接
-      var fullPath = pathTag + '/' + newPath.join('/');
-      return `
-            <li>
-              <a href="/play?path=${encodeURIComponent(fullPath)}">${node.name}</a>
-            </li>
-          `;
-    }
-  }).join('')}
-    </ul>
-  `;
-}
 ///////////////////////////////////////////////////////////
 // 列举服务项目
 app.get('/api/server-content', (req, res) => {
@@ -271,28 +244,23 @@ app.get('/api/server-content', (req, res) => {
 });
 
 // 获取视频目录结构
-app.get('/api/video-tree', (req, res) => {
+app.get('/api/video-list', (req, res) => {
   const key = req.query.key;
-  var treesHtml = '';
+  var videoInfo = {};
+  var vpath = '';
   if ((!(undefined === key)) && (!('' === key)) && VideoPathTagMap.has(key)) {
-    const videoList = VideoNameList.get(key);
-    const vpath = VideoPathTagMap.get(key).vpath;
-    treesHtml = videoList.map((node, index) => `
-    <div class="tree-root">
-      <h3>${index + 1}: ${node.name} (${node.type})</h3>
-      ${buildTreeHtml([node], vpath)}
-    </div>
-  `).join('');
+    videoInfo = VideoNameList.get(key);
+    vpath = VideoPathTagMap.get(key).vpath;
   }
-  else {
-    var lis = [];
-    VideoPathTagMap.forEach((val, ikey) => {
-      var li = '<li>' + '<a href="/videos?key=' + encodeURIComponent(ikey) + '">' + val.vpath + '</a></li>';
-      lis.push(li);
-    });
-    treesHtml = '<div class="tree-root"><ul>' + lis.join('') + '</ul></div>';
-  }
-  res.send(treesHtml);
+  res.json({videoInfo: videoInfo, key: key, vpath: vpath});
+});
+
+// 获取视频目录结构
+app.get('/api/video-paths', (req, res) => {
+  const videoPathList = Array.from(VideoPathTagMap.entries()).map(([key,val])=>{
+    return {key: key, vpath: val.vpath};
+  });
+  res.json({videoPathList: videoPathList});
 });
 
 // 获取音乐文件信息

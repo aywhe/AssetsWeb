@@ -39,16 +39,72 @@
             });
         });
     }
-    // 获取信息
-    fetch('/api/video-tree?key=' + encodeURIComponent(key))
-        .then(response => response.text())
-        .then(text => {
-            var videoList = document.getElementById('video-list');
-            videoList.innerHTML = videoList.innerHTML + text;
-            setClickOptions();
-        })
-        .catch(error => console.error('获取视频列表失败:', error));
 
+    // 递归生成 HTML 树结构
+    function buildTreeHtml(nodes, pathTag, currentPath = []) {
+        return `
+            <ul>
+            ${nodes.map(node => {
+            const newPath = [...currentPath, node.name];
+            if (node.children) {
+            return `
+                    <li>
+                    <div class='li-til'>${node.name}</div>
+                    ${buildTreeHtml(node.children, pathTag, newPath)}
+                    </li>
+                `;
+            } else {
+            // 文件节点，生成带完整路径的链接
+            var fullPath = pathTag + '/' + newPath.join('/');
+            return `
+                    <li>
+                    <a href="/play?path=${encodeURIComponent(fullPath)}">${node.name}</a>
+                    </li>
+                `;
+            }
+        }).join('')}
+            </ul>
+        `;
+    }
+
+    // 生成列表内容
+    function genTreeInfoHtml(videoInfo, vpath){
+        return videoInfo.map((node, index) => `
+            <div class="tree-root">
+            <h3>${index + 1}: ${node.name} (${node.type})</h3>
+            ${buildTreeHtml([node], vpath)}
+            </div>
+        `).join('');
+    }
+
+    // 获取信息
+    if ((!(undefined === key)) && (!('' === key))) {
+        fetch('/api/video-list?key=' + encodeURIComponent(key))
+            .then(response => response.json())
+            .then(data => {
+                var videoInfo = data.videoInfo;
+                var vpath = data.vpath;
+                var videoInfoEle = document.getElementById('video-list');
+                var text = genTreeInfoHtml(videoInfo, vpath);
+                videoInfoEle.innerHTML = videoInfoEle.innerHTML + text;
+                setClickOptions();
+            })
+            .catch(error => console.error('获取视频列表失败:', error));
+    }
+    else{
+        fetch('/api/video-paths')
+            .then(response => response.json())
+            .then(data => {
+                var videoPathList = data.videoPathList;
+                var lis = videoPathList.map(val=>{
+                    return '<li>' + '<a href="/videos?key=' + encodeURIComponent(val.key) + '">' + val.vpath + '</a></li>';
+                });
+                var text = '<div class="tree-root"><ul>' + lis.join('') + '</ul></div>';
+                var videoInfoEle = document.getElementById('video-list');
+                videoInfoEle.innerHTML = videoInfoEle.innerHTML + text;
+            })
+            .catch(error => console.error('获取视频目录失败:', error));
+    }
 </script>
 
 </html>
