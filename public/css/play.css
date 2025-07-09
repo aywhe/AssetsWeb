@@ -40,7 +40,7 @@ h2 {
     right: 0px;
     bottom: 0px;
     background-color: #d0d0d0;
-    transition: 0.3s;
+    transition: transform 0.3s;
 }
 
 .checkbox-slider:before {
@@ -50,8 +50,8 @@ h2 {
     height: 16px;
     top: 0px;
     left: 4px;
-    background-color: #000;
-    transition: 0.3s;
+    background-color: #777;
+    transition: transform 0.3s;
 }
 
 .add-container input[type="checkbox"] {
