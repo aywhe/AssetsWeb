@@ -33,7 +33,7 @@
                 您的浏览器不支持视频播放。
             </video>
             <div id="add_container" class="add-container">
-                <div id="auto_play_text">自动播放关：</div>
+                <div id="auto_play_text">自动播放(关)：</div>
                 <label for="auto_play_switch" class="switch">
                     <input type="checkbox" id="auto_play_switch">
                     <div class="checkbox-slider"></div>
@@ -155,9 +155,11 @@
             // 传递自动播放参数
             if('true' == autoPlayFlag){
                 auto_play_checked.checked = true;
-                const changeEvent = new Event('change');
-                auto_play_checked.dispatchEvent(changeEvent);
+            }else{
+                auto_play_checked.checked = false;
             }
+            const changeEvent = new Event('change');
+            auto_play_checked.dispatchEvent(changeEvent);
         }
 
         init();
