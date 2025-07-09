@@ -21,6 +21,7 @@
         var pathname = window.location.pathname;
         var urlParams = new URLSearchParams(queryString);
         var fullPath = (urlParams.get('path'));
+        var autoPlayFlag = urlParams.has('autoPlayFlag')?(urlParams.get('autoPlayFlag')):'false';
     </script>
     <div class="wrapper">
         <h2 id="til">
@@ -102,22 +103,23 @@
                     if (ind != -1) {
                         var button_container = document.getElementById("add_container");
                         // 有前一集
-                        if (ind != 0) {
+                        if (ind > 0) {
                             var btn_pre = document.createElement("button");
                             btn_pre.value = name_list[ind - 1];
                             btn_pre.addEventListener('click', function () {
-                                window.location.href = origin + pathname + '?path=' + encodeURIComponent(this.value);
+                                
+                                window.location.href = origin + pathname + '?path=' + encodeURIComponent(this.value) + '&autoPlayFlag=' + autoPlayFlag;
                             });
                             btn_pre.innerText = '前一集';
                             button_container.appendChild(btn_pre);
                         }
                         // 有后一集
-                        if (ind != name_list.length) {
+                        if (ind < name_list.length - 1) {
                             var btn_next = document.createElement("button");
                             btn_next.value = name_list[ind + 1];
                             btn_next.id = 'btn_next';
                             btn_next.addEventListener('click', function () {
-                                window.location.href = origin + pathname + '?path=' + encodeURIComponent(this.value);
+                                window.location.href = origin + pathname + '?path=' + encodeURIComponent(this.value) + '&autoPlayFlag=' + autoPlayFlag;
                             });
                             btn_next.innerText = '后一集';
                             button_container.appendChild(btn_next);
@@ -126,8 +128,8 @@
                             video.addEventListener('ended', function () {
                                 var btn_next = document.getElementById('btn_next');
                                 var auto_play_checked = document.getElementById('auto_play_switch');
-                                if (auto_play_checked.checked) {
-
+                                if (undefined != btn_next && auto_play_checked.checked) {
+                                    btn_next.click();
                                 }
                             });
                         }
@@ -138,12 +140,19 @@
                 .catch(error => console.error('获取播放列表失败:', error));
             // 修改自动播放文本
             var auto_play_checked = document.getElementById('auto_play_switch');
+            // 传递自动播放参数
+            if('true' == autoPlayFlag){
+                auto_play_checked.checked = true;
+            }
+            // 修改自动播放文本
             auto_play_checked.addEventListener('change', function () {
                 var auto_play_text = document.getElementById('auto_play_text');
                 if (this.checked) {
                     auto_play_text.innerText = '自动播放开：';
+                    autoPlayFlag = 'true';
                 } else {
                     auto_play_text.innerText = '自动播放关：';
+                    autoPlayFlag = 'false';
                 }
             });
 

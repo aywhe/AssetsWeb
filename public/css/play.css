@@ -45,12 +45,11 @@ h2 {
 
 .checkbox-slider:before {
     position: absolute;
-    top: 0px;
     content: '';
     width: 16px;
     height: 16px;
+    top: 0px;
     left: 4px;
-    bottom: 4px;
     background-color: #000;
     transition: 0.3s;
 }
