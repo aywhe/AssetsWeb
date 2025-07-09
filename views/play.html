@@ -140,22 +140,24 @@
                 .catch(error => console.error('获取播放列表失败:', error));
             // 修改自动播放文本
             var auto_play_checked = document.getElementById('auto_play_switch');
-            // 传递自动播放参数
-            if('true' == autoPlayFlag){
-                auto_play_checked.checked = true;
-            }
             // 修改自动播放文本
             auto_play_checked.addEventListener('change', function () {
                 var auto_play_text = document.getElementById('auto_play_text');
                 if (this.checked) {
-                    auto_play_text.innerText = '自动播放开：';
+                    auto_play_text.innerText = '自动播放(开)：';
                     autoPlayFlag = 'true';
                 } else {
-                    auto_play_text.innerText = '自动播放关：';
+                    auto_play_text.innerText = '自动播放(关)：';
                     autoPlayFlag = 'false';
                 }
             });
-
+            
+            // 传递自动播放参数
+            if('true' == autoPlayFlag){
+                auto_play_checked.checked = true;
+                const changeEvent = new Event('change');
+                auto_play_checked.dispatchEvent(changeEvent);
+            }
         }
 
         init();

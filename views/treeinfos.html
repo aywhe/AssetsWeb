@@ -58,7 +58,7 @@
             var fullPath = pathTag + '/' + newPath.join('/');
             return `
                     <li>
-                    <a href="/play?path=${encodeURIComponent(fullPath)}">${node.name}</a>
+                    <a href="/play?path=${encodeURIComponent(fullPath)}" target="_blank">${node.name}</a>
                     </li>
                 `;
             }
