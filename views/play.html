@@ -133,6 +133,12 @@
                                 }
                             });
                         }
+                        // 隐藏自动播放
+                        if(ind == 0 && ind == name_list.length - 1){
+                            var add_container = document.getElementById('add_container');
+                            //add_container.style.visibility = 'hidden';
+                            add_container.style.display = 'none';
+                        }
                     } else {
 
                     }
