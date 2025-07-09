@@ -242,7 +242,32 @@ app.get('/api/server-content', (req, res) => {
   });
   res.json(content);
 });
+// 获取播放页同目录列表
+app.get('/api/play-list', (req, res)=>{
+  const fullPath = req.query.fullPath;
+  const dirs = fullPath.split(/[\\/]/);
+  const vpath = '/' + dirs[1];
+  const key = Array.from(VideoPathTagMap.entries()).filter(([key,val])=>{
+    return val.vpath == vpath;
+  })[0][0];
+  var file_list = [];
+  if ((!(undefined === key)) && (!('' === key)) && VideoPathTagMap.has(key)) {
+    const videoInfo = VideoNameList.get(key);
+    var folder_ind = 2;
+    var subdir_files = videoInfo;
+    dirs.slice(2,-1).forEach((subdir)=>{
+      subdir_files = subdir_files.filter((val)=>{
+        return val.type == 'folder' && val.name == subdir;
+      })[0].children;
+    });
+    file_list = subdir_files.map((val)=>{
+      return [...dirs.slice(0,-1),val.name].join('/');
+    });
+  }else{
 
+  }
+  res.json(file_list);
+});
 // 获取视频目录结构
 app.get('/api/video-list', (req, res) => {
   const key = req.query.key;
