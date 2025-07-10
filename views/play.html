@@ -44,7 +44,7 @@
                 </select>
             </div>
 
-            <hr />
+            <hr id="hr" />
         </div>
 
     </div>
@@ -143,8 +143,10 @@
                         // 隐藏自动播放
                         if (ind == 0 && ind == name_list.length - 1) {
                             var add_container = document.getElementById('add_container');
+                            var hr = document.getElementById('hr');
                             //add_container.style.visibility = 'hidden';
                             add_container.style.display = 'none';
+                            hr.style.display = 'none';
                         }
                         // 填充select
                         var select_list = document.getElementById("select_list")
