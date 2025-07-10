@@ -118,5 +118,5 @@ select:hover {
 select option {
     background-color: #f0f0f0;
     color: #333;
-    text-align: left;
+    text-align: right;
 }
