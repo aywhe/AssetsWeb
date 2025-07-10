@@ -243,28 +243,32 @@ app.get('/api/server-content', (req, res) => {
   res.json(content);
 });
 // 获取播放页同目录列表
-app.get('/api/play-list', (req, res)=>{
+app.get('/api/play-list', (req, res) => {
   const fullPath = req.query.fullPath;
   const dirs = fullPath.split(/[\\/]/);
   const vpath = '/' + dirs[1];
-  const key = Array.from(VideoPathTagMap.entries()).filter(([key,val])=>{
-    return val.vpath == vpath;
-  })[0][0];
   var file_list = [];
-  if ((!(undefined === key)) && (!('' === key)) && VideoPathTagMap.has(key)) {
-    const videoInfo = VideoNameList.get(key);
-    var folder_ind = 2;
-    var subdir_files = videoInfo;
-    dirs.slice(2,-1).forEach((subdir)=>{
-      subdir_files = subdir_files.filter((val)=>{
-        return val.type == 'folder' && val.name == subdir;
-      })[0].children;
-    });
-    file_list = subdir_files.map((val)=>{
-      return [...dirs.slice(0,-1),val.name].join('/');
-    });
-  }else{
+  try {
+    const key = Array.from(VideoPathTagMap.entries()).filter(([key, val]) => {
+      return val.vpath == vpath;
+    })[0][0];
+    if ((!(undefined === key)) && (!('' === key)) && VideoPathTagMap.has(key)) {
+      const videoInfo = VideoNameList.get(key);
+      var folder_ind = 2;
+      var subdir_files = videoInfo;
+      dirs.slice(2, -1).forEach((subdir) => {
+        subdir_files = subdir_files.filter((val) => {
+          return val.type == 'folder' && val.name == subdir;
+        })[0].children;
+      });
+      file_list = subdir_files.map((val) => {
+        return [...dirs.slice(0, -1), val.name].join('/');
+      });
+    } else {
 
+    }
+  } catch (err) {
+    console.error('获取播放列表失败', err);
   }
   res.json(file_list);
 });
@@ -277,15 +281,15 @@ app.get('/api/video-list', (req, res) => {
     videoInfo = VideoNameList.get(key);
     vpath = VideoPathTagMap.get(key).vpath;
   }
-  res.json({videoInfo: videoInfo, key: key, vpath: vpath});
+  res.json({ videoInfo: videoInfo, key: key, vpath: vpath });
 });
 
 // 获取视频目录结构
 app.get('/api/video-paths', (req, res) => {
-  const videoPathList = Array.from(VideoPathTagMap.entries()).map(([key,val])=>{
-    return {key: key, vpath: val.vpath};
+  const videoPathList = Array.from(VideoPathTagMap.entries()).map(([key, val]) => {
+    return { key: key, vpath: val.vpath };
   });
-  res.json({videoPathList: videoPathList});
+  res.json({ videoPathList: videoPathList });
 });
 
 // 获取音乐文件信息
@@ -357,18 +361,18 @@ app.get('/api/lookfor-subtitles', (req, res) => {
 // 获取所有图片列表（用于slideshow）
 app.get('/api/all-images', (req, res) => {
   const subDir = req.query.subDir;
-  if (undefined === subDir || null === subDir || '' === subDir.trim()){
-    res.json({ images: PicturePathTagMap.images });    
-  }else{
-    var subDirs = PicturePathTagMap.paths.map((val)=>{
-      return path.join(val.vpath,subDir).replace(/\\/g,'/');
+  if (undefined === subDir || null === subDir || '' === subDir.trim()) {
+    res.json({ images: PicturePathTagMap.images });
+  } else {
+    var subDirs = PicturePathTagMap.paths.map((val) => {
+      return path.join(val.vpath, subDir).replace(/\\/g, '/');
     });
-    var images = PicturePathTagMap.images.filter((item)=>{
-      return subDirs.some((val)=>{
+    var images = PicturePathTagMap.images.filter((item) => {
+      return subDirs.some((val) => {
         return item.includes(val);
       });
     });
-    res.json({images: images});
+    res.json({ images: images });
   }
 });
 
