@@ -67,12 +67,50 @@ h2 {
     background-color: #d0d0d0;
 }
 
-button {
+button{
+    transition: transform 0.2s ease;
+}
+
+button:hover{
+    transform: scale(1.12);
+}
+
+#btn_pre,#btn_next{
+    padding: 0;
     margin: 0px 5px;
     cursor: pointer;
+    display: none;
+    border: none;
+}
+#auto_play_text{
+    padding: 0;
+    margin-left: 5px;
 }
 
 video {
     width: 100%;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    /* box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); */
+}
+
+.select-container{
+    max-width: 50%;
+    min-width: 80px;
+    margin-left: auto;
+}
+select{
+    border: none;
+    background: transparent;
+    border-radius: 0;
+}
+select:focus{
+    background: transparent;
+    outline: none;
+}
+select:hover{
+    cursor: pointer;
+}
+select option{
+    background-color: #f0f0f0;
+    color: #333;
+    text-align: left;
 }
