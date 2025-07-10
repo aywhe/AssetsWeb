@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
     <meta charset="UTF-8" />
     <title>内容卡片</title>
     <link rel="stylesheet" href="css/card.css" />
 </head>
+
 <body>
-    <h1>资源列表</h1><hr>
+    <h1>资源列表</h1>
+    <hr>
     <div id="card_container" class="container"></div>
     <script>
-        function getServerContent(){
+        function getServerContent() {
             fetch('/api/server-content')
                 .then(response => response.json())
                 .then(data => {
@@ -25,10 +28,11 @@
                         container.appendChild(ele);
                     });
                 })
-                .catch(error => console.log(error.message,error));
+                .catch(error => console.log(error.message, error));
         }
         // 获取列表
         getServerContent();
-    </script>    
+    </script>
 </body>
+
 </html>

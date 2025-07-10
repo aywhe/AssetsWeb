@@ -15,7 +15,7 @@
 <script>
     var queryString = window.location.search;
     var urlParams = new URLSearchParams(queryString);
-    var key = urlParams.has('key')?(urlParams.get('key')):'';
+    var key = urlParams.has('key') ? (urlParams.get('key')) : '';
     // 
     function setClickOptions() {
         // 设置点击函数
@@ -32,7 +32,7 @@
                         this.title = '点击展开列表';
                     }
                     else {
-                        this.textContent = this.textContent.substr(0,this.textContent.length - 4);
+                        this.textContent = this.textContent.substr(0, this.textContent.length - 4);
                         this.title = '点击收起列表'
                     }
                 }
@@ -47,16 +47,16 @@
             ${nodes.map(node => {
             const newPath = [...currentPath, node.name];
             if (node.children) {
-            return `
+                return `
                     <li>
                     <div class='li-til'>${node.name}</div>
                     ${buildTreeHtml(node.children, pathTag, newPath)}
                     </li>
                 `;
             } else {
-            // 文件节点，生成带完整路径的链接
-            var fullPath = pathTag + '/' + newPath.join('/');
-            return `
+                // 文件节点，生成带完整路径的链接
+                var fullPath = pathTag + '/' + newPath.join('/');
+                return `
                     <li>
                     <a href="/play?path=${encodeURIComponent(fullPath)}" target="_blank">${node.name}</a>
                     </li>
@@ -68,7 +68,7 @@
     }
 
     // 生成列表内容
-    function genTreeInfoHtml(videoInfo, vpath){
+    function genTreeInfoHtml(videoInfo, vpath) {
         return videoInfo.map((node, index) => `
             <div class="tree-root">
             <h3>${index + 1}: ${node.name} (${node.type})</h3>
@@ -91,12 +91,12 @@
             })
             .catch(error => console.error('获取视频列表失败:', error));
     }
-    else{
+    else {
         fetch('/api/video-paths')
             .then(response => response.json())
             .then(data => {
                 var videoPathList = data.videoPathList;
-                var lis = videoPathList.map(val=>{
+                var lis = videoPathList.map(val => {
                     return '<li>' + '<a href="/videos?key=' + encodeURIComponent(val.key) + '">' + val.vpath + '</a></li>';
                 });
                 var text = '<div class="tree-root"><ul>' + lis.join('') + '</ul></div>';

@@ -21,7 +21,7 @@
         var pathname = window.location.pathname;
         var urlParams = new URLSearchParams(queryString);
         var fullPath = (urlParams.get('path'));
-        var autoPlayFlag = urlParams.has('autoPlayFlag')?(urlParams.get('autoPlayFlag')):'false';
+        var autoPlayFlag = urlParams.has('autoPlayFlag') ? (urlParams.get('autoPlayFlag')) : 'false';
     </script>
     <div class="wrapper">
         <h2 id="til">
@@ -43,8 +43,8 @@
                 <select id="select_list" class="select-container">
                 </select>
             </div>
-            
-            <hr/>
+
+            <hr />
         </div>
 
     </div>
@@ -113,7 +113,7 @@
                         if (ind > 0) {
                             btn_pre.value = name_list[ind - 1];
                             btn_pre.addEventListener('click', function () {
-                                
+
                                 window.location.href = origin + pathname + '?path=' + encodeURIComponent(this.value) + '&autoPlayFlag=' + autoPlayFlag;
                             });
                             btn_pre.innerText = '前一集';
@@ -141,29 +141,29 @@
                             });
                         }
                         // 隐藏自动播放
-                        if(ind == 0 && ind == name_list.length - 1){
+                        if (ind == 0 && ind == name_list.length - 1) {
                             var add_container = document.getElementById('add_container');
                             //add_container.style.visibility = 'hidden';
                             add_container.style.display = 'none';
                         }
                         // 填充select
                         var select_list = document.getElementById("select_list")
-                        name_list.forEach((val,ind)=>{
-                            var base_name = val.substring(val.lastIndexOf('/') + 1,val.lastIndexOf('.'));
+                        name_list.forEach((val, ind) => {
+                            var base_name = val.substring(val.lastIndexOf('/') + 1, val.lastIndexOf('.'));
                             var option_ele = document.createElement("option");
                             option_ele.value = val;
                             option_ele.innerText = base_name;
                             select_list.add(option_ele);
                         });
                         select_list.selectedIndex = ind;
-                        select_list.addEventListener('change', function(){
+                        select_list.addEventListener('change', function () {
                             const sel_val = select_list.value;
-                            if(sel_val == fullPath){
+                            if (sel_val == fullPath) {
                                 // 同一个页面，不需要跳转
-                            }else{
-                                var base_name = sel_val.substring(sel_val.lastIndexOf('/') + 1,sel_val.lastIndexOf('.'));
-                                if(confirm("即将播放：\n《" + base_name + "》")){
-                                    window.location.href = origin + pathname + '?path=' + encodeURIComponent(sel_val) + '&autoPlayFlag=' + autoPlayFlag;                            
+                            } else {
+                                var base_name = sel_val.substring(sel_val.lastIndexOf('/') + 1, sel_val.lastIndexOf('.'));
+                                if (confirm("即将播放：\n《" + base_name + "》")) {
+                                    window.location.href = origin + pathname + '?path=' + encodeURIComponent(sel_val) + '&autoPlayFlag=' + autoPlayFlag;
                                 }
                             }
                         });
@@ -185,11 +185,11 @@
                     autoPlayFlag = 'false';
                 }
             });
-            
+
             // 传递自动播放参数
-            if('true' == autoPlayFlag){
+            if ('true' == autoPlayFlag) {
                 auto_play_checked.checked = true;
-            }else{
+            } else {
                 auto_play_checked.checked = false;
             }
             const changeEvent = new Event('change');

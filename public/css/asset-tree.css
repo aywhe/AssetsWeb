@@ -15,8 +15,8 @@ h3 {
     margin: 20px auto;
     justify-content: left;
     word-wrap: break-word;
-    width:100%;
-    
+    width: 100%;
+
 }
 
 /* 主列表样式 */
@@ -37,11 +37,11 @@ h3 {
     cursor: pointer;
 }
 
-.tree-root .li-til{
+.tree-root .li-til {
     cursor: pointer;
 }
 
-.hidden-ul{
+.hidden-ul {
     display: none;
 }
 

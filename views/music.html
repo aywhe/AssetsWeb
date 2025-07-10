@@ -10,7 +10,9 @@
 
 <body>
 
-    <div><h1 id="title" class="hidden-click-able" title="点击切换自动播放" onclick="onSwitchAutoPlay()">播放音乐</h1></div>
+    <div>
+        <h1 id="title" class="hidden-click-able" title="点击切换自动播放" onclick="onSwitchAutoPlay()">播放音乐</h1>
+    </div>
     <hr>
     <div>
         <h3 id="musicName" class="music-name hidden-click-able" title="点击筛选歌曲" onclick="onFilterFiles()">点击搜索歌曲</h3>
@@ -43,15 +45,15 @@
         const visiblePages = 10; // 可见页码数量
 
         // 音乐列表获取结束后的额外工作
-        function afterFetch(){
+        function afterFetch() {
             // 是否要随机播放
-            if(flagAutoPlay && flagAutoPlayAfterFetch){
+            if (flagAutoPlay && flagAutoPlayAfterFetch) {
                 flagAutoPlayAfterFetch = false; // 这个标记只作用一次
-                if(totalItems > 0){
+                if (totalItems > 0) {
                     const musicListEl = document.getElementById('musicList');
                     const musicListUl = musicListEl.getElementsByTagName('ul')[0];
                     const musicListItems = musicListUl.getElementsByTagName('li');
-                    const sel = Math.floor(Math.random()*(musicListItems.length - 0.5));
+                    const sel = Math.floor(Math.random() * (musicListItems.length - 0.5));
                     musicListItems[sel].click();
                 }
             }
@@ -60,9 +62,9 @@
         //获取音乐数据
         async function fetchMusic(page = 1, filter = '') {
             try {
-                const params = 'page=' + page 
-                        +'&pageSize=' + itemsPerPage
-                        +'&filter=' + encodeURIComponent(filter.trim());
+                const params = 'page=' + page
+                    + '&pageSize=' + itemsPerPage
+                    + '&filter=' + encodeURIComponent(filter.trim());
                 const res = await fetch('/api/page-music?' + params);
                 const data = await res.json();
                 totalItems = data.total;
@@ -157,7 +159,7 @@
                 addPaginationButton(totalPages, '>>', () => gotoPage(totalPages));
             } else {
                 addPaginationButton(totalPages, '>>', null, true);
-            }            
+            }
         }
 
         function addPaginationButton(page, text, onClick, disabled = false) {
@@ -175,30 +177,30 @@
         }
 
         // switch auto play
-        function onSwitchAutoPlay(){
+        function onSwitchAutoPlay() {
             const h1 = document.getElementById("title");
             flagAutoPlay = !flagAutoPlay;
-            if(flagAutoPlay){
+            if (flagAutoPlay) {
                 h1.innerHTML = '自动播放音乐';
                 const audioPlayer = document.getElementById('audioPlayer');
-                if(audioPlayer.ended || audioPlayer.paused){
+                if (audioPlayer.ended || audioPlayer.paused) {
                     audioPlayer.dispatchEvent(new Event('ended')); // 触发结束事件
                 }
             }
-            else{
+            else {
                 h1.innerHTML = '播放音乐';
             }
         }
         // 筛选歌曲
-        function onFilterFiles(){
-            var filter = prompt("输入要查找的文件信息",'');
-            if(filter === null) filter = '';
+        function onFilterFiles() {
+            var filter = prompt("输入要查找的文件信息", '');
+            if (filter === null) filter = '';
             fetchFilter = filter.trim();
             var musicNameEle = document.getElementById('musicName');
-            if(fetchFilter.length > 0){
+            if (fetchFilter.length > 0) {
                 musicNameEle.classList.add('music-name-aft-filter');
             }
-            else{
+            else {
                 musicNameEle.classList.remove('music-name-aft-filter');
             }
             gotoPage(1);
@@ -206,25 +208,25 @@
 
         function gotoPage(page) {
             currentPage = page;
-            fetchMusic(page,fetchFilter);
+            fetchMusic(page, fetchFilter);
         }
 
-        function prepareAutoPlay(){
+        function prepareAutoPlay() {
             const audioPlayer = document.getElementById('audioPlayer');
-            audioPlayer.addEventListener('ended', ()=>{
-                if(!flagAutoPlay) return;
+            audioPlayer.addEventListener('ended', () => {
+                if (!flagAutoPlay) return;
                 const totalPages = Math.ceil(totalItems / itemsPerPage);
-                const page = Math.floor(Math.random()*(totalPages - 0.5)) + 1;
+                const page = Math.floor(Math.random() * (totalPages - 0.5)) + 1;
                 flagAutoPlayAfterFetch = true; // fetch 是异步的，这里设置标记，fetch结束后根据这个标记判断是否自动播放
                 gotoPage(page); // 跳转到随机页面
             });
         }
-        
 
-        function init(){
+
+        function init() {
             // 初始化加载第一页
             gotoPage(currentPage);
-            prepareAutoPlay(); 
+            prepareAutoPlay();
         }
 
         // 初始化
