@@ -68,6 +68,7 @@ h2 {
 }
 
 button {
+    background: transparent;
     transition: transform 0.2s ease;
 }
 
