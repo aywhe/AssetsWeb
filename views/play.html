@@ -21,7 +21,7 @@
         var pathname = window.location.pathname;
         var urlParams = new URLSearchParams(queryString);
         var fullPath = (urlParams.get('path'));
-        var autoPlayFlag = urlParams.has('autoPlayFlag') ? (urlParams.get('autoPlayFlag')) : 'false';
+        var fullPathList = [];
     </script>
     <div class="wrapper">
         <h2 id="til">
@@ -50,21 +50,90 @@
     </div>
 
     <script>
-        function getFilePathExt2(filepath, defaultVal = '') {
-            var lang = defaultVal;
-            var arr = filepath.split(".");
-            if (arr.length >= 3) {
-                lang = arr[arr.length - 2];
-            }
-            return lang;
-        }
-        async function init() {
+        // 设置播放文件
+        function setVideoFile() {
+            document.getElementById("til").innerHTML = '正在播放 ' + fullPath;
             var ext = fullPath.substring(fullPath.lastIndexOf('.')).toLowerCase();
             var videoSourceElement = document.getElementById("video_source");
             videoSourceElement.src = fullPath;
             videoSourceElement.type = videoExtMap.get(ext);
-            document.getElementById("til").innerHTML = '正在播放 ' + fullPath;
-            //console.log(fullPath);
+            // flv
+            if ('.flv' === ext && flvjs.isSupported()) {
+                try {
+                    const video = document.getElementById('video');
+                    const flvPlayer = flvjs.createPlayer({
+                        type: 'flv',
+                        url: fullPath
+                    });
+                    flvPlayer.attachMediaElement(video);
+                    flvPlayer.load();
+                    flvPlayer.play();
+                } catch (error) {
+                    console.error('flv 出错', error);
+                    warning(error.message);
+                }
+            } else {
+                const video = document.getElementById('video');
+                video.load();
+                video.play();
+            }
+        }
+        // 设置按键
+        function setButtions() {
+            var ind = fullPathList.indexOf(fullPath);
+            if (ind != -1) {
+                var button_container = document.getElementById("add_container");
+                var btn_pre = document.getElementById("btn_pre");
+                var btn_next = document.getElementById("btn_next");
+                // 有前一集
+                if (ind > 0) {
+                    btn_pre.value = fullPathList[ind - 1];
+                    btn_pre.innerText = '前一集';
+                    btn_pre.style.display = 'block';
+                } else {
+                    btn_pre.style.display = 'none';
+                }
+                // 有后一集
+                if (ind < fullPathList.length - 1) {
+                    btn_next.value = fullPathList[ind + 1];
+                    btn_next.id = 'btn_next';
+                    btn_next.innerText = '后一集';
+                    btn_next.style.display = 'block';
+                } else {
+                    btn_next.style.display = 'none';
+                }
+                // 隐藏自动播放
+                if (ind == 0 && ind == fullPathList.length - 1) {
+                    var add_container = document.getElementById('add_container');
+                    var hr = document.getElementById('hr');
+                    //add_container.style.visibility = 'hidden';
+                    add_container.style.display = 'none';
+                    hr.style.display = 'none';
+                }
+                // 填充select
+                var select_list = document.getElementById("select_list");
+                select_list.innerHTML = '';
+                fullPathList.forEach((val, ind) => {
+                    var base_name = val.substring(val.lastIndexOf('/') + 1, val.lastIndexOf('.'));
+                    var option_ele = document.createElement("option");
+                    option_ele.value = val;
+                    option_ele.innerText = base_name;
+                    select_list.add(option_ele);
+                });
+                select_list.selectedIndex = ind;
+            } else {
+
+            }
+        }
+        // 获取字幕
+        function getSubtitles() {
+            // 删除原来的字幕
+            const video = document.getElementById('video');
+            if (video.textTracks && video.textTracks.length > 0) {
+                video.textTracks.forEach((val, ind) => {
+                    video.removeChild(val);
+                });
+            }
             // 尝试添加字幕
             fetch('/api/lookfor-subtitles?path=' + encodeURIComponent(fullPath) + '&subtitleExts=' + encodeURIComponent(JSON.stringify(subtileExts)))
                 .then(response => response.json())
@@ -83,95 +152,26 @@
                     }
                 })
                 .catch(error => console.error('获取字幕失败:', error));
-            // flv
-            if ('.flv' === ext && flvjs.isSupported()) {
-                try {
-                    const video = document.getElementById('video');
-                    const flvPlayer = flvjs.createPlayer({
-                        type: 'flv',
-                        url: fullPath
-                    });
-                    flvPlayer.attachMediaElement(video);
-                    flvPlayer.load();
-                    flvPlayer.play();
-                } catch (error) {
-                    console.error('flv 出错', error);
-                    warning(error.message);
-                }
-            }
+        }
+
+        // 播放其他文件
+        function resetPlayFile(filename) {
+            fullPath = filename;
+            setVideoFile();
+            getSubtitles();
+            setButtions();
+        }
+        async function init() {
+            //console.log(fullPath);
+            setVideoFile();
+            getSubtitles();
             // 获取播放列表
-            fetch('/api/play-list?fullPath=' + encodeURIComponent(fullPath))
+            await fetch('/api/play-list?fullPath=' + encodeURIComponent(fullPath))
                 .then(response => response.json())
                 .then(name_list => {
-                    name_list.sort();
-                    var ind = name_list.indexOf(fullPath);
-                    if (ind != -1) {
-                        var button_container = document.getElementById("add_container");
-                        var btn_pre = document.getElementById("btn_pre");
-                        var btn_next = document.getElementById("btn_next");
-                        // 有前一集
-                        if (ind > 0) {
-                            btn_pre.value = name_list[ind - 1];
-                            btn_pre.addEventListener('click', function () {
-
-                                window.location.href = origin + pathname + '?path=' + encodeURIComponent(this.value) + '&autoPlayFlag=' + autoPlayFlag;
-                            });
-                            btn_pre.innerText = '前一集';
-                            btn_pre.style.display = 'block';
-                            //button_container.appendChild(btn_pre);
-                        }
-                        // 有后一集
-                        if (ind < name_list.length - 1) {
-                            btn_next.value = name_list[ind + 1];
-                            btn_next.id = 'btn_next';
-                            btn_next.addEventListener('click', function () {
-                                window.location.href = origin + pathname + '?path=' + encodeURIComponent(this.value) + '&autoPlayFlag=' + autoPlayFlag;
-                            });
-                            btn_next.innerText = '后一集';
-                            btn_next.style.display = 'block';
-                            //button_container.appendChild(btn_next);
-                            // 自动播放
-                            const video = document.getElementById('video');
-                            video.addEventListener('ended', function () {
-                                var btn_next = document.getElementById('btn_next');
-                                var auto_play_checked = document.getElementById('auto_play_switch');
-                                if (undefined != btn_next && auto_play_checked.checked) {
-                                    btn_next.click();
-                                }
-                            });
-                        }
-                        // 隐藏自动播放
-                        if (ind == 0 && ind == name_list.length - 1) {
-                            var add_container = document.getElementById('add_container');
-                            var hr = document.getElementById('hr');
-                            //add_container.style.visibility = 'hidden';
-                            add_container.style.display = 'none';
-                            hr.style.display = 'none';
-                        }
-                        // 填充select
-                        var select_list = document.getElementById("select_list")
-                        name_list.forEach((val, ind) => {
-                            var base_name = val.substring(val.lastIndexOf('/') + 1, val.lastIndexOf('.'));
-                            var option_ele = document.createElement("option");
-                            option_ele.value = val;
-                            option_ele.innerText = base_name;
-                            select_list.add(option_ele);
-                        });
-                        select_list.selectedIndex = ind;
-                        select_list.addEventListener('change', function () {
-                            const sel_val = select_list.value;
-                            if (sel_val == fullPath) {
-                                // 同一个页面，不需要跳转
-                            } else {
-                                var base_name = sel_val.substring(sel_val.lastIndexOf('/') + 1, sel_val.lastIndexOf('.'));
-                                if (confirm("即将播放：\n《" + base_name + "》")) {
-                                    window.location.href = origin + pathname + '?path=' + encodeURIComponent(sel_val) + '&autoPlayFlag=' + autoPlayFlag;
-                                }
-                            }
-                        });
-                    } else {
-
-                    }
+                    fullPathList = name_list;
+                    fullPathList.sort();
+                    setButtions();
                 })
                 .catch(error => console.error('获取播放列表失败:', error));
             // 修改自动播放文本
@@ -187,17 +187,39 @@
                     autoPlayFlag = 'false';
                 }
             });
-
-            // 传递自动播放参数
-            if ('true' == autoPlayFlag) {
-                auto_play_checked.checked = true;
-            } else {
-                auto_play_checked.checked = false;
-            }
-            const changeEvent = new Event('change');
-            auto_play_checked.dispatchEvent(changeEvent);
+            // select 点击响应
+            var select_list = document.getElementById("select_list");
+            select_list.addEventListener('change', function () {
+                const sel_val = select_list.value;
+                if (sel_val == fullPath) {
+                    // 同一个页面，不需要跳转
+                } else {
+                    resetPlayFile(sel_val);
+                }
+            });
+            // 按钮响应
+            var btn_pre = document.getElementById("btn_pre");
+            var btn_next = document.getElementById("btn_next");
+            btn_pre.addEventListener('click', function () {
+                resetPlayFile(this.value);
+            });
+            btn_next.addEventListener('click', function () {
+                resetPlayFile(this.value);
+            });
+            // 播放结束时的响应
+            const video = document.getElementById('video');
+            video.addEventListener('ended', function () {
+                var btn_next = document.getElementById('btn_next');
+                if (btn_next.checkVisibility()) {
+                    var auto_play_checked = document.getElementById('auto_play_switch');
+                    if (auto_play_checked.checked) {
+                        btn_next.click();
+                    }
+                }
+            });
         }
 
+        // run
         init();
     </script>
 
