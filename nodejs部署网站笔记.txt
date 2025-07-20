@@ -44,3 +44,4 @@
 9. 问题： onclick="onClickFunction()"，出现错误 onClickFunction undefined。
    方法： function onClickFunction(){} 要放在 fetch 等异步函数操作的前面，反正就是要尽快加载 onClickFunction()
 10. 问题： 自动播放功能在全屏时，跳转后不再全屏，所以传递参数自动全屏，但是遇到问题是，为了安全性考虑“全屏必需要用户点击”，不能用程序自动全屏。
+   方法： 不跳转页面，只在当前页面修改播放参数。
