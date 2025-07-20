@@ -9,6 +9,7 @@
 
 <body>
     <script src="js/flv.min.js"></script>
+    <script src="js/js.cookie.min.js"></script>
     <script>
         const subtileExts = ['.vtt'];
         const videoExtMap = new Map([
@@ -29,7 +30,6 @@
         <div class="video-container">
             <video id="video" controls autoplay>
                 <source id="video_source" src="" type="">
-
                 您的浏览器不支持视频播放。
             </video>
             <div id="add_container" class="add-container">
@@ -174,19 +174,26 @@
                     setButtions();
                 })
                 .catch(error => console.error('获取播放列表失败:', error));
-            // 修改自动播放文本
+            // 修改自动播放
             var auto_play_checked = document.getElementById('auto_play_switch');
+            if(Cookies.get('autoPlayFlag')){
+                auto_play_checked.checked = true;
+            } else {
+                auto_play_checked.checked = false;
+            }
             // 修改自动播放文本
             auto_play_checked.addEventListener('change', function () {
                 var auto_play_text = document.getElementById('auto_play_text');
                 if (this.checked) {
                     auto_play_text.innerText = '自动播放(开)：';
-                    autoPlayFlag = 'true';
                 } else {
                     auto_play_text.innerText = '自动播放(关)：';
-                    autoPlayFlag = 'false';
                 }
+                // 更新 cookie
+                Cookies.set('autoPlayFlag', auto_play_checked.checked, {path: ''});
             });
+            const changeEvent = new Event('change');
+            auto_play_checked.dispatchEvent(changeEvent);
             // select 点击响应
             var select_list = document.getElementById("select_list");
             select_list.addEventListener('change', function () {
