@@ -190,7 +190,7 @@
                     auto_play_text.innerText = '自动播放(关)：';
                 }
                 // 更新 cookie
-                Cookies.set('autoPlayFlag', auto_play_checked.checked, {path: ''});
+                Cookies.set('autoPlayFlag', auto_play_checked.checked, {expires: 5, path: ''});
             });
             const changeEvent = new Event('change');
             auto_play_checked.dispatchEvent(changeEvent);
