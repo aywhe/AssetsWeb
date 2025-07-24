@@ -4,6 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const app = express();
 
+const __DEBUG__ = false;
+
 //////////////////////// global datas ///////////////////////////////////
 const ConfigFilePath = 'assets_config.json';
 var PORT = 3000;
@@ -82,16 +84,6 @@ function findOtherExtFiles(fullPath, exts) {
       }
     }
   });
-  return foundFiles;
-
-  /*   const pattern = path.join(dirName, `${prefix}*{${exts.join(',')}}`);
-    glob.glob(pattern, { nocase: true }, (err, files) => {
-      foundFiles = files;
-      if (err) {
-        console.error('查找文件出错',error);
-      }
-    }); */
-
   return foundFiles;
 }
 // 自定义断言
@@ -360,20 +352,61 @@ app.get('/api/lookfor-subtitles', (req, res) => {
 
 // 获取所有图片列表（用于slideshow）
 app.get('/api/all-images', (req, res) => {
+  const subDirs = req.query.subDirs;
   const subDir = req.query.subDir;
-  if (undefined === subDir || null === subDir || '' === subDir.trim()) {
-    res.json({ images: PicturePathTagMap.images });
-  } else {
-    var subDirs = PicturePathTagMap.paths.map((val) => {
-      return path.join(val.vpath, subDir).replace(/\\/g, '/');
-    });
-    var images = PicturePathTagMap.images.filter((item) => {
-      return subDirs.some((val) => {
+  const excludes = req.query.excludes;
+
+  const parseSubDirs = function(dirs){
+    // 分割字符串参数
+    if (undefined === dirs || null === dirs || '' === dirs.trim()) {
+      return [];
+    } else {
+      return dirs.trim().split(',');
+    }
+  };
+  // 整理后的子目录 
+  var actSubDirs = [...parseSubDirs(subDirs), ...parseSubDirs(subDir)];
+  // 排除的目录
+  var actExcludes = parseSubDirs(excludes);
+
+  if(__DEBUG__) {console.dir(actSubDirs);}
+  if(__DEBUG__) {console.dir(actExcludes);}
+
+  const genFilterPath = function(dirs){
+    // 构造完整目录前缀
+    if (undefined === dirs || null === dirs || 0 == dirs.length) {
+      return [];
+    }
+    return PicturePathTagMap.paths.map((_path) => {
+      return dirs.map((_dir) => {
+        return path.join(_path.vpath, _dir).replace(/\\/g, '/');
+      });
+    }).flat();
+  };
+
+  // 构造前缀，筛选文件
+  var images = PicturePathTagMap.images;
+  if (actSubDirs.length > 0) {
+    var fullSubDirs = genFilterPath(actSubDirs);
+    images = images.filter((item) => {
+      // 筛选
+      return fullSubDirs.some((val) => {
         return item.includes(val);
       });
     });
-    res.json({ images: images });
   }
+  // 构造前缀，筛选文件
+  if (actExcludes.length > 0) {
+    var fullExcludes = genFilterPath(actExcludes);
+    images = images.filter((item) => {
+      // 排除
+      return !fullExcludes.some((val) => {
+        return item.includes(val);
+      });
+    });
+  }
+  // response
+  res.json({ images: images });
 });
 
 /////////////////////////////////////////////////////////////////////////
@@ -415,6 +448,9 @@ app.get('/', (req, res) => {
 // 初始化工作
 initConfig();
 initDatas();
+
+if(__DEBUG__) {PORT = 3001;}
+
 // 启动服务器
 app.listen(PORT, () => {
   console.log(`服务器运行在 http://localhost:${PORT}`);

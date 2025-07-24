@@ -33,6 +33,8 @@
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     const subDir = urlParams.has('subDir') ? urlParams.get('subDir') : '';
+    const subDirs = urlParams.has('subDirs') ? urlParams.get('subDirs') : '';
+    const excludes = urlParams.has('excludes') ? urlParams.get('excludes') : '';
 
     // 获取图片列表
     let allImages = [];
@@ -42,7 +44,10 @@
     var g_wrapper = null;
 
 
-    fetch('/api/all-images?subDir=' + encodeURIComponent(subDir))
+    fetch('/api/all-images?subDirs=' + encodeURIComponent(subDirs) 
+      + '&subDir=' + encodeURIComponent(subDir)
+      + '&excludes=' + encodeURIComponent(excludes)
+      )
       .then(response => response.json())
       .then(data => {
         allImages = data.images;
