@@ -23,6 +23,9 @@
         var urlParams = new URLSearchParams(queryString);
         var fullPath = (urlParams.get('path'));
         var fullPathList = [];
+        var videoSlipTime = 10;
+        var videoSlipVolume = 0.05;
+        var videoSetCurrentTimeRange = [0.1, 0.9]; // 自动设置进度条时只在中间区域有效
     </script>
     <div class="wrapper">
         <h2 id="til">
@@ -154,12 +157,21 @@
                 .catch(error => console.error('获取字幕失败:', error));
         }
 
+        // 保存video相关cookies
+        function saveVideoCookies(){
+            Cookies.set(getCookieVideoCurrentTimeFlag(), video.currentTime - videoSlipTime, {path: ''});
+        }
+
         // 播放其他文件
         function resetPlayFile(filename) {
+            saveVideoCookies();
             fullPath = filename;
             setVideoFile();
             getSubtitles();
             setButtions();
+        }
+        function getCookieVideoCurrentTimeFlag(){
+            return 'video-current-time-' + fullPath;
         }
         async function init() {
             //console.log(fullPath);
@@ -223,6 +235,45 @@
                         btn_next.click();
                     }
                 }
+            });
+            // video响应
+            video.addEventListener('loadedmetadata', function() {
+                // 读取cookie
+                var cookieVideoCurrentTime =  Cookies.get(getCookieVideoCurrentTimeFlag());
+                if(cookieVideoCurrentTime){
+                    var timeRangePos = cookieVideoCurrentTime/video.duration;
+                    if(timeRangePos >= videoSetCurrentTimeRange[0] && timeRangePos <= videoSetCurrentTimeRange[1]){
+                        video.currentTime = cookieVideoCurrentTime;
+                    }
+                }
+
+                // 按键响应
+                document.addEventListener('keydown', (event) => {
+                    // 阻止默认行为
+                    event.preventDefault();
+                    //
+                    const key = event.key;
+                    switch(key) {
+                        case 'ArrowLeft':
+                            video.currentTime -= videoSlipTime;
+                            break;
+                        case 'ArrowRight':
+                            video.currentTime += videoSlipTime;
+                            break;
+                        case 'ArrowUp':
+                            video.volume = Math.min(1.0, video.volume + videoSlipVolume);
+                            break;
+                        case 'ArrowDown':
+                            video.volume = Math.max(0.0, video.volume - videoSlipVolume);
+                            break;
+                        default:
+                            break;
+                    }
+                });
+            });
+            // 关闭页面时保存 cookie
+            window.addEventListener('beforeunload', function(event) {
+                saveVideoCookies();
             });
         }
 
