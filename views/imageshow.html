@@ -130,8 +130,10 @@
           tip.classList.remove('show-tip');
         }, 1500);
       })
-      //      
-      setInterval(restoreSlideOntime, autoPlayDelay);
+      //显示一半的图片后开启自动清理和补充
+      setTimeout(() => {
+        setInterval(restoreSlideOntime, autoPlayDelay);
+      }, autoPlayDelay * Math.round(allImagesEndIdx / 2));
     }
   </script>
 </body>
