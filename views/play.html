@@ -159,7 +159,7 @@
 
         // 保存video相关cookies
         function saveVideoCookies(){
-            Cookies.set(getCookieVideoCurrentTimeFlag(), video.currentTime - videoSlipTime, {path: ''});
+            Cookies.set(getCookieVideoCurrentTimeFlag(), video.currentTime - videoSlipTime, {expires: 2, path: ''});
         }
 
         // 播放其他文件
