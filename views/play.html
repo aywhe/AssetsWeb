@@ -193,6 +193,7 @@
                 .then(name_list => {
                     fullPathList = name_list;
                     fullPathList.sort();
+                    //fullPathList.sort((a, b) => { return a.localeCompare(b, 'zh-Hans-CN', { numeric: true }); }); // 这样排序可能会遇到更复杂的问题
                     setButtions();
                 })
                 .catch(error => console.error('获取播放列表失败:', error));

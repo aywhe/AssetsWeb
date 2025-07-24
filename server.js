@@ -241,23 +241,31 @@ app.get('/api/play-list', (req, res) => {
   const vpath = '/' + dirs[1];
   var file_list = [];
   try {
+    // 获取key
     const key = Array.from(VideoPathTagMap.entries()).filter(([key, val]) => {
       return val.vpath == vpath;
     })[0][0];
+    // 只对有效的key做处理
     if ((!(undefined === key)) && (!('' === key)) && VideoPathTagMap.has(key)) {
       const videoInfo = VideoNameList.get(key);
       var folder_ind = 2;
       var subdir_files = videoInfo;
+      // 目录一层一层的匹配下去，遇到错误的话给catch
       dirs.slice(2, -1).forEach((subdir) => {
         subdir_files = subdir_files.filter((val) => {
           return val.type == 'folder' && val.name == subdir;
         })[0].children;
       });
-      file_list = subdir_files.map((val) => {
+      // 找到了同一个目录中的文件，在 subdir_files 中
+      file_list = subdir_files.filter((val) => {
+        // 放弃更深层的子目录
+        return val.type == 'file';
+      }).map((val) => {
+        // 补全目录名称
         return [...dirs.slice(0, -1), val.name].join('/');
       });
     } else {
-
+      // 无效的key，file_list 保留为空;
     }
   } catch (err) {
     console.error('获取播放列表失败', err);
@@ -356,7 +364,7 @@ app.get('/api/all-images', (req, res) => {
   const subDir = req.query.subDir;
   const excludes = req.query.excludes;
 
-  const parseSubDirs = function(dirs){
+  const parseSubDirs = function (dirs) {
     // 分割字符串参数
     if (undefined === dirs || null === dirs || '' === dirs.trim()) {
       return [];
@@ -369,10 +377,10 @@ app.get('/api/all-images', (req, res) => {
   // 排除的目录
   var actExcludes = parseSubDirs(excludes);
 
-  if(__DEBUG__) {console.dir(actSubDirs);}
-  if(__DEBUG__) {console.dir(actExcludes);}
+  if (__DEBUG__) { console.dir(actSubDirs); }
+  if (__DEBUG__) { console.dir(actExcludes); }
 
-  const genFilterPath = function(dirs){
+  const genFilterPath = function (dirs) {
     // 构造完整目录前缀
     if (undefined === dirs || null === dirs || 0 == dirs.length) {
       return [];
@@ -449,7 +457,7 @@ app.get('/', (req, res) => {
 initConfig();
 initDatas();
 
-if(__DEBUG__) {PORT = 3001;}
+if (__DEBUG__) { PORT = 3001; }
 
 // 启动服务器
 app.listen(PORT, () => {

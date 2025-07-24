@@ -52,10 +52,10 @@
       return arr;
     }
 
-    fetch('/api/all-images?subDirs=' + encodeURIComponent(subDirs) 
+    fetch('/api/all-images?subDirs=' + encodeURIComponent(subDirs)
       + '&subDir=' + encodeURIComponent(subDir)
       + '&excludes=' + encodeURIComponent(excludes)
-      )
+    )
       .then(response => response.json())
       .then(data => {
         allImages = shuffleArray(data.images); // 随机打乱
