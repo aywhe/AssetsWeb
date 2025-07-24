@@ -18,6 +18,9 @@
     var urlParams = new URLSearchParams(queryString);
     var key = urlParams.has('key') ? (urlParams.get('key')) : '';
     var hiddenTextListFlag = key + '-hiddenTextList';
+    if(key.length > 0) {
+        document.title = key + '-文件列表';
+    }
 
     // 收起和展开的标题字符串
     function hiddenText(text){

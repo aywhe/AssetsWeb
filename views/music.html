@@ -101,6 +101,9 @@
             const audioPlayer = document.getElementById('audioPlayer');
             audioPlayer.src = url;
             audioPlayer.play();
+            // 修改title
+            var base_name = url.substring(url.lastIndexOf('/') + 1);
+            document.title = '播放音乐-' + base_name;
         }
 
         function renderPagination() {

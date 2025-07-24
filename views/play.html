@@ -55,7 +55,11 @@
     <script>
         // 设置播放文件
         function setVideoFile() {
+            // 设置标题
             document.getElementById("til").innerHTML = '正在播放 ' + fullPath;
+            var base_name = fullPath.substring(fullPath.lastIndexOf('/') + 1);
+            document.title = '播放视频-' + base_name;
+
             var ext = fullPath.substring(fullPath.lastIndexOf('.')).toLowerCase();
             var videoSourceElement = document.getElementById("video_source");
             videoSourceElement.src = fullPath;
@@ -174,10 +178,14 @@
             }
         }
 
+        function setFullPath(filename) {
+            fullPath = filename;
+        }
+
         // 播放其他文件
         function resetPlayFile(filename) {
             setVideoCookies();
-            fullPath = filename;
+            setFullPath(filename);
             setVideoFile();
             getSubtitles();
             setButtions();
