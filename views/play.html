@@ -157,9 +157,18 @@
                 .catch(error => console.error('获取字幕失败:', error));
         }
 
+        // 进度条信息cookie的key名称
+        function getCookieVideoCurrentTimeFlag() {
+            return 'video-current-time-' + fullPath;
+        }
+
         // 保存video相关cookies
-        function saveVideoCookies(){
-            Cookies.set(getCookieVideoCurrentTimeFlag(), video.currentTime - videoSlipTime, {expires: 2, path: ''});
+        function saveVideoCookies() {
+            const video = document.getElementById('video');
+            var timeRangePos = video.currentTime / video.duration;
+            if (timeRangePos >= videoSetCurrentTimeRange[0] && timeRangePos <= videoSetCurrentTimeRange[1]) {
+                Cookies.set(getCookieVideoCurrentTimeFlag(), video.currentTime - videoSlipTime, { expires: 2, path: '' });
+            }
         }
 
         // 播放其他文件
@@ -170,9 +179,7 @@
             getSubtitles();
             setButtions();
         }
-        function getCookieVideoCurrentTimeFlag(){
-            return 'video-current-time-' + fullPath;
-        }
+        // initialize
         async function init() {
             //console.log(fullPath);
             setVideoFile();
@@ -188,7 +195,7 @@
                 .catch(error => console.error('获取播放列表失败:', error));
             // 修改自动播放
             var auto_play_checked = document.getElementById('auto_play_switch');
-            if(Cookies.get('autoPlayFlag')){
+            if (Cookies.get('autoPlayFlag')) {
                 auto_play_checked.checked = true;
             } else {
                 auto_play_checked.checked = false;
@@ -202,7 +209,7 @@
                     auto_play_text.innerText = '自动播放(关)：';
                 }
                 // 更新 cookie
-                Cookies.set('autoPlayFlag', auto_play_checked.checked, {expires: 5, path: ''});
+                Cookies.set('autoPlayFlag', auto_play_checked.checked, { expires: 5, path: '' });
             });
             const changeEvent = new Event('change');
             auto_play_checked.dispatchEvent(changeEvent);
@@ -237,42 +244,16 @@
                 }
             });
             // video响应
-            video.addEventListener('loadedmetadata', function() {
+            video.addEventListener('loadedmetadata', function () {
+                const video = document.getElementById('video');
                 // 读取cookie
-                var cookieVideoCurrentTime =  Cookies.get(getCookieVideoCurrentTimeFlag());
-                if(cookieVideoCurrentTime){
-                    var timeRangePos = cookieVideoCurrentTime/video.duration;
-                    if(timeRangePos >= videoSetCurrentTimeRange[0] && timeRangePos <= videoSetCurrentTimeRange[1]){
-                        video.currentTime = cookieVideoCurrentTime;
-                    }
+                var cookieVideoCurrentTime = Cookies.get(getCookieVideoCurrentTimeFlag());
+                if (cookieVideoCurrentTime) {
+                    video.currentTime = cookieVideoCurrentTime;
                 }
-
-                // 按键响应
-                document.addEventListener('keydown', (event) => {
-                    // 阻止默认行为
-                    event.preventDefault();
-                    //
-                    const key = event.key;
-                    switch(key) {
-                        case 'ArrowLeft':
-                            video.currentTime -= videoSlipTime;
-                            break;
-                        case 'ArrowRight':
-                            video.currentTime += videoSlipTime;
-                            break;
-                        case 'ArrowUp':
-                            video.volume = Math.min(1.0, video.volume + videoSlipVolume);
-                            break;
-                        case 'ArrowDown':
-                            video.volume = Math.max(0.0, video.volume - videoSlipVolume);
-                            break;
-                        default:
-                            break;
-                    }
-                });
             });
             // 关闭页面时保存 cookie
-            window.addEventListener('beforeunload', function(event) {
+            window.addEventListener('beforeunload', function (event) {
                 saveVideoCookies();
             });
         }
