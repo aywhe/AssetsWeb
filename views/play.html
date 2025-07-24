@@ -25,7 +25,7 @@
         var fullPathList = [];
         var videoSlipTime = 10;
         var videoSlipVolume = 0.05;
-        var videoSetCurrentTimeRange = [0.1, 0.9]; // 自动设置进度条时只在中间区域有效
+        var videoSetCurrentTimeRange = [0.05, 0.95]; // 自动设置进度条时只在中间区域有效
     </script>
     <div class="wrapper">
         <h2 id="til">
@@ -165,9 +165,12 @@
         // 保存video相关cookies
         function saveVideoCookies() {
             const video = document.getElementById('video');
+            const opt = { expires: 2, path: '' };
             var timeRangePos = video.currentTime / video.duration;
             if (timeRangePos >= videoSetCurrentTimeRange[0] && timeRangePos <= videoSetCurrentTimeRange[1]) {
-                Cookies.set(getCookieVideoCurrentTimeFlag(), video.currentTime - videoSlipTime, { expires: 2, path: '' });
+                Cookies.set(getCookieVideoCurrentTimeFlag(), video.currentTime - videoSlipTime, opt);
+            } else {
+                Cookies.remove(getCookieVideoCurrentTimeFlag(), opt);
             }
         }
 
