@@ -163,7 +163,7 @@
         }
 
         // 保存video相关cookies
-        function saveVideoCookies() {
+        function setVideoCookies() {
             const video = document.getElementById('video');
             const opt = { expires: 2, path: '' };
             var timeRangePos = video.currentTime / video.duration;
@@ -176,7 +176,7 @@
 
         // 播放其他文件
         function resetPlayFile(filename) {
-            saveVideoCookies();
+            setVideoCookies();
             fullPath = filename;
             setVideoFile();
             getSubtitles();
@@ -257,7 +257,7 @@
             });
             // 关闭页面时保存 cookie
             window.addEventListener('beforeunload', function (event) {
-                saveVideoCookies();
+                setVideoCookies();
             });
         }
 

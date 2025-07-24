@@ -137,7 +137,11 @@
         }).map((div) => {
             return unHiddenText(div.textContent);
         });
-        Cookies.set(hiddenTextListFlag, JSON.stringify(hiddenTextList), {path: ''});
+        if(hiddenTextList.length > 0){
+            Cookies.set(hiddenTextListFlag, JSON.stringify(hiddenTextList), {path: ''});
+        } else {
+            Cookies.remove(hiddenTextListFlag, {path: ''});
+        }
     });
 </script>
 
