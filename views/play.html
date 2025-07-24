@@ -17,11 +17,14 @@
             ['.mkv', ''], // mkv格式，给的格式要为空，因为mkv只是容器，具体编码未知，有的mkv能播放有的不能
             ['.mp4', 'video/mp4'],
         ]);
+
         var queryString = window.location.search;
         var origin = window.location.origin;
         var pathname = window.location.pathname;
         var urlParams = new URLSearchParams(queryString);
-        var fullPath = (urlParams.get('path'));
+        var fullPath = sessionStorage.getItem('fullPath');
+        if (null === fullPath) { fullPath = (urlParams.get('path')); }
+
         var fullPathList = [];
         var videoSlipTime = 10;
         var videoSlipVolume = 0.05;
@@ -172,7 +175,7 @@
             const opt = { expires: 2, path: '' };
             var timeRangePos = video.currentTime / video.duration;
             if (timeRangePos >= videoSetCurrentTimeRange[0] && timeRangePos <= videoSetCurrentTimeRange[1]) {
-                Cookies.set(getCookieVideoCurrentTimeFlag(), video.currentTime - videoSlipTime, opt);
+                Cookies.set(getCookieVideoCurrentTimeFlag(), video.currentTime, opt);
             } else {
                 Cookies.remove(getCookieVideoCurrentTimeFlag(), opt);
             }
@@ -180,6 +183,8 @@
 
         function setFullPath(filename) {
             fullPath = filename;
+            // 存到 sessionStorage 中
+            sessionStorage.setItem('fullPath', fullPath);
         }
 
         // 播放其他文件
@@ -261,7 +266,7 @@
                 // 读取cookie
                 var cookieVideoCurrentTime = Cookies.get(getCookieVideoCurrentTimeFlag());
                 if (cookieVideoCurrentTime) {
-                    video.currentTime = cookieVideoCurrentTime;
+                    video.currentTime = cookieVideoCurrentTime - videoSlipTime;
                 }
             });
             // 关闭页面时保存 cookie
