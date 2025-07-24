@@ -413,7 +413,7 @@ app.get('/api/all-images', (req, res) => {
 // 图片轮播页面
 app.get('/imageshow', (req, res) => {
   if (PicturePathTagMap.images.length > 0) {
-    PicturePathTagMap.images = shuffleArray(PicturePathTagMap.images);
+    //PicturePathTagMap.images = shuffleArray(PicturePathTagMap.images); // 放客户端
     res.sendFile(path.join(__dirname, 'views', 'imageshow.html'));
   } else {
     res.send('没有图片可以显示');
