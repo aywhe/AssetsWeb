@@ -38,9 +38,10 @@
 
     // 获取图片列表
     let allImages = [];
-    let allImagesEndIdx = 50;
+    let allImagesEndIdx = 20;
     let autoPlayDelay = 6000;
     let isPaused = false;
+    var isHandledSlide = false; // 接管轮播动作
     var g_wrapper = null;
 
     // 随机排列数组元素
@@ -72,10 +73,17 @@
       const slide = document.createElement('div');
       slide.className = 'swiper-slide';
       slide.innerHTML = `<img src="${imageUrl}" alt="轮播图片 ${index + 1}">`;
-      if (g_wrapper === null) { g_wrapper = new Swiper('.swiper-container'); }
-      g_wrapper.removeSlide(0);//(wrapper.firstElementChild);
+      // 接管轮播动作
+      if(!isHandledSlide) {
+        g_wrapper.autoplay.stop();
+        isHandledSlide = true;
+      } 
+      // 删除第一个，尾部加一个
       g_wrapper.appendSlide(slide);
+      g_wrapper.removeSlide(0);
       g_wrapper.update();
+      g_wrapper.slideNext();
+      //g_wrapper.autoplay.start();
     }
 
     function initSlideshow() {
@@ -97,12 +105,12 @@
       // 初始化 Swiper
       g_wrapper = new Swiper('.swiper-container', {
         lazy: true,
-        lazyLoadInAdvance: 10,
-        loop: true,
+        loop: false,
         autoplay: {
           delay: autoPlayDelay,
-          disableOnInteraction: false,
+          disableOnInteraction: false // 用户交互后继续自动轮播
         },
+
         navigation: {
           nextEl: '.swiper-button-next',
           prevEl: '.swiper-button-prev',
@@ -111,7 +119,8 @@
       //
       document.getElementById("slideshowWrapper").addEventListener('click', function (e) {
         isPaused = !isPaused;
-        if (g_wrapper != null) {
+        if ((g_wrapper != null) && (!isHandledSlide)) {
+          // 还没有接管轮播动作时，还是按照原来的方式
           if (!isPaused) {
             g_wrapper.autoplay.start();
           }
@@ -132,6 +141,9 @@
       })
       //显示一半的图片后开启自动清理和补充
       setTimeout(() => {
+/*         g_wrapper.on('slideChange', function(){
+          restoreSlideOntime(); // 有问题，用监听的方式，总是跳到第一个去播放，放弃这种方式
+        }); */
         setInterval(restoreSlideOntime, autoPlayDelay);
       }, autoPlayDelay * Math.round(allImagesEndIdx / 2));
     }
