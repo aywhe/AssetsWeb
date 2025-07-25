@@ -4,7 +4,6 @@ const fs = require('fs');
 const path = require('path');
 const app = express();
 
-const __DEBUG__ = false;
 
 //////////////////////// global datas ///////////////////////////////////
 const ConfigFilePath = 'assets_config.json';
@@ -377,9 +376,6 @@ app.get('/api/all-images', (req, res) => {
   // 排除的目录
   var actExcludes = parseSubDirs(excludes);
 
-  if (__DEBUG__) { console.dir(actSubDirs); }
-  if (__DEBUG__) { console.dir(actExcludes); }
-
   const genFilterPath = function (dirs) {
     // 构造完整目录前缀
     if (undefined === dirs || null === dirs || 0 == dirs.length) {
@@ -457,7 +453,6 @@ app.get('/', (req, res) => {
 initConfig();
 initDatas();
 
-if (__DEBUG__) { PORT = 3001; }
 
 // 启动服务器
 app.listen(PORT, () => {
