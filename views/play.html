@@ -21,6 +21,7 @@
             left: 0;
             width: 100%;
             pointer-events: none;
+            display: none;
         }
 
         .danmaku-item {
@@ -210,6 +211,14 @@
                 .catch(error => console.error('获取字幕失败:', error));
         }
         // 删除弹幕
+        function displayDanmaku(enable){
+            var danmaku = document.getElementById('danmaku-container');
+            if(enable) {
+                danmaku.style.display = 'block';
+            } else {
+                danmaku.style.display = 'none';
+            }
+        }
         function clearDanmaku() {
             var danmaku = document.getElementById('danmaku-container');
             danmaku.innerHTML = '';
@@ -228,8 +237,7 @@
         // 获取弹幕
         function getDanmaku() {
             // 删除原来的
-            const danmaku = document.getElementById('danmaku-container');
-            danmaku.innerHTML = '';
+            clearDanmaku();
             // 尝试添加字幕
             fetch('/api/lookfor-danmaku?path=' + encodeURIComponent(fullPath))
                 .then(response => response.text())
@@ -254,9 +262,9 @@
                         if(danmakuData.length > 0) {
                             var btn_danmaku = document.getElementById('btn_danmaku');
                             btn_danmaku.style.display = 'block';
+                            displayDanmaku(true);
                         } else {
-                            var danmaku = document.getElementById('danmaku-container');
-                            danmaku.style.display = 'none';
+                            displayDanmaku(false);
                             return;
                         }
                         // 按照时间排序
@@ -310,8 +318,6 @@
                         console.error('获取弹幕信息失败：'); 
                         // 删除原来的弹幕
                         clearDanmaku();
-                        var danmaku = document.getElementById('danmaku-container');
-                        danmaku.style.display = 'none';
                     }
                 })
                 .catch(error => console.error('获取弹幕失败:', error));
