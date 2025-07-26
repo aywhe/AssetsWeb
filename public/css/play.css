@@ -9,8 +9,8 @@ body {
 .video-container {
     align-items: center;
     max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
+    margin: 20px auto;
+    padding: 0px;
 }
 
 h2 {
@@ -68,6 +68,9 @@ h2 {
 }
 
 button {
+    cursor: pointer;
+    padding: 0;
+    border: none;
     background: transparent;
     transition: transform 0.2s ease;
 }
@@ -78,11 +81,8 @@ button:hover {
 
 #btn_pre,
 #btn_next {
-    padding: 0;
     margin: 0px 5px;
-    cursor: pointer;
     display: none;
-    border: none;
 }
 
 #auto_play_text {
