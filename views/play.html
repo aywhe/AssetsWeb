@@ -5,6 +5,49 @@
     <meta charset="UTF-8" />
     <title>播放视频</title>
     <link rel="stylesheet" href="css/play.css" />
+    <style>
+        .video-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            padding: 0;
+        }
+
+        #danmaku-container {
+            height: 50%;
+            overflow: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        .danmaku-item {
+            position: absolute;
+            color: white;
+            font-size: 18px;
+            white-space: nowrap;
+            overflow: hidden;
+            animation: danmaku-item-move 16s linear infinite;
+        }
+
+        #btn_danmaku {
+            margin: 0px 5px;
+            padding: 0px 5px;
+            background-color: #c0c0c0;
+            display: none;
+        }
+        @keyframes danmaku-item-move {
+            from {
+                left: 100%
+            }
+
+            to {
+                left: -200%
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -29,6 +72,7 @@
         var videoSlipTime = 10;
         var videoSlipVolume = 0.05;
         var videoSetCurrentTimeRange = [0.05, 0.95]; // 自动设置进度条时只在中间区域有效
+        var bShowDanmaku = true;
     </script>
     <div class="wrapper">
         <h2 id="til">
@@ -38,6 +82,7 @@
                 <source id="video_source" src="" type="">
                 您的浏览器不支持视频播放。
             </video>
+            <div id="danmaku-container"></div>
             <div id="add_container" class="add-container">
                 <button id="btn_pre">前一集</button>|
                 <button id="btn_next">后一集</button>|
@@ -46,6 +91,7 @@
                     <input type="checkbox" id="auto_play_switch">
                     <div class="checkbox-slider"></div>
                 </label>
+                <button id="btn_danmaku" onclick="onClickDanmaku()">弹幕</button>
                 <select id="select_list" class="select-container">
                 </select>
             </div>
@@ -163,6 +209,113 @@
                 })
                 .catch(error => console.error('获取字幕失败:', error));
         }
+        // 删除弹幕
+        function clearDanmaku() {
+            var danmaku = document.getElementById('danmaku-container');
+            danmaku.innerHTML = '';
+        }
+        // 切换弹幕
+        function onClickDanmaku(){
+            bShowDanmaku = !bShowDanmaku;
+            const btn_danmaku = document.getElementById('btn_danmaku');
+            if(bShowDanmaku){
+                btn_danmaku.style.backgroundColor = '#c0c0c0';
+            } else {
+                btn_danmaku.style.backgroundColor = 'transparent';
+                clearDanmaku();
+            }
+        }
+        // 获取弹幕
+        function getDanmaku() {
+            // 删除原来的
+            const danmaku = document.getElementById('danmaku-container');
+            danmaku.innerHTML = '';
+            // 尝试添加字幕
+            fetch('/api/lookfor-danmaku?path=' + encodeURIComponent(fullPath))
+                .then(response => response.text())
+                .then(data => {
+                    // 删除原来的弹幕
+                    clearDanmaku();
+                    if (data) {
+                        const parser = new DOMParser();
+                        const xmlDoc = parser.parseFromString(data, 'text/xml');
+                        const danmakuList = xmlDoc.getElementsByTagName('d');
+                        // 读取弹幕
+                        const danmakuData = Array.from(danmakuList).map(item => {
+                            var p = item.getAttribute('p').split(',');
+                            return {
+                                time: parseFloat(p[0]),
+                                text: item.textContent,
+                                color: parseInt(p[3]),
+                                font: parseInt(p[2])
+                            }
+                        });
+                        // 显示弹幕按钮
+                        if(danmakuData.length > 0) {
+                            var btn_danmaku = document.getElementById('btn_danmaku');
+                            btn_danmaku.style.display = 'block';
+                        } else {
+                            var danmaku = document.getElementById('danmaku-container');
+                            danmaku.style.display = 'none';
+                            return;
+                        }
+                        // 按照时间排序
+                        danmakuData.sort((a, b) => { return a.time - b.time; });
+                        const video = document.getElementById('video');
+                        var idxItem = 0;
+                        video.addEventListener('timeupdate', () => {
+                            var danmaku = document.getElementById('danmaku-container');
+                            // 删除旧的
+                            var items = danmaku.children;
+                            const expire_time = 10;
+                            for (let i = 0; i < items.length; i++) {
+                                if (items[i].time < video.currentTime - expire_time) {
+                                    danmaku.removeChild(items[i]);
+                                }
+                            }
+                            if(!bShowDanmaku) return; // 不显示弹幕
+                            // 选取一部分
+                            var activeDanmakuData = [];
+                            var time_padding = 2;
+                            for (let i = idxItem; i < danmakuData.length; i++) {
+                                const item = danmakuData[i];
+                                if (Math.abs(video.currentTime - item.time) < time_padding) {
+                                    activeDanmakuData.push(item);
+                                }
+                                if (item.time > video.currentTime + time_padding) {
+                                    // 下次继续
+                                    idxItem = i;
+                                    break;
+                                }
+                            }
+                            // 再随机选取和显示
+                            activeDanmakuData.sort((a, b) => { return Math.random() - 0.5; });
+                            
+                            // 增加新的
+                            const actLen = 20;
+                            for (let i = 0; i < Math.min(actLen, activeDanmakuData.length); i++) {
+                                const item = activeDanmakuData[i]
+                                const ele = document.createElement('div');
+                                ele.className = 'danmaku-item';
+                                ele.style.color = item.color;
+                                ele.textContent = item.text;
+                                ele.style.font = item.font;
+                                ele.style.top = `${Math.floor((Math.random() * 50) / 10) * 10}%`;
+                                ele.time = item.time;
+                                danmaku.appendChild(ele);
+                            }
+
+                        });
+                    } else {
+                        console.error('获取弹幕信息失败：'); 
+                        // 删除原来的弹幕
+                        clearDanmaku();
+                        var danmaku = document.getElementById('danmaku-container');
+                        danmaku.style.display = 'none';
+                    }
+                })
+                .catch(error => console.error('获取弹幕失败:', error));
+        }
 
         // 进度条信息cookie的key名称
         function getCookieVideoCurrentTimeFlag() {
@@ -193,6 +346,7 @@
             setFullPath(filename);
             setVideoFile();
             getSubtitles();
+            getDanmaku();
             setButtions();
         }
         // initialize
@@ -200,6 +354,7 @@
             //console.log(fullPath);
             setVideoFile();
             getSubtitles();
+            getDanmaku();
             // 获取播放列表
             await fetch('/api/play-list?fullPath=' + encodeURIComponent(fullPath))
                 .then(response => response.json())

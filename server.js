@@ -443,6 +443,32 @@ app.get('/videos', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'treeinfos.html'));
 });
 
+// 获取字幕文件
+app.get('/api/lookfor-danmaku', (req, res) => {
+  const danmakuSuffix = 'danmaku.xml';
+  const vitualPath = req.query.path;
+  var realdir = '';
+  var vpath = '';
+  // 获取实际目录和文件名
+  for (const [key, val] of VideoPathTagMap) {
+    if (val.vpath === vitualPath.substring(0, val.vpath.length)) {
+      realdir = val.path;
+      vpath = val.vpath;
+      break;
+    }
+  }
+  var realPath = path.join(realdir, vitualPath.substring(vpath.length));
+  // 寻找字幕文件
+  var realDanmakuFilePath = realPath.substring(0, realPath.lastIndexOf('.') + 1) + danmakuSuffix;
+  //var vitualDanmakuFilePath = vitualPath.substring(0, vitualPath.lastIndexOf('.') + 1) + danmakuSuffix;
+
+  fs.readFile(realDanmakuFilePath, 'utf8', (err, data) => {
+    res.set('Content-Type', 'application/xml');
+    res.send(data)
+  });
+  
+});
+
 // 主页面
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'cards.html'));
