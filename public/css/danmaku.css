@@ -1,0 +1,43 @@
+.video-canvas {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    padding: 0;
+    margin: 0;
+}
+
+#danmaku-container {
+    height: 50%;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    pointer-events: none;
+    display: none;
+}
+
+.danmaku-item {
+    position: absolute;
+    color: white;
+    font-size: 18px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+#btn_danmaku {
+    margin: 0px 5px;
+    padding: 0px 5px;
+    background-color: #d0d0d0;
+    display: none;
+}
+
+@keyframes danmaku-item-move {
+    from {
+        left: 100%
+    }
+
+    to {
+        left: -200%
+    }
+}

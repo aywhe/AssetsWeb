@@ -466,7 +466,7 @@ app.get('/api/lookfor-danmaku', (req, res) => {
     res.set('Content-Type', 'application/xml');
     res.send(data)
   });
-  
+
 });
 
 // 主页面
@@ -479,7 +479,9 @@ app.get('/', (req, res) => {
 initConfig();
 initDatas();
 
-
+if (process.env.debug) {
+  PORT = parseInt(process.env.PORT);
+}
 // 启动服务器
 app.listen(PORT, () => {
   console.log(`服务器运行在 http://localhost:${PORT}`);
