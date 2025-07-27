@@ -126,20 +126,23 @@
                     add_container.style.display = 'none';
                     hr.style.display = 'none';
                 }
-                // 填充select
-                var select_list = document.getElementById("select_list");
-                select_list.innerHTML = '';
-                fullPathList.forEach((val, ind) => {
-                    var base_name = val.substring(val.lastIndexOf('/') + 1, val.lastIndexOf('.'));
-                    var option_ele = document.createElement("option");
-                    option_ele.value = val;
-                    option_ele.innerText = base_name;
-                    select_list.add(option_ele);
-                });
                 select_list.selectedIndex = ind;
             } else {
 
             }
+        }
+        // 配置select列表
+        function setSelects() {
+            // 填充select
+            var select_list = document.getElementById("select_list");
+            select_list.innerHTML = '';
+            fullPathList.forEach((val, ind) => {
+                var base_name = val.substring(val.lastIndexOf('/') + 1, val.lastIndexOf('.'));
+                var option_ele = document.createElement("option");
+                option_ele.value = val;
+                option_ele.innerText = base_name;
+                select_list.add(option_ele);
+            });
         }
         // 获取字幕
         function getSubtitles() {
@@ -191,6 +194,7 @@
         // 切换弹幕
         function onClickDanmaku() {
             bShowDanmaku = !bShowDanmaku;
+            Cookies.set('bShowDanmaku', bShowDanmaku, {expires: 2, path : ''});
             const btn_danmaku = document.getElementById('btn_danmaku');
             if (bShowDanmaku) {
                 btn_danmaku.style.backgroundColor = '#c0c0c0';
@@ -215,24 +219,6 @@
                 }
             }
         }
-        // bilibili的xml格式弹幕字符串转换为数组
-        function getBilibiliDanmaku(danmakuString) {
-            // bilibili弹幕格式[弹幕出现时间(秒),弹幕模式(1~3滚动，4底部，5顶部，6逆向，7定位，8高级),字号,颜色(十进制整数),unix时间戳,弹幕池,发送者ID,弹幕ID]
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(danmakuString, 'text/xml');
-            const danmakuList = xmlDoc.getElementsByTagName('d');
-            // 读取弹幕
-            const danmakuData = Array.from(danmakuList).map(item => {
-                var p = item.getAttribute('p').split(',');
-                return {
-                    time: parseFloat(p[0]),
-                    text: item.textContent,
-                    color: parseInt(p[3]),
-                    font: parseInt(p[2])
-                }
-            });
-            return danmakuData;
-        }
         // 制作弹幕轨道
         function createDanmakuTrails(font_height) {
             const danmaku = document.getElementById('danmaku-container');
@@ -243,17 +229,35 @@
             return trails;
         }
         // 获取弹幕
+        var danmakuData = []; // 弹幕数据
+        var danmakuDataIteratorIndex = 0; // 根据当前视频时间向后更新搜索指针，避免重头开始搜索弹幕
         function getDanmaku() {
             // 删除原来的弹幕
             clearDanmaku();
+            displayDanmaku(false);
+            displayDanmakuButton(false);
+            danmakuData = []; // 清除弹幕数据
+            danmakuDataIteratorIndex = 0; // 根据当前视频时间向后更新搜索指针，避免重头开始搜索弹幕
             // 尝试添加字幕
             fetch('/api/lookfor-danmaku?path=' + encodeURIComponent(fullPath))
                 .then(response => response.text())
                 .then(data => {
                     if (data) {
                         // bilibili的xml格式弹幕字符串转换为数组
-                        const danmakuData = getBilibiliDanmaku(data);
-                        var danmakuDataIteratorIndex = 0; // 根据当前视频时间向后更新搜索指针，避免重头开始搜索弹幕
+                        // bilibili弹幕格式[弹幕出现时间(秒),弹幕模式(1~3滚动，4底部，5顶部，6逆向，7定位，8高级),字号,颜色(十进制整数),unix时间戳,弹幕池,发送者ID,弹幕ID]
+                        const parser = new DOMParser();
+                        const xmlDoc = parser.parseFromString(data, 'text/xml');
+                        const danmakuList = xmlDoc.getElementsByTagName('d');
+                        // 读取弹幕
+                        danmakuData = Array.from(danmakuList).map(item => {
+                            var p = item.getAttribute('p').split(',');
+                            return {
+                                time: parseFloat(p[0]),
+                                text: item.textContent,
+                                color: parseInt(p[3]),
+                                font: parseInt(p[2])
+                            }
+                        });
                         // 按照时间排序
                         danmakuData.sort((a, b) => { return a.time - b.time; });
                         // 显示弹幕按钮
@@ -264,95 +268,103 @@
                             displayDanmakuButton(false);
                             displayDanmaku(false);
                             console.log('no danmaku data found');
-                            return; // 后续就不用做了
                         }
-                        // 制作弹幕轨道
-                        const font_height = 20;
-                        var trails = createDanmakuTrails(font_height);
-                        // 更新弹幕
-                        const danmaku = document.getElementById('danmaku-container');
-                        const danmaku_run_time = 16; // 弹幕一个行程的用时
-                        const danmaku_run_distance = 3 * danmaku.clientWidth;// 弹幕一个行程的路程
-                        const danmaku_run_speed = danmaku_run_distance / danmaku_run_time;
-                        const video = document.getElementById('video');
-                        video.addEventListener('timeupdate', () => {
-                            const danmaku = document.getElementById('danmaku-container');
-                            const video_curr_time = video.currentTime;
-                            // 删除过时弹幕
-                            deleteDanmaku(video_curr_time, danmaku_run_time);
-                            if (!bShowDanmaku) return; // 不显示弹幕
-                            // 选取当前时间点附近的弹幕
-                            var activeDanmakuData = [];
-                            var danmaku_catch_time_window = 2;
-                            for (let i = danmakuDataIteratorIndex; i < danmakuData.length; i++) {
-                                const item = danmakuData[i];
-                                if (Math.abs(video_curr_time - item.time) < danmaku_catch_time_window) {
-                                    activeDanmakuData.push(item);
-                                }
-                                if (item.time > video_curr_time + danmaku_catch_time_window) {
-                                    // 下次继续
-                                    danmakuDataIteratorIndex = i;
-                                    break;
-                                }
-                            }
-                            // 计算轨道剩余空间
-                            function calcReserveDist(item) {
-                                return (video_curr_time - item.item.time) * danmaku_run_speed - item.item.text.length * item.item.font;
-                            }
-                            // 轨道根据剩余空间从大到小排序
-                            trails.sort((a, b) => {
-                                // 计算剩余空间
-                                return calcReserveDist(b) - calcReserveDist(a);
-                            });
-                            // 随机选一部分来显示
-                            activeDanmakuData.sort((a, b) => { return Math.random() - 0.5; });
-                            const max_select_num = 20; // 一次最多选20个
-                            var append_item_ind = 0; // 这次已经加载给轨道的弹幕数量
-                            // 在轨道中选择
-                            for (let j = 0; j < trails.length; j++) {
-                                const reserve_dist = calcReserveDist(trails[j]);
-                                if (reserve_dist > 0 && append_item_ind < activeDanmakuData.length) {
-                                    const item = activeDanmakuData[append_item_ind];
-                                    // 有剩余空间
-                                    // 使用这个轨道并且更新这个轨道的信息
-                                    const ele = document.createElement('div');
-                                    ele.className = 'danmaku-item';
-                                    ele.style.color = '#' + item.color.toString(16);
-                                    ele.textContent = item.text;
-                                    ele.style.font = `${item.font}px`;
-                                    ele.style.animation = `danmaku-item-move ${danmaku_run_time}s linear 0s 1 normal forwards`;
-                                    ele.style.top = `${trails[j].positionY}px`;
-                                    ele.time = video_curr_time;
-                                    ele.trail_index = j;
-                                    danmaku.appendChild(ele);
-                                    trails[j].item = item;
-                                    // 判断下次
-                                    append_item_ind++;
-                                }
-                            }
-                        });
-                        // 重新搜索弹幕
-                        // 进度条监听
-                        video.addEventListener('seeked', () => {
-                            clearDanmaku();
-                            danmakuDataIteratorIndex = 0; // 重头开始搜索弹幕
-                            trails = createDanmakuTrails(font_height);
-                        });
                     } else {
                         console.error('获取弹幕信息失败：');
-                        // 删除原来的弹幕
-                        displayDanmakuButton(false);
-                        displayDanmaku(false);
-                        clearDanmaku();
                     }
                 })
                 .catch((error) => {
                     console.error('获取弹幕失败:', error);
-                    // 删除原来的弹幕
-                    displayDanmakuButton(false);
-                    displayDanmaku(false);
-                    clearDanmaku();
                 });
+        }
+        // 弹幕实时更新函数
+        function addDanmakuListener() {
+            // 制作弹幕轨道
+            const font_height = 27;
+            var trails = createDanmakuTrails(font_height);
+            // 更新弹幕
+            const danmaku = document.getElementById('danmaku-container');
+            const danmaku_run_time = 16; // 弹幕一个行程的用时
+            const danmaku_run_distance = 3 * danmaku.clientWidth;// 弹幕一个行程的路程
+            const danmaku_run_speed = danmaku_run_distance / danmaku_run_time;
+            const video = document.getElementById('video');
+            video.addEventListener('timeupdate', () => {
+                const danmaku = document.getElementById('danmaku-container');
+                const video_curr_time = video.currentTime;
+                // 删除过时弹幕
+                deleteDanmaku(video_curr_time, danmaku_run_time);
+                if (!bShowDanmaku || danmakuData.length == 0) return; // 不显示弹幕
+                // 选取当前时间点附近的弹幕
+                var activeDanmakuData = [];
+                var danmaku_catch_time_window = 2;
+                for (let i = danmakuDataIteratorIndex; i < danmakuData.length; i++) {
+                    const item = danmakuData[i];
+                    if (Math.abs(video_curr_time - item.time) < danmaku_catch_time_window) {
+                        activeDanmakuData.push(item);
+                    }
+                    if (item.time > video_curr_time + danmaku_catch_time_window) {
+                        // 下次继续
+                        danmakuDataIteratorIndex = i;
+                        break;
+                    }
+                }
+                // 计算轨道剩余空间
+                function calcReserveDist(item) {
+                    return (video_curr_time - item.item.time) * danmaku_run_speed - item.item.text.length * item.item.font;
+                }
+                // 轨道根据剩余空间从大到小排序
+                trails.sort((a, b) => {
+                    // 计算剩余空间
+                    return calcReserveDist(b) - calcReserveDist(a);
+                });
+                // 随机选一部分来显示
+                activeDanmakuData.sort((a, b) => { return Math.random() - 0.5; });
+                const max_select_num = 20; // 一次最多选20个
+                var append_item_ind = 0; // 这次已经加载给轨道的弹幕数量
+                // 在轨道中选择
+                for (let j = 0; j < trails.length; j++) {
+                    const reserve_dist = calcReserveDist(trails[j]);
+                    if (reserve_dist > 0 && append_item_ind < activeDanmakuData.length) {
+                        const item = activeDanmakuData[append_item_ind];
+                        // 有剩余空间
+                        // 使用这个轨道并且更新这个轨道的信息
+                        const ele = document.createElement('div');
+                        ele.className = 'danmaku-item';
+                        ele.style.color = '#' + item.color.toString(16);
+                        ele.textContent = item.text;
+                        ele.style.fontSize = `${item.font}px`;
+                        ele.style.animation = `danmaku-item-move ${danmaku_run_time}s linear 0s 1 normal forwards`;
+                        ele.style.top = `${trails[j].positionY}px`;
+                        ele.time = video_curr_time;
+                        ele.trail_index = j;
+                        danmaku.appendChild(ele);
+                        trails[j].item = item;
+                        // 判断下次
+                        append_item_ind++;
+                    }
+                }
+            });
+            // 重新搜索弹幕
+            // 进度条监听
+            video.addEventListener('seeked', () => {
+                clearDanmaku();
+                danmakuDataIteratorIndex = 0; // 重头开始搜索弹幕
+                trails = createDanmakuTrails(font_height);
+            });
+            // 暂停
+            video.addEventListener('pause', () => {
+                const danmaku_items = document.querySelectorAll('.danmaku-item');
+                danmaku_items.forEach((value, key) => {
+                    value.style.animationPlayState = 'paused';
+                });
+            });
+            // 播放
+            video.addEventListener('play', () => {
+                const danmaku_items = document.querySelectorAll('.danmaku-item');
+                danmaku_items.forEach((value, key) => {
+                    value.style.animationPlayState = 'running';
+                });
+            });
         }
 
         // 进度条信息cookie的key名称
@@ -400,6 +412,7 @@
                     fullPathList = name_list;
                     fullPathList.sort();
                     //fullPathList.sort((a, b) => { return a.localeCompare(b, 'zh-Hans-CN', { numeric: true }); }); // 这样排序可能会遇到更复杂的问题
+                    setSelects();
                     setButtions();
                 })
                 .catch(error => console.error('获取播放列表失败:', error));
@@ -419,7 +432,7 @@
                     auto_play_text.innerText = '自动播放(关)：';
                 }
                 // 更新 cookie
-                Cookies.set('autoPlayFlag', auto_play_checked.checked, { expires: 5, path: '' });
+                Cookies.set('autoPlayFlag', auto_play_checked.checked, { expires: 2, path: '' });
             });
             const changeEvent = new Event('change');
             auto_play_checked.dispatchEvent(changeEvent);
@@ -461,11 +474,22 @@
                 if (cookieVideoCurrentTime) {
                     video.currentTime = cookieVideoCurrentTime - videoSlipTime;
                 }
+                // 弹幕更新监听函数
+                addDanmakuListener();                
             });
+            // 弹幕按钮开关
+            if(Cookies.get('bShowDanmaku')){
+                bShowDanmaku = false; // 先设为false，再click，就会变为 true
+            } else {
+                bShowDanmaku = true;
+            }
+            const btn_danmaku = document.getElementById('btn_danmaku');
+            btn_danmaku.click();
             // 关闭页面时保存 cookie
             window.addEventListener('beforeunload', function (event) {
                 setVideoCookies();
             });
+            
         }
 
         // run
