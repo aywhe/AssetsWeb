@@ -468,7 +468,18 @@ app.get('/api/lookfor-danmaku', (req, res) => {
   });
 
 });
-
+// 版本日志和信息
+app.get('/gitlog', (req, res) => {
+  res.set('Content-Type', 'text/plain');
+  fs.readFile('./gitlog.txt', 'utf8', (err, data) => {
+    if(err){
+      console.error(err);
+      res.status(500).send(err.message);
+    } else {
+      res.status(200).send(data);
+    }
+  });
+});
 // 主页面
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'cards.html'));

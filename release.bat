@@ -30,6 +30,9 @@ echo copied assets_config.json
 xcopy /s /e /i "views" "%target_dir%\views"
 xcopy /s /e /i "public" "%target_dir%\public"
 
+:: 程序日志
+git log --encoding=UTF-8 --oneline > "%target_dir%\gitlog.txt"
+
 :: 结束
 echo 操作结束
 pause
