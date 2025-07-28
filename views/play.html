@@ -36,12 +36,12 @@
         <h2 id="til">
         </h2>
         <div class="video-container">
-            <div class="video-canvas">
+            <div id="video_canvas">
                 <video id="video" controls autoplay>
                     <source id="video_source" src="" type="">
                     您的浏览器不支持视频播放。
                 </video>
-                <div id="danmaku-container"></div>
+                <div id="danmaku_container"></div>
             </div>
             <div id="add_container" class="add-container">
                 <button id="btn_pre">前一集</button>|
@@ -174,7 +174,7 @@
         }
         // 关闭弹幕
         function displayDanmaku(enable) {
-            var danmaku = document.getElementById('danmaku-container');
+            var danmaku = document.getElementById('danmaku_container');
             if (enable) {
                 danmaku.style.display = 'block';
             } else {
@@ -206,12 +206,12 @@
         }
         // 删除弹幕内容
         function clearDanmaku() {
-            var danmaku = document.getElementById('danmaku-container');
+            var danmaku = document.getElementById('danmaku_container');
             danmaku.innerHTML = '';
         }
         // 删除过时的弹幕
         function deleteDanmaku(currentTime, expires) {
-            const danmaku = document.getElementById('danmaku-container');
+            const danmaku = document.getElementById('danmaku_container');
             const items = danmaku.children;
             for (let i = 0; i < items.length; i++) {
                 if (items[i].time < currentTime - expires) {
@@ -221,7 +221,7 @@
         }
         // 制作弹幕轨道
         function createDanmakuTrails(font_height) {
-            const danmaku = document.getElementById('danmaku-container');
+            const danmaku = document.getElementById('danmaku_container');
             var trails = [];
             for (let i = 0; i < danmaku.clientHeight - font_height; i += font_height) {
                 trails.push({ positionY: i, item: { time: 0, text: '', font: 0 } });
@@ -283,13 +283,13 @@
             const font_height = 27;
             var trails = createDanmakuTrails(font_height);
             // 更新弹幕
-            const danmaku = document.getElementById('danmaku-container');
+            const danmaku = document.getElementById('danmaku_container');
             const danmaku_run_time = 16; // 弹幕一个行程的用时
             const danmaku_run_distance = 3 * danmaku.clientWidth;// 弹幕一个行程的路程
             const danmaku_run_speed = danmaku_run_distance / danmaku_run_time;
             const video = document.getElementById('video');
             video.addEventListener('timeupdate', () => {
-                const danmaku = document.getElementById('danmaku-container');
+                const danmaku = document.getElementById('danmaku_container');
                 const video_curr_time = video.currentTime;
                 // 删除过时弹幕
                 deleteDanmaku(video_curr_time, danmaku_run_time);
@@ -366,6 +366,9 @@
                 danmaku_items.forEach((value, key) => {
                     value.style.animationPlayState = 'running';
                 });
+            });
+            video.addEventListener('fullscreenchange', () => {
+                // do nothing yet
             });
         }
 
