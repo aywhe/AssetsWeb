@@ -1,6 +1,6 @@
 @echo off
+chcp 65001 > nul
 :: 设置代码为 utf8
-chcp 65001 >nul
 setlocal enabledelayedexpansion
 rem 发布程序
 

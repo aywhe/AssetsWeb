@@ -64,3 +64,9 @@
            还是使用video的control中的默认全屏方式，使用默认全屏，可以自适应不同使用环境，但是这种方式又显示不了弹幕div。
            使用fullscreenchange监听video的全屏再设置弹幕，但也是要处理弹幕的布局变化，很麻烦，这跟自定义全屏按钮一样，还不如自定义按钮呢。
     方法： 放弃。
+15. 问题： danmaku分支的一个bat文件，在master分支checkout下来后，运行时出错。
+           原因是 git config core.autocrlf = input, git 会在提交时把文件的换行符改为 LF，下载时却不换回来。
+           导致Windows终端运行bat时编码问题。
+    方法： git config core.autocrlf = false, 文件的换行编码git不管，让开发员手动管理。
+          或者Windows开发环境 core.autocrlf = true, 提交文件时强制改为LF，下载文件时强制改为CRLF。
+          linux开发环境 core.autocrlf = input, input 是提交文件时强制改为LF，下载时不更改。
