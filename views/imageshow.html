@@ -35,6 +35,7 @@
     const subDir = urlParams.has('subDir') ? urlParams.get('subDir') : '';
     const subDirs = urlParams.has('subDirs') ? urlParams.get('subDirs') : '';
     const excludes = urlParams.has('excludes') ? urlParams.get('excludes') : '';
+    const sortShow = urlParams.has('sortShow') ? urlParams.get('sortShow') : 'false';
 
     // 获取图片列表
     let allImages = [];
@@ -59,7 +60,11 @@
     )
       .then(response => response.json())
       .then(data => {
-        allImages = shuffleArray(data.images); // 随机打乱
+        if ('false' == sortShow || 'False' == sortShow) {
+          allImages = shuffleArray(data.images); // 随机打乱
+        } else {
+          allImages = data.images;
+        }
         initSlideshow();
       })
       .catch(error => console.error('获取图片失败:', error));
@@ -74,10 +79,10 @@
       slide.className = 'swiper-slide';
       slide.innerHTML = `<img src="${imageUrl}" alt="轮播图片 ${index + 1}">`;
       // 接管轮播动作
-      if(!isHandledSlide) {
+      if (!isHandledSlide) {
         g_wrapper.autoplay.stop();
         isHandledSlide = true;
-      } 
+      }
       // 删除第一个，尾部加一个
       g_wrapper.appendSlide(slide);
       g_wrapper.removeSlide(0);
@@ -141,9 +146,9 @@
       })
       //显示一半的图片后开启自动清理和补充
       setTimeout(() => {
-/*         g_wrapper.on('slideChange', function(){
-          restoreSlideOntime(); // 有问题，用监听的方式，总是跳到第一个去播放，放弃这种方式
-        }); */
+        /*         g_wrapper.on('slideChange', function(){
+                  restoreSlideOntime(); // 有问题，用监听的方式，总是跳到第一个去播放，放弃这种方式
+                }); */
         setInterval(restoreSlideOntime, autoPlayDelay);
       }, autoPlayDelay * Math.round(allImagesEndIdx / 2));
     }
