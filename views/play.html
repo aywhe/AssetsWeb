@@ -423,7 +423,8 @@
                 .catch(error => console.error('获取播放列表失败:', error));
             // 修改自动播放
             var auto_play_checked = document.getElementById('auto_play_switch');
-            if (Cookies.get('autoPlayFlag')) {
+            var autoPlayFlag = Cookies.get('autoPlayFlag');
+            if (autoPlayFlag && (autoPlayFlag == 'true' || autoPlayFlag == true)) {
                 auto_play_checked.checked = true;
             } else {
                 auto_play_checked.checked = false;
@@ -483,7 +484,8 @@
                 addDanmakuListener();
             });
             // 弹幕按钮开关
-            if (Cookies.get('bShowDanmaku')) {
+            var cookieShowDanmaku = Cookies.get('bShowDanmaku');
+            if (cookieShowDanmaku && (cookieShowDanmaku == 'true' || cookieShowDanmaku == true)) {
                 bShowDanmaku = false; // 先设为false，再click，就会变为 true
             } else {
                 bShowDanmaku = true;
