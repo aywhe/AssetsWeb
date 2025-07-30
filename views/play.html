@@ -145,11 +145,11 @@
                         btn_next.id = 'btn_next';
                         btn_next.innerText = '后一集';
                         btn_next.style.display = 'block';
-                        // 隐藏自动播放
-                        auto_play_container.style.display = 'block';
                     } else {
                         btn_next.style.display = 'none';
                     }
+                    // 隐藏自动播放
+                    auto_play_container.style.display = 'block';
                 } else {
                     console.error('select list not includes fullPath: ' + fullPath);
                 }
