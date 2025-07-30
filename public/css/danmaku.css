@@ -14,7 +14,7 @@
     left: 0;
     width: 100%;
     pointer-events: none;
-    display: block;
+    display: none;
 }
 
 .danmaku-item {
