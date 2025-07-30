@@ -9,6 +9,7 @@
 ## modules
 
 * "express": "^5.1.0"
+* "readdir": "^1.0.2"
 
 # 配置文件
 
