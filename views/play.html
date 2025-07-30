@@ -20,16 +20,17 @@
             ['.mp4', 'video/mp4'],
         ]);
 
-        var queryString = window.location.search;
-        var origin = window.location.origin;
-        var pathname = window.location.pathname;
-        var urlParams = new URLSearchParams(queryString);
+        const queryString = window.location.search;
+        const origin = window.location.origin;
+        const pathname = window.location.pathname;
+        const urlParams = new URLSearchParams(queryString);
         var fullPath = sessionStorage.getItem('fullPath');
         if (null === fullPath) { fullPath = (urlParams.get('path')); }
 
         var fullPathList = []; // select 控件中的播放列表
-        var videoSlipTime = 10; // 加载播放进度后向前移动一段时间
-        var videoSetCurrentTimeRange = [0.05, 0.95]; // 自动设置进度条时只在中间区域有效
+        const  videoSlipTime = 10; // 进度条调整
+        const videoSlipVol = 0.05; // 音量调整
+        const videoSetCurrentTimeRange = [0.05, 0.95]; // 自动设置进度条时只在中间区域有效
         var bShowDanmaku = true; // 如果有弹幕，弹幕显示开关
     </script>
     <div class="wrapper">
@@ -367,9 +368,6 @@
                     value.style.animationPlayState = 'running';
                 });
             });
-            video.addEventListener('fullscreenchange', () => {
-                // do nothing yet
-            });
         }
 
         // 进度条信息cookie的key名称
@@ -492,6 +490,33 @@
             }
             const btn_danmaku = document.getElementById('btn_danmaku');
             btn_danmaku.click();
+            // 按键响应
+            document.addEventListener('keydown', function (event) {
+                if(document.activeElement === video) { return;} // video处于焦点时本来就能响应这些按键
+                switch (event.key) {
+                    case ' ':
+                        if (video.paused) {
+                            video.play();
+                        } else {
+                            video.pause();
+                        }
+                        break;
+                    case 'ArrowRight':
+                        video.currentTime += videoSlipTime;
+                        break;
+                    case 'ArrowLeft':
+                        video.currentTime -= videoSlipTime;
+                        break;
+                    case 'ArrowUp':
+                        video.volume = Math.min(1.0, video.volume + videoSlipVol);
+                        break;
+                    case 'ArrowDown':
+                        video.volume = Math.max(0.0, video.volume - videoSlipVol);
+                        break;
+                    default:
+                        break;
+                }
+            });
             // 关闭页面时保存 cookie
             window.addEventListener('beforeunload', function (event) {
                 setVideoCookies();
