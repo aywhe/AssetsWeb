@@ -29,7 +29,7 @@ body {
 .music-item {
     text-align: left;
     cursor: pointer;
-    margin: 5px;
+    margin: 0px;
     background-color: rgb(150, 150, 147);
     border: solid;
 }
@@ -39,11 +39,11 @@ body {
     list-style: none;
     margin: 0;
     background-color: #ffffff;
-    padding: 10px;
+    padding: 0px;
 }
 
 .music-list ul li {
-    padding: 6px 6px;
+    padding: 5px;
     margin: 5px 0;
     background-color: #ffffff;
     border-radius: 6px;
@@ -67,7 +67,7 @@ body {
 }
 
 .audio-container{
-    padding: 0px 6px;
+    padding: 0px;
     margin: 5px 0;
 }
 
