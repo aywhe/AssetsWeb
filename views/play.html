@@ -103,11 +103,11 @@
             const add_container = document.getElementById('add_container');
             // 显示弹幕按钮
             if (danmakuData.length > 0) {
-                displayDanmakuButton(true);
+                enableDanmakuElements(true);
                 add_container.style.display = 'flex';
                 hr.style.display = 'flex';
             } else {
-                displayDanmakuButton(false);
+                enableDanmakuElements(false);
                 if (fullPathList.length < 2) {
                     add_container.style.display = 'none';
                     hr.style.display = 'none';
@@ -199,7 +199,7 @@
                 .catch(error => console.error('获取字幕失败:', error));
         }
         // 关闭弹幕
-        function displayDanmaku(enable) {
+        function showDanmaku(enable) {
             var danmaku = document.getElementById('danmaku_container');
             if (enable) {
                 danmaku.style.visibility = 'visible';
@@ -208,12 +208,15 @@
             }
         }
         // 弹幕按钮
-        function displayDanmakuButton(enable) {
+        function enableDanmakuElements(enable) {
             var btn_danmaku = document.getElementById('btn_danmaku');
+            var danmaku = document.getElementById('danmaku_container');
             if (enable) {
                 btn_danmaku.style.display = 'block';
+                danmaku.style.display = 'block';
             } else {
                 btn_danmaku.style.display = 'none';
+                danmaku.style.display = 'none';
             }
 
         }
@@ -224,10 +227,10 @@
             const btn_danmaku = document.getElementById('btn_danmaku');
             if (bShowDanmaku) {
                 btn_danmaku.style.backgroundColor = '#d0d0d0';
-                displayDanmaku(true);
+                showDanmaku(true);
             } else {
                 btn_danmaku.style.backgroundColor = 'transparent';
-                displayDanmaku(false);
+                showDanmaku(false);
             }
         }
         // 删除弹幕内容
@@ -250,7 +253,7 @@
         function getDanmaku() {
             // 删除原来的弹幕
             clearDanmaku();
-            displayDanmakuButton(false);
+            enableDanmakuElements(false);
             danmakuData = []; // 清除弹幕数据
             danmakuDataIteratorIndex = 0; // 根据当前视频时间向后更新搜索指针，避免重头开始搜索弹幕
             // 尝试添加字幕
@@ -277,7 +280,7 @@
                         danmakuData.sort((a, b) => { return a.time - b.time; });
                         setDanmakuButtions();
                     } else {
-                        console.warn('获取弹幕信息为空');
+                        console.log('获取弹幕信息为空');
                     }
                 })
                 .catch((error) => {
