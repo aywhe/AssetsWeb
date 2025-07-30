@@ -14,21 +14,25 @@ if "%1"=="" (
 :: 处理空格
 for %%A in ("%target_dir%") do set "target_dir=%%~fA"
 
-:: 创建目录
-if exist "%target_dir%" (
-    echo 删除目录...
-    rmdir /s /q "%target_dir%"
+:: 是否全部重新复制
+if "%2"=="rebuild" (
+    if exist "%target_dir%" (
+        echo 删除目录："%target_dir%"
+        rmdir /s /q "%target_dir%"
+    )
 )
-echo 创建目录：%target_dir%
-mkdir "%target_dir%"
+:: 创建目录
+if not exist "%target_dir%" (
+    echo 创建目录："%target_dir%"
+    mkdir "%target_dir%"
+)
+
 
 :: 拷贝文件
-copy "server.js" "%target_dir%\server.js"
-echo copied server.js
-copy "assets_config.json" "%target_dir%\assets_config.json"
-echo copied assets_config.json
-xcopy /s /e /i "views" "%target_dir%\views"
-xcopy /s /e /i "public" "%target_dir%\public"
+xcopy ".\server.js" "%target_dir%\" /D /Y
+xcopy ".\assets_config.json" "%target_dir%\" /D /Y
+xcopy "views" "%target_dir%\views" /D /Y /E /I
+xcopy "public" "%target_dir%\public" /D /Y /E /I
 
 :: 程序日志
 git log --encoding=UTF-8 --oneline > "%target_dir%\gitlog.txt"
