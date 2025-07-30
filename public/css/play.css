@@ -18,6 +18,13 @@ h2 {
     margin-bottom: 20px;
 }
 
+#til {
+    cursor: pointer;
+}
+#til:hover{
+    color: #c0c0c0;
+}
+
 .add-container {
     display: none;
     align-items: center;
