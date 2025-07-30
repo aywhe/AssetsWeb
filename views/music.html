@@ -11,11 +11,13 @@
 <body>
 
     <div>
-        <h2 id="title" class="hidden-click-able" title="点击切换自动播放" onclick="onSwitchAutoPlay()">播放音乐</h2>
+        <!-- <h2 id="title" class="hidden-click-able" title="点击切换自动播放" onclick="onSwitchAutoPlay()">播放音乐</h2> -->
+        <h2 id="musicName" class="music-name hidden-click-able"></h2>
     </div>
     <hr>
-    <div>
-        <h3 id="musicName" class="music-name hidden-click-able" title="点击筛选歌曲" onclick="onFilterFiles()">点击搜索歌曲</h3>
+    <div class="top-tool">
+        搜索：<input type="text" id="search_text" oninput="onFilterFiles()" placeholder="输入搜索词">
+        <button id="btn_random" onclick="onSwitchAutoPlay()">自动随机播放</button>
     </div>
 
     <!-- 音频播放器 -->
@@ -181,32 +183,26 @@
 
         // switch auto play
         function onSwitchAutoPlay() {
-            const h1 = document.getElementById("title");
+            const btn_random = document.getElementById("btn_random");
             flagAutoPlay = !flagAutoPlay;
             if (flagAutoPlay) {
-                h1.innerHTML = '自动播放音乐';
+                btn_random.innerHTML = '单曲播放';
                 const audioPlayer = document.getElementById('audioPlayer');
                 if (audioPlayer.ended || audioPlayer.paused) {
                     audioPlayer.dispatchEvent(new Event('ended')); // 触发结束事件
                 }
             }
             else {
-                h1.innerHTML = '播放音乐';
+                btn_random.innerHTML = '自动随机播放';
             }
         }
         // 筛选歌曲
         function onFilterFiles() {
-            var filter = prompt("输入要查找的文件信息", '');
-            if (filter === null) filter = '';
-            fetchFilter = filter.trim();
-            var musicNameEle = document.getElementById('musicName');
-            if (fetchFilter.length > 0) {
-                musicNameEle.classList.add('music-name-aft-filter');
+            var filter = document.getElementById('search_text').value;
+            if (filter || filter == ''){
+                fetchFilter = filter;
+                gotoPage(1);
             }
-            else {
-                musicNameEle.classList.remove('music-name-aft-filter');
-            }
-            gotoPage(1);
         }
 
         function gotoPage(page) {

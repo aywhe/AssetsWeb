@@ -66,7 +66,7 @@ body {
     border-radius: 8px;
 }
 
-.audio-container{
+.audio-container .top-tool{
     padding: 0px 6px;
     margin: 5px 0;
 }
