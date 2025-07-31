@@ -325,6 +325,11 @@
                     const item = danmakuData[i];
                     if (Math.abs(video_curr_time - item.time) < danmaku_catch_time_window) {
                         activeDanmakuData.push(item);
+                        if(i == danmakuData.length - 1){
+                            // 已经到最后一个了，设置为下一个，不然在 danmaku_catch_time_window 期间再次响应会重复获取最后一个
+                            danmakuDataIteratorIndex = i + 1;
+                            break;
+                        }
                     } else if (item.time > video_curr_time + danmaku_catch_time_window) {
                         // 下次继续
                         danmakuDataIteratorIndex = i;
