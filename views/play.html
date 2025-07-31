@@ -127,6 +127,8 @@
                 add_container.style.display = 'flex';
                 hr.style.display = 'flex';
                 var ind = fullPathList.indexOf(fullPath);
+                var select_list = document.getElementById("select_list");
+                select_list.selectedIndex = ind;
                 if (ind != -1) {
                     var btn_pre = document.getElementById("btn_pre");
                     var btn_next = document.getElementById("btn_next");
