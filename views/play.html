@@ -311,6 +311,7 @@
                 return danmaku_run_speed;
             }
             const video = document.getElementById('video');
+            var last_video_curr_time = 0; // 上一次timeupdate触发时间
             // 提取对应时间的弹幕
             let listenerTimeupdate = function () {
                 const danmaku = document.getElementById('danmaku_container');
@@ -320,7 +321,8 @@
                 if (!bShowDanmaku || danmakuData.length == 0) return; // 不显示弹幕
                 // 选取当前时间点附近的弹幕
                 var activeDanmakuData = [];
-                var danmaku_catch_time_window = 2;
+                var danmaku_catch_time_window = Math.min(2*Math.abs(video_curr_time - last_video_curr_time),2);
+                last_video_curr_time = video_curr_time;
                 for (let i = danmakuDataIteratorIndex; i < danmakuData.length; i++) {
                     const item = danmakuData[i];
                     if (Math.abs(video_curr_time - item.time) < danmaku_catch_time_window) {
@@ -344,8 +346,10 @@
                 }
                 // 轨道根据剩余空间从大到小排序
                 trails.sort((a, b) => {
+                    // 随机轨道排序
+                    return Math.random() - 0.5;
                     // 计算剩余空间
-                    return calcReserveDist(b) - calcReserveDist(a);
+                    //return calcReserveDist(b) - calcReserveDist(a);
                 });
                 // 随机选一部分来显示
                 activeDanmakuData.sort((a, b) => { return Math.random() - 0.5; });
