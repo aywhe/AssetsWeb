@@ -29,7 +29,7 @@
     </script>
     <div class="wrapper">
         <h2 id="til" onclick="onTilClick() " title="点击进入沉浸模式"></h2>
-        <div class="video-container">
+        <div class="video-container" id="video_container">
             <div id="video_canvas">
                 <video id="video" controls autoplay>
                     <source id="video_source" src="" type="">
@@ -47,7 +47,8 @@
                         <div class="checkbox-slider"></div>
                     </label>
                 </div>
-                <button id="btn_danmaku" onclick="onClickDanmaku()">弹幕</button>
+                <button class="gray-btn" id="btn_danmaku" onclick="onClickDanmaku()">弹幕</button>                
+                <button class="gray-btn" id="btn_fullscreen" onclick="onClickFullBtn()">弹幕全屏</button>
                 <select id="select_list" class="select-container">
                 </select>
             </div>
@@ -136,7 +137,7 @@
                     if (ind > 0) {
                         btn_pre.value = fullPathList[ind - 1];
                         btn_pre.innerText = '前一集';
-                        btn_pre.style.display = 'block';
+                        btn_pre.style.display = 'flex';
                     } else {
                         btn_pre.style.display = 'none';
                     }
@@ -145,12 +146,12 @@
                         btn_next.value = fullPathList[ind + 1];
                         btn_next.id = 'btn_next';
                         btn_next.innerText = '后一集';
-                        btn_next.style.display = 'block';
+                        btn_next.style.display = 'flex';
                     } else {
                         btn_next.style.display = 'none';
                     }
                     // 隐藏自动播放
-                    auto_play_container.style.display = 'block';
+                    auto_play_container.style.display = 'flex';
                 } else {
                     console.error('select list not includes fullPath: ' + fullPath);
                 }
@@ -211,12 +212,15 @@
         // 弹幕按钮
         function enableDanmakuElements(enable) {
             var btn_danmaku = document.getElementById('btn_danmaku');
+            var btn_fullscreen = document.getElementById('btn_fullscreen');
             var danmaku = document.getElementById('danmaku_container');
             if (enable) {
-                btn_danmaku.style.display = 'block';
-                danmaku.style.display = 'block';
+                btn_danmaku.style.display = 'flex';
+                btn_fullscreen.style.display = 'flex';
+                danmaku.style.display = 'flex';
             } else {
                 btn_danmaku.style.display = 'none';
+                btn_fullscreen.style.display = 'none';
                 danmaku.style.display = 'none';
             }
 
@@ -303,7 +307,7 @@
         // 弹幕实时更新函数
         function addDanmakuListener(bFirst) {
             const danmaku = document.getElementById('danmaku_container');
-            const danmaku_run_time = 16; // 弹幕一个行程的用时
+            const danmaku_run_time = 24; // 弹幕一个行程的用时
             // 计算弹幕速度
             function calcDanmakuSpeed() {
                 const danmaku_run_distance = 3 * danmaku.clientWidth;// 弹幕一个行程的路程
@@ -574,34 +578,57 @@
                 setVideoCookies();
             });
 
+            // 全屏响应
+            setFullScreenListener();
+        }
+
+        // 全屏响应
+        function setFullScreenListener(){
+            document.addEventListener('fullscreenchange', function () {
+                const video = document.getElementById('video');
+                var danmaku = document.getElementById('danmaku_container');
+                var add_container = document.getElementById('add_container');
+                var hr = document.getElementById('hr');
+                var til = document.getElementById('til');
+                const video_canvas = document.getElementById('video_canvas');
+                if(!document.fullscreenElement){
+                    // 退出全屏
+                    document.body.style.backgroundColor = '#f0f0f0';
+                    add_container.style.visibility = 'visible';
+                    hr.style.visibility = 'visible';
+                    til.style.visibility = 'visible';
+                } else if(document.fullscreenElement === video){
+                    // 播放器全屏
+                    // 失败，权限问题，需要按钮
+                    //video_canvas.requestFullscreen();
+                } else {
+                    // 其他全屏
+                    document.body.style.backgroundColor = '#000000';
+                    add_container.style.visibility = 'hidden';
+                    hr.style.visibility = 'hidden';
+                    til.style.visibility = 'hidden';
+                }
+            });
         }
 
         // 沉浸式
-        var bAddedDocFullscreenListener = false;
         function onTilClick() {
             if (!document.fullscreenElement) {
                 document.body.requestFullscreen();
             }
-            if (!bAddedDocFullscreenListener) {
-                bAddedDocFullscreenListener = true;
-                document.addEventListener('fullscreenchange', function () {
-                    var add_container = document.getElementById('add_container');
-                    var hr = document.getElementById('hr');
-                    var til = document.getElementById('til');
-                    if (document.fullscreenElement) {
-                        document.body.style.backgroundColor = '#000000';
-                        add_container.style.visibility = 'hidden';
-                        hr.style.visibility = 'hidden';
-                        til.style.visibility = 'hidden';
-                    } else {
-                        document.body.style.backgroundColor = '#f0f0f0';
-                        add_container.style.visibility = 'visible';
-                        hr.style.visibility = 'visible';
-                        til.style.visibility = 'visible';
-                    }
-                });
+        }
+        // 手动全屏
+        function onClickFullBtn(){
+            const video_container = document.getElementById('video_container');
+            const video_canvas = document.getElementById('video_canvas');
+            const btn_fullscreen = document.getElementById('btn_fullscreen');
+            if (!document.fullscreenElement) {
+                video_canvas.requestFullscreen();
+            } else {
+                document.exitFullscreen();
             }
         }
+
         // run
         init();
     </script>

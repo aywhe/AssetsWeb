@@ -1,9 +1,20 @@
 #video_canvas {
     width: 100%;
-    height: 100%;
     position: relative;
     padding: 0;
     margin: 0;
+}
+
+#video_canvas:fullscreen {
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+
+#video_canvas:fullscreen video {
+    width: 100%;
+    height: auto;
+    max-height: 100vh;
 }
 
 #danmaku_container {
@@ -25,10 +36,17 @@
     overflow: hidden;
 }
 
-#btn_danmaku {
+.gray-btn{    
     margin: 0px 5px;
     padding: 0px 5px;
     background-color: #d0d0d0;
+}
+
+#btn_danmaku {
+    display: none;
+}
+
+#btn_fullscreen{
     display: none;
 }
 
