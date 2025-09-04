@@ -29,21 +29,29 @@
 
   <!-- 自定义脚本 -->
   <script>
+    const defaultDelay = '6000';
     // 获取参数
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     const subDir = urlParams.has('subDir') ? urlParams.get('subDir') : '';
     const subDirs = urlParams.has('subDirs') ? urlParams.get('subDirs') : '';
     const excludes = urlParams.has('excludes') ? urlParams.get('excludes') : '';
-    const sortShow = urlParams.has('sortShow') ? urlParams.get('sortShow') : 'false';
+    const randomShow = urlParams.has('randomShow') ? urlParams.get('randomShow') : 'true';
+    const delay = urlParams.has('delay') ? urlParams.get('delay') : defaultDelay;
 
     // 获取图片列表
     let allImages = [];
     let allImagesEndIdx = 20;
-    let autoPlayDelay = 6000;
+    let autoPlayDelay = parseInt(delay);
     let isPaused = false;
     var isHandledSlide = false; // 接管轮播动作
     var g_wrapper = null;
+
+    // 处理参数
+    if(isNaN(autoPlayDelay) || autoPlayDelay <= 0){
+      autoPlayDelay = parseInt(defaultDelay);
+      console.warn('delay value "' + delay + '" invaild, so set autoPlayDelay as default value ' + autoPlayDelay);
+    }
 
     // 随机排列数组元素
     function shuffleArray(arr) {
@@ -60,11 +68,12 @@
     )
       .then(response => response.json())
       .then(data => {
-        if ('false' == sortShow || 'False' == sortShow) {
-          allImages = shuffleArray(data.images); // 随机打乱
-        } else {
+        if ('false' == randomShow || 'False' == randomShow) {
           allImages = data.images;
+        } else {
+          allImages = shuffleArray(data.images); // 随机打乱
         }
+        
         initSlideshow();
       })
       .catch(error => console.error('获取图片失败:', error));
@@ -93,7 +102,7 @@
 
     function initSlideshow() {
       if (!Array.isArray(allImages) || allImages.length == 0) return;
-      console.log('start initSlideshow');
+      //console.log('start initSlideshow');
       const wrapper = document.getElementById('slideshowWrapper');
       wrapper.innerHTML = '';
       if (allImagesEndIdx > allImages.length) allImagesEndIdx = allImages.length;
