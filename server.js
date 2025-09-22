@@ -3,7 +3,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const app = express();
-
+const FtpSrv = require('ftp-srv');
 
 //////////////////////// global datas ///////////////////////////////////
 const ConfigFilePath = 'assets_config.json';
@@ -78,7 +78,7 @@ function findOtherExtFiles(fullPath, exts) {
     const stats = fs.statSync(itemPath);
     if (!stats.isDirectory()) {
       if (prefix === item.substring(0, prefix.length) && exts.includes(ext)) {
-        var labels = item.substring(prefix.length).split(/[_\-\(\)\.]/).filter(item => item !== '' && item.length >=2);
+        var labels = item.substring(prefix.length).split(/[_\-\(\)\.]/).filter(item => item !== '' && item.length >= 2);
         var label = labels[0].replace(/[^a-zA-Z]/g, '');
         foundFiles.push({ file: item, label: label });
       }
@@ -141,7 +141,7 @@ function initConfig() {
     try {
       console.log('reading config from ' + ConfigFilePath);
       const content = fs.readFileSync(ConfigFilePath, 'utf8');
-      console.log(content);
+      //console.log(content);
       const data = JSON.parse(content);
       //
       PORT = data.ServerPort;//3000;
@@ -473,7 +473,7 @@ app.get('/api/lookfor-danmaku', (req, res) => {
 app.get('/gitlog', (req, res) => {
   res.set('Content-Type', 'text/plain');
   fs.readFile('./gitlog.txt', 'utf8', (err, data) => {
-    if(err){
+    if (err) {
       console.error(err);
       res.status(500).send(err.message);
     } else {
@@ -498,3 +498,87 @@ if (process.env.debug) {
 app.listen(PORT, () => {
   console.log(`服务器运行在 http://localhost:${PORT}`);
 });
+////////////////////////// FTP ////////////////////////////////////
+// 读取配置文件信息
+function ftpConfig() {
+  let ftpconfig = {};
+  console.log('init ftp config');
+  if (fs.existsSync(ConfigFilePath)) {
+    try {
+      console.log('reading config from ' + ConfigFilePath);
+      const content = fs.readFileSync(ConfigFilePath, 'utf8');
+      const data = JSON.parse(content);
+      ftpconfig = data.FtpConfig;
+    } catch (err) {
+      console.error('读取ftpConfig失败', err);
+    }
+  }
+  return ftpconfig; // 添加返回语句
+}
+
+// ftp监听
+function startFtpServer() {
+  const ftpconfig = ftpConfig();
+  if (undefined === ftpconfig || null === ftpconfig) {
+    console.log('没有ftp配置，跳过ftp服务');
+    return null;
+  }
+  
+  // 需要引入 FtpSrv 模块
+  
+  const ftpServer = new FtpSrv({
+    url: `ftp://0.0.0.0:${ftpconfig.port}`, // 使用非特权端口避免权限问题
+    anonymous: false
+  });
+
+  ftpServer.on('login', ({ connection, username, password }, resolve, reject) => {
+    // 遍历所有路径配置
+    try {
+      // 修复：使用 ftpconfig 而不是 ftpConfig
+      if (ftpconfig.paths && Array.isArray(ftpconfig.paths)) {
+        for (const pathConfig of ftpconfig.paths) {
+          // 检查每个路径配置中的用户
+          if (pathConfig.users && Array.isArray(pathConfig.users)) {
+            for (const user of pathConfig.users) {
+              // 如果用户名和密码匹配
+              if (user.username === username && user.password === password) {
+                // resolve对应的rootPath
+                const rootPath = pathConfig.rootPath;
+                // 确保路径存在
+                if (rootPath && fs.existsSync(rootPath)) {
+                  // console.log(`用户 ${username} 登录成功，根目录: ${rootPath}`);
+                  resolve({ root: rootPath });
+                  return;
+                } else {
+                  console.error(`用户 ${username} 的根目录不存在: ${rootPath}`);
+                  reject(new Error('根目录不存在'));
+                  return;
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.error('FTP登录处理错误:', err);
+      reject(new Error('服务器错误'));
+      return;
+    }
+    // 如果没有匹配的用户，拒绝登录
+    // console.log(`FTP登录失败: 用户名=${username}`);
+    reject(new Error('无效的用户名或密码'));
+  });
+
+  ftpServer.listen()
+    .then(() => {
+      console.log(`FTP服务器运行在 ftp://localhost:${ftpconfig.port}`);
+    })
+    .catch(err => {
+      console.error('FTP服务器启动失败:', err);
+    });
+
+  return ftpServer;
+}
+
+// 启动ftp服务器
+const ftpServer = startFtpServer();

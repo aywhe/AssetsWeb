@@ -42,5 +42,16 @@
     "ServerPort": 3000,
     "VideoFilter": [".mp4", ".flv", ".mkv", ".rmvb"],
     "ImageExts": [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"],
-    "AudioExts": [".mp3", ".wma", ".ogg", ".wav"]
+    "AudioExts": [".mp3", ".wma", ".ogg", ".wav"],
+    "FtpConfig": {
+        "port": 2121,
+        "paths": [
+            {
+                "users": [
+                    {"username": "guest", "password": "guest"}
+                ],
+                "rootPath": "E:/电子书"
+            }
+        ]
+    }
 }
