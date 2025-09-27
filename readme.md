@@ -10,10 +10,14 @@
 
 * "express": "^5.1.0"
 * "readdir": "^1.0.2"
+* "ftp-srv": "^2.16.2",
+* "get-intrinsic": "^1.3.0",
+* "node-cache": "^5.1.2",
+* "winston": "^3.17.0"
 
 # 配置文件
 
-参考 [assets_config.json.sample](assets_config.json.sample) 编辑 *assets_config.json* 文件，并保存到项目根目录中。
+编辑 [assets_config.json](assets_config.json) 文件，并保存到项目根目录中。
 
 # 运行
 
