@@ -1,0 +1,132 @@
+{
+    "AudioPathTagMap": {
+        "tag": "音乐",
+        "vpic": "playmusic.jpg",
+        "paths": [
+            {
+                "path": "E:/音乐",
+                "vpath": "/eaudios"
+            },
+            {
+                "path": "E:/Games/Audios/Deemo",
+                "vpath": "/gaudios"
+            },
+            {
+                "path": "D:/users/aywhe/Music",
+                "vpath": "/daudios"
+            }
+        ]
+    },
+    "PicturePathTagMap": {
+        "tag": "图片",
+        "vpic": "imageshow.jpg",
+        "paths": [
+            {
+                "path": "D:/Users/aywhe/Pictures/Pictures",
+                "vpath": "/dimages"
+            }
+        ]
+    },
+    "VideoPathTagMap": {
+        "ECommentary": {
+            "path": "E:/影视解说",
+            "vpath": "/ECommentary",
+            "vpic": "ECommentary.png",
+            "tag": "影视解说"
+        },
+        "DVideos": {
+            "path": "D:/Users/aywhe/Videos",
+            "vpath": "/DVideos",
+            "vpic": "DVideos.png",
+            "tag": "电影"
+        },
+        "EVideos": {
+            "path": "E:/电影",
+            "vpath": "/EVideos",
+            "vpic": "EVideos.png",
+            "tag": "电影"
+        },
+        "ETelevision": {
+            "path": "E:/电视剧",
+            "vpath": "/ETelevision",
+            "vpic": "ETelevision.png",
+            "tag": "电视剧"
+        },
+        "EAnime": {
+            "path": "E:/动漫",
+            "vpath": "/EAnime",
+            "vpic": "EAnime.png",
+            "tag": "动漫"
+        },
+        "EDocumentary": {
+            "path": "E:/纪录片",
+            "vpath": "/EDocumentary",
+            "vpic": "EDocumentary.png",
+            "tag": "纪录片"
+        },
+        "ETutorialVideos": {
+            "path": "E:/视频教程",
+            "vpath": "/ETutorialVideos",
+            "vpic": "ETutorialVideos.png",
+            "tag": "视频教程"
+        },
+        "EGameVideos": {
+            "path": "E:/Games/Videos",
+            "vpath": "/EGameVideos",
+            "vpic": "EGameVideos.png",
+            "tag": "游戏视频"
+        }
+    },
+    "ServerPort": 3000,
+    "VideoFilter": [
+        ".mp4",
+        ".flv",
+        ".mkv",
+        ".rmvb"
+    ],
+    "ImageExts": [
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".gif",
+        ".bmp",
+        ".webp"
+    ],
+    "AudioExts": [
+        ".mp3",
+        ".wma",
+        ".ogg",
+        ".wav",
+        ".flac"
+    ],
+    "FtpConfig": {
+        "port": 2121,
+        "paths": [
+            {
+                "users": [
+                    {
+                        "username": "guest",
+                        "password": "guest",
+                        "permissions": "lr"
+                    },
+                    {
+                        "username": "admin",
+                        "password": "mimashi1dao9",
+                        "permissions": "lrwd"
+                    }
+                ],
+                "rootPath": "D:/书"
+            },
+            {
+                "users": [
+                    {
+                        "username": "guest2",
+                        "password": "guest2",
+                        "permissions": "lrwd"
+                    }
+                ],
+                "rootPath": "D:/users/aywhe/Downloads"
+            }
+        ]
+    }
+}
