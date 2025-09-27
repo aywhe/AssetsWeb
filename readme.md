@@ -13,7 +13,7 @@
 
 # 配置文件
 
-参考 [assets_config.json.sample](assets_config.json.sample) 编辑 *assets_config.json* 文件，并保存到项目根目录中。
+编辑 [assets_config.json](assets_config.json) 文件，并保存到项目根目录中。
 
 # 运行
 
