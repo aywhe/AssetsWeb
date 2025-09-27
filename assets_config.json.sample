@@ -48,8 +48,8 @@
         "paths": [
             {
                 "users": [
-                    {"username": "guest", "password": "guest", "permissions":"elr"},
-                    {"username": "admin", "password": "admin", "permissions":"elrwd"}
+                    {"username": "guest", "password": "guest", "permissions":"lr"},
+                    {"username": "admin", "password": "admin", "permissions":"lrwd"}
                 ],
                 "rootPath": "D:/书"
             }

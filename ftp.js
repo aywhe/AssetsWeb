@@ -30,11 +30,7 @@ function startFtpServer() {
 
   // 修改后:
   ftpServer = new FtpSrv(`ftp://localhost:${ftpconfig.port}`, {
-    anonymous: false,
-    greeting: ['欢迎使用FTP服务器'],
-    pasv_min: 0,
-    pasv_max: 8000,
-    whitelist: ['LIST', 'NLST', 'PWD', 'CWD', 'MKD', 'RMD', 'DELE', 'STOR', 'RETR', 'SIZE', 'MDTM', 'RNFR', 'RNTO']
+    anonymous: false
   });
 
   // 添加服务器错误处理
@@ -58,7 +54,7 @@ function startFtpServer() {
               if (user.username === username && user.password === password) {
                 const rootPath = pathConfig.rootPath;
                 if (rootPath && fs.existsSync(rootPath)) {
-                  connection.userPermissions = user.permissions || 'elr';
+                  connection.userPermissions = user.permissions || 'lr';
                   connection.username = username;
                   logger.info(`用户 ${username} 登录成功，根目录: ${rootPath}，权限: ${connection.userPermissions}`);
                   resolve({ root: rootPath });
@@ -86,7 +82,7 @@ function startFtpServer() {
 
   // 检查用户是否有指定权限
   function hasPermission(connection, permission) {
-    const permissions = connection.userPermissions || 'elr';
+    const permissions = connection.userPermissions || 'lr';
     return permissions.includes(permission);
   }
 
