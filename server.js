@@ -1,436 +1,400 @@
 // server.js
 const express = require('express');
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 const app = express();
-const FtpSrv = require('ftp-srv');
+const config = require('./config');
+const logger = require('./logger');
+const FileUtils = require('./fileUtils');
 
 //////////////////////// global datas ///////////////////////////////////
 const ConfigFilePath = 'assets_config.json';
-var PORT = 3000;
-var VideoFilter = ['.mp4', '.flv', '.mkv', '.rmvb'];
-var ImageExts = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
-var AudioExts = ['.mp3', '.wma', '.ogg', '.wav'];
-//const SubtitleExts = ['.srt','.vtt', '.ass'];
+
+// 从配置中读取默认值
+var PORT = config.getPort();
+var VideoFilter = config.get('VideoFilter', ['.mp4', '.flv', '.mkv', '.rmvb']);
+var ImageExts = config.get('ImageExts', ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp']);
+var AudioExts = config.get('AudioExts', ['.mp3', '.wma', '.ogg', '.wav']);
 
 // 图片
-var PicturePathTagMap = {
+var PicturePathTagMap = config.get('PicturePathTagMap', {
   images: [], // 存储所有图片路径
   vpic: 'imageshow.jpg', // 图片位置的虚拟目录中卡片图片位置
   paths: [{ path: 'D:/Users/aywhe/Pictures/Pictures', vpath: '/dimages' }] // 不同位置有不同的标记名称
-};
+});
 
 // 视频
 var VideoNameList = new Map(); // 视频文件名列表
-var VideoPathTagMap = new Map([
-  ['DVideos', { path: 'D:/Users/aywhe/Videos', vpath: '/DVideos', vpic: 'DVideos.png' }]
-]); // 不同视频位置有不同的标记名称
+var VideoPathTagMap = new Map(Object.entries(config.get('VideoPathTagMap', {
+  'DVideos': { path: 'D:/Users/aywhe/Videos', vpath: '/DVideos', vpic: 'DVideos.png' }
+}))); // 不同视频位置有不同的标记名称
 
 // 音频
-var AudioPathTagMap = {
+var AudioPathTagMap = config.get('AudioPathTagMap', {
   audios: [], // 存储所有路径
   vpic: 'playaudio.jpg', // 音频位置的虚拟目录中卡片图片位置
   paths: [{ path: 'D:/Users/aywhe/Music', vpath: '/daudios' }] // 不同位置有不同的标记名称
-};
-
-//////////////////////// tool functions /////////////////////////////////
-
-// 检验文件名的后缀是否符合
-function matchFilterName(name, filter) {
-  const ext = path.extname(name).toLowerCase();
-  return filter.includes(ext);
-}
-
-// 获取文件及其子文件的文件名
-function getFilesAndFoldersInDir(dir, filter = []) {
-  const result = [];
-  const items = fs.readdirSync(dir);
-  var bUseFilter = false;
-  if (Array.isArray(filter) && filter.length > 0) {
-    bUseFilter = true;
-  }
-  items.forEach(item => {
-    const itemPath = path.join(dir, item);
-    const stats = fs.statSync(itemPath);
-    if (stats.isDirectory()) {
-      const children = getFilesAndFoldersInDir(itemPath, filter);
-      if (children.length > 0) {
-        result.push({ type: 'folder', name: item, children });
-      }
-    } else if (!bUseFilter || matchFilterName(item, filter)) {
-      result.push({ type: 'file', name: item });
-    }
-  });
-  return result;
-}
-// 获取同一个目录中同文件名的其他类型文件
-function findOtherExtFiles(fullPath, exts) {
-  const dirName = path.dirname(fullPath);
-  const baseName = path.basename(fullPath);
-  const parts = baseName.split(".");
-  var prefix = parts.slice(0, -1).join(".");
-  var foundFiles = [];
-
-  const items = fs.readdirSync(dirName);
-  items.forEach(item => {
-    const itemPath = path.join(dirName, item);
-    const ext = path.extname(item).toLowerCase();
-    const stats = fs.statSync(itemPath);
-    if (!stats.isDirectory()) {
-      if (prefix === item.substring(0, prefix.length) && exts.includes(ext)) {
-        var labels = item.substring(prefix.length).split(/[_\-\(\)\.]/).filter(item => item !== '' && item.length >= 2);
-        var label = labels[0].replace(/[^a-zA-Z]/g, '');
-        foundFiles.push({ file: item, label: label });
-      }
-    }
-  });
-  return foundFiles;
-}
-// 自定义断言
-function assert(condition, message) {
-  if (!condition) {
-    throw new Error(message || 'Assertion failed');
-  }
-}
-
-// 随机排列数组元素
-function shuffleArray(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
-
-/**
- * 递归读取图片目录
- * @param {string} dirPath - 当前目录路径
- */
-function readVpathFileFromDir(dirPath, exts, vpath, vroot) {
-  const files = fs.readdirSync(dirPath);
-  var data = [];
-  files.forEach(file => {
-    const filePath = path.join(dirPath, file);
-    const stat = fs.statSync(filePath);
-
-    if (stat.isDirectory()) {
-      // 如果是子目录，递归处理
-      var indata = readVpathFileFromDir(filePath, exts, vpath, vroot);
-      Array.prototype.push.apply(data, indata);
-    } else {
-      // 只添加图片文件
-      const ext = path.extname(file).toLowerCase();
-      if (exts.includes(ext)) {
-        // 添加相对URL路径
-        const relativePath = path.relative(vroot, filePath)
-          .replace(/\\/g, '/'); // Windows兼容
-
-        data.push(`${vpath}/${relativePath}`);
-      }
-    }
-  });
-  return data;
-}
+});
 
 ////////////////////////// running functions //////////////////////////////////////
 
 // 读取配置文件信息
-function initConfig() {
-  if (fs.existsSync(ConfigFilePath)) {
-    try {
-      console.log('reading config from ' + ConfigFilePath);
-      const content = fs.readFileSync(ConfigFilePath, 'utf8');
-      //console.log(content);
-      const data = JSON.parse(content);
-      //
-      PORT = data.ServerPort;//3000;
-      VideoFilter = data.VideoFilter;//['.mp4', '.flv', '.mkv', '.rmvb'];
-      ImageExts = data.ImageExts;//['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
-      AudioExts = data.AudioExts;//['.mp3', '.wma', '.ogg', '.wav'];
-      //
-      PicturePathTagMap = data.PicturePathTagMap;
-      PicturePathTagMap.images = [];
-      AudioPathTagMap = data.AudioPathTagMap;
-      AudioPathTagMap.audios = [];
-      VideoPathTagMap = new Map(Object.entries(data.VideoPathTagMap));
-    } catch (err) {
-      console.error('读取配置信息失败，将使用默认配置', err);
-    }
-  } else {
-    console.log('config file ' + ConfigFilePath + 'is not found, use default config.');
-  }
-}
-// 初始化工作
-function initDatas() {
-  // 删除无效的视频目录
-  for (let [key, val] of VideoPathTagMap) {
-    if (!fs.existsSync(val.path)) {
-      VideoPathTagMap.delete(key);
-    }
-  }
-
-  //assert(fs.existsSync(PicturePath), "图片目录不存在");
-
-  // 设置静态资源目录
-  app.use(express.static('public'));
-
-  // 读取图片文件名
-  console.log('use picture paths bellow: ')
-  PicturePathTagMap.paths.forEach((val) => {
-    if (fs.existsSync(val.path)) {
-      app.use(val.vpath, express.static(val.path));
-      // 初始化时读取所有图片
-      console.log(val.path);
-      const indata = readVpathFileFromDir(val.path, ImageExts, val.vpath, val.path);
-      Array.prototype.push.apply(PicturePathTagMap.images, indata);
-    }
-  });
-  console.log('找到 ' + PicturePathTagMap.images.length + ' 张图片');
-
-  // 读取音频文件名
-  console.log('use audio paths bellow: ')
-  AudioPathTagMap.paths.forEach((val) => {
-    if (fs.existsSync(val.path)) {
-      app.use(val.vpath, express.static(val.path));
-      // 初始化时读取所有图片
-      console.log(val.path);
-      const indata = readVpathFileFromDir(val.path, AudioExts, val.vpath, val.path);
-      Array.prototype.push.apply(AudioPathTagMap.audios, indata);
-    }
-  });
-  console.log('找到 ' + AudioPathTagMap.audios.length + ' 个音频文件');
-
-  // app use
-  VideoPathTagMap.forEach((val, key) => { app.use(val.vpath, express.static(val.path)); });
-
-  // 调用函数读取指定目录
-  console.log('use video paths bellow: ')
-  VideoPathTagMap.forEach((val, key) => {
-    const videolist = getFilesAndFoldersInDir(val.path, VideoFilter);
-    VideoNameList.set(key, videolist);
-    console.log('' + key + ' => ' + val.path);
-    //console.log(JSON.stringify(videolist, null, 2));
-  });
-}
-
-
-///////////////////////////////////////////////////////////
-// 列举服务项目
-app.get('/api/server-content', (req, res) => {
-  let content = [];
-  if (PicturePathTagMap.images.length > 0) {
-    let PicContent = { uri: '/imageshow', imguri: '/images/' + PicturePathTagMap.vpic, til: PicturePathTagMap.tag };
-    content.push(PicContent);
-  }
-  if (AudioPathTagMap.audios.length > 0) {
-    let PicContent = { uri: '/music', imguri: '/images/' + AudioPathTagMap.vpic, til: AudioPathTagMap.tag };
-    content.push(PicContent);
-  }
-
-  VideoPathTagMap.forEach((val, key) => {
-    const ele = { uri: '/videos?key=' + encodeURIComponent(key), imguri: '/images/' + val.vpic, til: val.tag };
-    content.push(ele);
-  });
-  res.json(content);
-});
-// 获取播放页同目录列表
-app.get('/api/play-list', (req, res) => {
-  const fullPath = req.query.fullPath;
-  const dirs = fullPath.split(/[\\/]/);
-  const vpath = '/' + dirs[1];
-  var file_list = [];
+async function initConfig() {
   try {
-    // 获取key
-    const key = Array.from(VideoPathTagMap.entries()).filter(([key, val]) => {
-      return val.vpath == vpath;
-    })[0][0];
-    // 只对有效的key做处理
-    if ((!(undefined === key)) && (!('' === key)) && VideoPathTagMap.has(key)) {
-      const videoInfo = VideoNameList.get(key);
-      var folder_ind = 2;
-      var subdir_files = videoInfo;
-      // 目录一层一层的匹配下去，遇到错误的话给catch
-      dirs.slice(2, -1).forEach((subdir) => {
-        subdir_files = subdir_files.filter((val) => {
-          return val.type == 'folder' && val.name == subdir;
-        })[0].children;
-      });
-      // 找到了同一个目录中的文件，在 subdir_files 中
-      file_list = subdir_files.filter((val) => {
-        // 放弃更深层的子目录
-        return val.type == 'file';
-      }).map((val) => {
-        // 补全目录名称
-        return [...dirs.slice(0, -1), val.name].join('/');
-      });
-    } else {
-      // 无效的key，file_list 保留为空;
+    const data = config.get(null, {});
+    
+    PORT = data.ServerPort || PORT;
+    VideoFilter = data.VideoFilter || VideoFilter;
+    ImageExts = data.ImageExts || ImageExts;
+    AudioExts = data.AudioExts || AudioExts;
+    
+    PicturePathTagMap = data.PicturePathTagMap || PicturePathTagMap;
+    PicturePathTagMap.images = [];
+    
+    AudioPathTagMap = data.AudioPathTagMap || AudioPathTagMap;
+    AudioPathTagMap.audios = [];
+    
+    VideoPathTagMap = new Map(Object.entries(data.VideoPathTagMap || Object.fromEntries(VideoPathTagMap)));
+  } catch (err) {
+    logger.error('读取配置信息失败，将使用默认配置', err);
+  }
+}
+
+// 初始化工作
+async function initDatas() {
+  try {
+    // 删除无效的视频目录
+    for (let [key, val] of VideoPathTagMap) {
+      try {
+        await fs.access(val.path);
+      } catch {
+        VideoPathTagMap.delete(key);
+        logger.warn(`视频目录不存在，已删除: ${key}`);
+      }
+    }
+
+    // 设置静态资源目录
+    app.use(express.static('public'));
+
+    // 读取图片文件名
+    logger.info('使用图片路径:');
+    for (const val of PicturePathTagMap.paths) {
+      try {
+        await fs.access(val.path);
+        app.use(val.vpath, express.static(val.path));
+        logger.info(val.path);
+        const indata = await FileUtils.readVpathFileFromDir(val.path, ImageExts, val.vpath, val.path);
+        PicturePathTagMap.images = PicturePathTagMap.images.concat(indata);
+      } catch {
+        logger.warn(`图片目录不存在: ${val.path}`);
+      }
+    }
+    logger.info(`找到 ${PicturePathTagMap.images.length} 张图片`);
+
+    // 读取音频文件名
+    logger.info('使用音频路径:');
+    for (const val of AudioPathTagMap.paths) {
+      try {
+        await fs.access(val.path);
+        app.use(val.vpath, express.static(val.path));
+        logger.info(val.path);
+        const indata = await FileUtils.readVpathFileFromDir(val.path, AudioExts, val.vpath, val.path);
+        AudioPathTagMap.audios = AudioPathTagMap.audios.concat(indata);
+      } catch {
+        logger.warn(`音频目录不存在: ${val.path}`);
+      }
+    }
+    logger.info(`找到 ${AudioPathTagMap.audios.length} 个音频文件`);
+
+    // app use
+    VideoPathTagMap.forEach((val, key) => { 
+      app.use(val.vpath, express.static(val.path)); 
+    });
+
+    // 调用函数读取指定目录
+    logger.info('使用视频路径:');
+    for (let [key, val] of VideoPathTagMap) {
+      try {
+        const videolist = await FileUtils.getFilesAndFoldersInDir(val.path, VideoFilter);
+        VideoNameList.set(key, videolist);
+        logger.info(`${key} => ${val.path}`);
+      } catch (err) {
+        logger.error(`读取视频目录失败: ${val.path}`, err);
+      }
     }
   } catch (err) {
-    console.error('获取播放列表失败', err);
+    logger.error('初始化数据失败', err);
   }
-  res.json(file_list);
-});
-// 获取视频目录结构
-app.get('/api/video-list', (req, res) => {
-  const key = req.query.key;
-  var videoInfo = {};
-  var vpath = '';
-  if ((!(undefined === key)) && (!('' === key)) && VideoPathTagMap.has(key)) {
-    videoInfo = VideoNameList.get(key);
-    vpath = VideoPathTagMap.get(key).vpath;
+}
+
+///////////////////////////////////////////////////////////
+// API路由
+app.get('/api/server-content', (req, res) => {
+  try {
+    let content = [];
+    if (PicturePathTagMap.images.length > 0) {
+      let PicContent = { 
+        uri: '/imageshow', 
+        imguri: '/images/' + PicturePathTagMap.vpic, 
+        til: PicturePathTagMap.tag 
+      };
+      content.push(PicContent);
+    }
+    if (AudioPathTagMap.audios.length > 0) {
+      let PicContent = { 
+        uri: '/music', 
+        imguri: '/images/' + AudioPathTagMap.vpic, 
+        til: AudioPathTagMap.tag 
+      };
+      content.push(PicContent);
+    }
+
+    VideoPathTagMap.forEach((val, key) => {
+      const ele = { 
+        uri: '/videos?key=' + encodeURIComponent(key), 
+        imguri: '/images/' + val.vpic, 
+        til: val.tag 
+      };
+      content.push(ele);
+    });
+    res.json(content);
+  } catch (err) {
+    logger.error('获取服务器内容失败', err);
+    res.status(500).json({ error: '获取内容失败' });
   }
-  res.json({ videoInfo: videoInfo, key: key, vpath: vpath });
 });
 
-// 获取视频目录结构
-app.get('/api/video-paths', (req, res) => {
-  const videoPathList = Array.from(VideoPathTagMap.entries()).map(([key, val]) => {
-    return { key: key, vpath: val.vpath };
-  });
-  res.json({ videoPathList: videoPathList });
-});
-
-// 获取音乐文件信息
-app.get('/api/page-music', (req, res) => {
-  const page = parseInt(req.query.page);
-  const pageSize = parseInt(req.query.pageSize);
-  //
-  if (AudioPathTagMap.audios.length > 0) {
-    var filter = req.query.filter;
-    var audios = [];
-    //
-    if (undefined === filter || null === filter || '' === filter.trim()) {
-      audios = AudioPathTagMap.audios;
-    } else {
-      audios = [];
-      filter = filter.trim();
-      AudioPathTagMap.audios.forEach((val, ind) => {
-        if (path.basename(val).includes(filter)) {
-          audios.push(val);
+app.get('/api/play-list', async (req, res) => {
+  try {
+    const fullPath = req.query.fullPath;
+    if (!fullPath) {
+      return res.status(400).json({ error: '缺少 fullPath 参数' });
+    }
+    
+    const dirs = fullPath.split(/[\\/]/);
+    const vpath = '/' + dirs[1];
+    let file_list = [];
+    
+    // 获取key
+    const entry = Array.from(VideoPathTagMap.entries()).find(([key, val]) => {
+      return val.vpath == vpath;
+    });
+    
+    if (entry) {
+      const [key, val] = entry;
+      if (VideoPathTagMap.has(key)) {
+        const videoInfo = VideoNameList.get(key);
+        let subdir_files = videoInfo;
+        
+        // 目录一层一层的匹配下去
+        for (let i = 2; i < dirs.length - 1; i++) {
+          const subdir = dirs[i];
+          const folder = subdir_files.find((val) => {
+            return val.type == 'folder' && val.name == subdir;
+          });
+          
+          if (folder && folder.children) {
+            subdir_files = folder.children;
+          } else {
+            subdir_files = [];
+            break;
+          }
         }
-      });
+        
+        // 找到了同一个目录中的文件
+        file_list = subdir_files
+          .filter((val) => val.type == 'file')
+          .map((val) => {
+            return [...dirs.slice(0, -1), val.name].join('/');
+          });
+      }
     }
+    
+    res.json(file_list);
+  } catch (err) {
+    logger.error('获取播放列表失败', err);
+    res.status(500).json({ error: '获取播放列表失败' });
   }
-  const total = audios.length;
-  var sendData = [];
-  if (total > 0) {
-    // 
-    if (page <= 0) { page = 1; }
-    if (pageSize <= 0) { pageSize = 10; }
-    var startId = (page - 1) * pageSize;
-    if (startId < 0 || startId >= total) { startId = 0; }
-    var endId = startId + pageSize;
-    if (endId <= 0 || endId > total) { endId = total; }
-    //console.log(page + ',' + pageSize + ',' + startId + ',' + endId);
-    sendData = audios.slice(startId, endId);
-  }
-  //console.log('send ' + sendData.length + ' audios')
-  res.json({ audios: sendData, total: total });
 });
 
-// 获取字幕文件
-app.get('/api/lookfor-subtitles', (req, res) => {
-  const vitualPath = req.query.path;
-  const subtitleExts = JSON.parse(req.query.subtitleExts);
-  var realdir = '';
-  var vpath = '';
-  // 获取实际目录和文件名
-  for (const [key, val] of VideoPathTagMap) {
-    if (val.vpath === vitualPath.substring(0, val.vpath.length)) {
-      realdir = val.path;
-      vpath = val.vpath;
-      break;
+app.get('/api/video-list', (req, res) => {
+  try {
+    const key = req.query.key;
+    let videoInfo = {};
+    let vpath = '';
+    
+    if (key && VideoPathTagMap.has(key)) {
+      videoInfo = VideoNameList.get(key);
+      vpath = VideoPathTagMap.get(key).vpath;
     }
+    
+    res.json({ videoInfo: videoInfo, key: key, vpath: vpath });
+  } catch (err) {
+    logger.error('获取视频列表失败', err);
+    res.status(500).json({ error: '获取视频列表失败' });
   }
-  var realPath = path.join(realdir, vitualPath.substring(vpath.length));
-  // 寻找字幕文件
-  var subtitleFiles = findOtherExtFiles(realPath, subtitleExts);
-
-  // 修改字幕文件到虚拟目录
-  var subtitles = [];
-  var dirName = path.dirname(vitualPath);
-  subtitleFiles.forEach((val, ind) => {
-    var tmp = path.join(dirName, val.file).replace(/\\/g, '/');
-    subtitles.push({ file: tmp, label: val.label });
-  });
-  res.json({ subtitles: subtitles });
 });
 
-// 获取所有图片列表（用于slideshow）
+app.get('/api/video-paths', (req, res) => {
+  try {
+    const videoPathList = Array.from(VideoPathTagMap.entries()).map(([key, val]) => {
+      return { key: key, vpath: val.vpath };
+    });
+    res.json({ videoPathList: videoPathList });
+  } catch (err) {
+    logger.error('获取视频路径失败', err);
+    res.status(500).json({ error: '获取视频路径失败' });
+  }
+});
+
+app.get('/api/page-music', (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 10;
+    
+    let audios = [];
+    if (AudioPathTagMap.audios.length > 0) {
+      let filter = req.query.filter;
+      
+      if (!filter || !filter.trim()) {
+        audios = AudioPathTagMap.audios;
+      } else {
+        filter = filter.trim();
+        audios = AudioPathTagMap.audios.filter((val) => {
+          return path.basename(val).includes(filter);
+        });
+      }
+    }
+    
+    const total = audios.length;
+    let sendData = [];
+    
+    if (total > 0) {
+      const startId = Math.max(0, (page - 1) * pageSize);
+      const endId = Math.min(total, startId + pageSize);
+      sendData = audios.slice(startId, endId);
+    }
+    
+    res.json({ audios: sendData, total: total });
+  } catch (err) {
+    logger.error('获取音乐列表失败', err);
+    res.status(500).json({ error: '获取音乐列表失败' });
+  }
+});
+
+app.get('/api/lookfor-subtitles', async (req, res) => {
+  try {
+    const vitualPath = req.query.path;
+    const subtitleExts = JSON.parse(req.query.subtitleExts);
+    
+    if (!vitualPath || !subtitleExts) {
+      return res.status(400).json({ error: '缺少必要参数' });
+    }
+    
+    let realdir = '';
+    let vpath = '';
+    
+    // 获取实际目录和文件名
+    for (const [key, val] of VideoPathTagMap) {
+      if (val.vpath === vitualPath.substring(0, val.vpath.length)) {
+        realdir = val.path;
+        vpath = val.vpath;
+        break;
+      }
+    }
+    
+    if (!realdir || !vpath) {
+      return res.status(400).json({ error: '无效的路径' });
+    }
+    
+    const realPath = path.join(realdir, vitualPath.substring(vpath.length));
+    
+    // 寻找字幕文件
+    const subtitleFiles = await FileUtils.findOtherExtFiles(realPath, subtitleExts);
+
+    // 修改字幕文件到虚拟目录
+    const subtitles = [];
+    const dirName = path.dirname(vitualPath);
+    subtitleFiles.forEach((val) => {
+      const tmp = path.join(dirName, val.file).replace(/\\/g, '/');
+      subtitles.push({ file: tmp, label: val.label });
+    });
+    
+    res.json({ subtitles: subtitles });
+  } catch (err) {
+    logger.error('获取字幕文件失败', err);
+    res.status(500).json({ error: '获取字幕文件失败' });
+  }
+});
+
 app.get('/api/all-images', (req, res) => {
-  const subDirs = req.query.subDirs;
-  const subDir = req.query.subDir;
-  const excludes = req.query.excludes;
+  try {
+    const subDirs = req.query.subDirs;
+    const subDir = req.query.subDir;
+    const excludes = req.query.excludes;
 
-  const parseSubDirs = function (dirs) {
-    // 分割字符串参数
-    if (undefined === dirs || null === dirs || '' === dirs.trim()) {
-      return [];
-    } else {
-      return dirs.trim().split(',');
+    const parseSubDirs = function (dirs) {
+      if (!dirs || !dirs.trim()) {
+        return [];
+      } else {
+        return dirs.trim().split(',');
+      }
+    };
+    
+    // 整理后的子目录 
+    const actSubDirs = [...parseSubDirs(subDirs), ...parseSubDirs(subDir)];
+    // 排除的目录
+    const actExcludes = parseSubDirs(excludes);
+
+    const genFilterPath = function (dirs) {
+      if (!dirs || dirs.length === 0) {
+        return [];
+      }
+      return PicturePathTagMap.paths.flatMap((_path) => {
+        return dirs.map((_dir) => {
+          return path.join(_path.vpath, _dir).replace(/\\/g, '/');
+        });
+      });
+    };
+
+    // 构造前缀，筛选文件
+    let images = PicturePathTagMap.images;
+    if (actSubDirs.length > 0) {
+      const fullSubDirs = genFilterPath(actSubDirs);
+      images = images.filter((item) => {
+        return fullSubDirs.some((val) => item.includes(val));
+      });
     }
-  };
-  // 整理后的子目录 
-  var actSubDirs = [...parseSubDirs(subDirs), ...parseSubDirs(subDir)];
-  // 排除的目录
-  var actExcludes = parseSubDirs(excludes);
-
-  const genFilterPath = function (dirs) {
-    // 构造完整目录前缀
-    if (undefined === dirs || null === dirs || 0 == dirs.length) {
-      return [];
+    
+    // 构造前缀，筛选文件
+    if (actExcludes.length > 0) {
+      const fullExcludes = genFilterPath(actExcludes);
+      images = images.filter((item) => {
+        return !fullExcludes.some((val) => item.includes(val));
+      });
     }
-    return PicturePathTagMap.paths.map((_path) => {
-      return dirs.map((_dir) => {
-        return path.join(_path.vpath, _dir).replace(/\\/g, '/');
-      });
-    }).flat();
-  };
-
-  // 构造前缀，筛选文件
-  var images = PicturePathTagMap.images;
-  if (actSubDirs.length > 0) {
-    var fullSubDirs = genFilterPath(actSubDirs);
-    images = images.filter((item) => {
-      // 筛选
-      return fullSubDirs.some((val) => {
-        return item.includes(val);
-      });
-    });
+    
+    res.json({ images: images });
+  } catch (err) {
+    logger.error('获取图片列表失败', err);
+    res.status(500).json({ error: '获取图片列表失败' });
   }
-  // 构造前缀，筛选文件
-  if (actExcludes.length > 0) {
-    var fullExcludes = genFilterPath(actExcludes);
-    images = images.filter((item) => {
-      // 排除
-      return !fullExcludes.some((val) => {
-        return item.includes(val);
-      });
-    });
-  }
-  // response
-  res.json({ images: images });
 });
 
 /////////////////////////////////////////////////////////////////////////
-// 图片轮播页面
+// 页面路由
 app.get('/imageshow', (req, res) => {
   if (PicturePathTagMap.images.length > 0) {
-    //PicturePathTagMap.images = shuffleArray(PicturePathTagMap.images); // 放客户端
     res.sendFile(path.join(__dirname, 'views', 'imageshow.html'));
   } else {
     res.send('没有图片可以显示');
   }
 });
 
-// 播放视频页面
 app.get('/play', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'play.html'));
 });
 
-// 播放音乐页面
 app.get('/music', (req, res) => {
   if (AudioPathTagMap.audios.length > 0) {
     res.sendFile(path.join(__dirname, 'views', 'music.html'));
@@ -439,146 +403,91 @@ app.get('/music', (req, res) => {
   }
 });
 
-// 视频列表页面
 app.get('/videos', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'treeinfos.html'));
 });
 
-// 获取字幕文件
-app.get('/api/lookfor-danmaku', (req, res) => {
-  const danmakuSuffix = 'danmaku.xml';
-  const vitualPath = req.query.path;
-  var realdir = '';
-  var vpath = '';
-  // 获取实际目录和文件名
-  for (const [key, val] of VideoPathTagMap) {
-    if (val.vpath === vitualPath.substring(0, val.vpath.length)) {
-      realdir = val.path;
-      vpath = val.vpath;
-      break;
+app.get('/api/lookfor-danmaku', async (req, res) => {
+  try {
+    const danmakuSuffix = 'danmaku.xml';
+    const vitualPath = req.query.path;
+    
+    if (!vitualPath) {
+      return res.status(400).send('缺少路径参数');
     }
-  }
-  var realPath = path.join(realdir, vitualPath.substring(vpath.length));
-  // 寻找字幕文件
-  var realDanmakuFilePath = realPath.substring(0, realPath.lastIndexOf('.') + 1) + danmakuSuffix;
-  //var vitualDanmakuFilePath = vitualPath.substring(0, vitualPath.lastIndexOf('.') + 1) + danmakuSuffix;
+    
+    let realdir = '';
+    let vpath = '';
+    
+    // 获取实际目录和文件名
+    for (const [key, val] of VideoPathTagMap) {
+      if (val.vpath === vitualPath.substring(0, val.vpath.length)) {
+        realdir = val.path;
+        vpath = val.vpath;
+        break;
+      }
+    }
+    
+    if (!realdir || !vpath) {
+      return res.status(400).send('无效的路径');
+    }
+    
+    const realPath = path.join(realdir, vitualPath.substring(vpath.length));
+    const realDanmakuFilePath = realPath.substring(0, realPath.lastIndexOf('.') + 1) + danmakuSuffix;
 
-  fs.readFile(realDanmakuFilePath, 'utf8', (err, data) => {
+    const data = await fs.readFile(realDanmakuFilePath, 'utf8');
     res.set('Content-Type', 'application/xml');
-    res.send(data)
-  });
+    res.send(data);
+  } catch (err) {
+    logger.error('获取弹幕文件失败', err);
+    res.status(404).send('弹幕文件不存在');
+  }
+});
 
+app.get('/gitlog', async (req, res) => {
+  try {
+    res.set('Content-Type', 'text/plain');
+    const data = await fs.readFile('./gitlog.txt', 'utf8');
+    res.status(200).send(data);
+  } catch (err) {
+    logger.error('读取gitlog失败', err);
+    res.status(500).send(err.message);
+  }
 });
-// 版本日志和信息
-app.get('/gitlog', (req, res) => {
-  res.set('Content-Type', 'text/plain');
-  fs.readFile('./gitlog.txt', 'utf8', (err, data) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send(err.message);
-    } else {
-      res.status(200).send(data);
-    }
-  });
-});
-// 主页面
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'cards.html'));
 });
 
 ////////////////////////// 运行脚本 ////////////////////////////////////
-// 初始化工作
-initConfig();
-initDatas();
-
-if (process.env.debug) {
-  PORT = parseInt(process.env.PORT);
-}
-// 启动服务器
-app.listen(PORT, () => {
-  console.log(`服务器运行在 http://localhost:${PORT}`);
+// 全局错误处理
+process.on('uncaughtException', (err) => {
+  logger.error('未捕获的异常:', err);
+  process.exit(1);
 });
-////////////////////////// FTP ////////////////////////////////////
-// 读取配置文件信息
-function ftpConfig() {
-  let ftpconfig = {};
-  console.log('init ftp config');
-  if (fs.existsSync(ConfigFilePath)) {
-    try {
-      console.log('reading config from ' + ConfigFilePath);
-      const content = fs.readFileSync(ConfigFilePath, 'utf8');
-      const data = JSON.parse(content);
-      ftpconfig = data.FtpConfig;
-    } catch (err) {
-      console.error('读取ftpConfig失败', err);
-    }
-  }
-  return ftpconfig; // 添加返回语句
+
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('未处理的 Promise 拒绝:', reason);
+  process.exit(1);
+});
+
+// 初始化工作
+async function initialize() {
+  await initConfig();
+  await initDatas();
 }
 
-// ftp监听
-function startFtpServer() {
-  const ftpconfig = ftpConfig();
-  if (undefined === ftpconfig || null === ftpconfig) {
-    console.log('没有ftp配置，跳过ftp服务');
-    return null;
-  }
-  
-  // 需要引入 FtpSrv 模块
-  
-  const ftpServer = new FtpSrv({
-    url: `ftp://0.0.0.0:${ftpconfig.port}`, // 使用非特权端口避免权限问题
-    anonymous: false
-  });
-
-  ftpServer.on('login', ({ connection, username, password }, resolve, reject) => {
-    // 遍历所有路径配置
-    try {
-      // 修复：使用 ftpconfig 而不是 ftpConfig
-      if (ftpconfig.paths && Array.isArray(ftpconfig.paths)) {
-        for (const pathConfig of ftpconfig.paths) {
-          // 检查每个路径配置中的用户
-          if (pathConfig.users && Array.isArray(pathConfig.users)) {
-            for (const user of pathConfig.users) {
-              // 如果用户名和密码匹配
-              if (user.username === username && user.password === password) {
-                // resolve对应的rootPath
-                const rootPath = pathConfig.rootPath;
-                // 确保路径存在
-                if (rootPath && fs.existsSync(rootPath)) {
-                  // console.log(`用户 ${username} 登录成功，根目录: ${rootPath}`);
-                  resolve({ root: rootPath });
-                  return;
-                } else {
-                  console.error(`用户 ${username} 的根目录不存在: ${rootPath}`);
-                  reject(new Error('根目录不存在'));
-                  return;
-                }
-              }
-            }
-          }
-        }
-      }
-    } catch (err) {
-      console.error('FTP登录处理错误:', err);
-      reject(new Error('服务器错误'));
-      return;
-    }
-    // 如果没有匹配的用户，拒绝登录
-    // console.log(`FTP登录失败: 用户名=${username}`);
-    reject(new Error('无效的用户名或密码'));
-  });
-
-  ftpServer.listen()
-    .then(() => {
-      console.log(`FTP服务器运行在 ftp://localhost:${ftpconfig.port}`);
-    })
-    .catch(err => {
-      console.error('FTP服务器启动失败:', err);
+// 如果直接运行 server.js，则启动服务器
+if (require.main === module) {
+  initialize().then(() => {
+    app.listen(PORT, () => {
+      logger.info(`服务器运行在 http://localhost:${PORT}`);
     });
-
-  return ftpServer;
+  }).catch(err => {
+    logger.error('服务器启动失败', err);
+    process.exit(1);
+  });
 }
 
-// 启动ftp服务器
-const ftpServer = startFtpServer();
+app.set('port', PORT);
+module.exports = app;

@@ -48,9 +48,10 @@
         "paths": [
             {
                 "users": [
-                    {"username": "guest", "password": "guest"}
+                    {"username": "guest", "password": "guest", "permissions":"elr"},
+                    {"username": "admin", "password": "admin", "permissions":"elrwd"}
                 ],
-                "rootPath": "E:/电子书"
+                "rootPath": "D:/书"
             }
         ]
     }
