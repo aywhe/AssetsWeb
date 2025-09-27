@@ -24,10 +24,12 @@ async function stopServers() {
 process.on('SIGINT', async () => {
   logger.info('收到SIGINT信号，正在关闭服务器...');
   await stopServers();
+  process.exit(0);
 });
 process.on('SIGTERM', async () => {
   logger.info('收到SIGTERM信号，正在关闭服务器...');
   await stopServers();
+  process.exit(0);
 });
 
 

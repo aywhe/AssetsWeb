@@ -44,7 +44,7 @@ function initDatas() {
   try {
     // 删除无效的视频目录
     for (let [key, val] of VideoPathTagMap) {
-      if(!fs.existsSync(val.path)){
+      if (!fs.existsSync(val.path)) {
         VideoPathTagMap.delete(key);
         logger.warn(`视频目录不存在: ${key}`);
       }
@@ -57,7 +57,7 @@ function initDatas() {
     logger.info('使用图片路径:');
     PicturePathTagMap.images = []; // 清空旧数据
     for (const val of PicturePathTagMap.paths) {
-      if(fs.existsSync(val.path)){
+      if (fs.existsSync(val.path)) {
         app.use(val.vpath, express.static(val.path));
         logger.info(val.path);
         FileUtils.readVpathFileFromDir(val.path, ImageExts, val.vpath, val.path).then((indata) => {
@@ -75,7 +75,7 @@ function initDatas() {
     logger.info('使用音频路径:');
     AudioPathTagMap.audios = []; // 清空旧数据
     for (const val of AudioPathTagMap.paths) {
-      if(fs.existsSync(val.path)){
+      if (fs.existsSync(val.path)) {
         app.use(val.vpath, express.static(val.path));
         logger.info(val.path);
         FileUtils.readVpathFileFromDir(val.path, AudioExts, val.vpath, val.path).then((indata) => {
@@ -97,7 +97,7 @@ function initDatas() {
     // 调用函数读取指定目录
     logger.info('使用视频路径:');
     for (let [key, val] of VideoPathTagMap) {
-      if(fs.existsSync(val.path)){
+      if (fs.existsSync(val.path)) {
         FileUtils.getFilesAndFoldersInDir(val.path, VideoFilter).then((videolist) => {
           VideoNameList.set(key, videolist);
           logger.info(`${key} => ${val.path}`);
@@ -268,7 +268,7 @@ app.get('/api/page-music', (req, res) => {
   }
 });
 
-app.get('/api/lookfor-subtitles',  (req, res) => {
+app.get('/api/lookfor-subtitles', (req, res) => {
   try {
     const vitualPath = req.query.path;
     const subtitleExts = JSON.parse(req.query.subtitleExts);
@@ -300,11 +300,11 @@ app.get('/api/lookfor-subtitles',  (req, res) => {
     const dirName = path.dirname(vitualPath);
     // 寻找字幕文件
     FileUtils.findOtherExtFiles(realPath, subtitleExts).then((subtitleFiles) => {
-        subtitleFiles.forEach((val) => {
-          const tmp = path.join(dirName, val.file).replace(/\\/g, '/');
-          subtitles.push({ file: tmp, label: val.label });
-        });
-        res.json({ subtitles: subtitles });
+      subtitleFiles.forEach((val) => {
+        const tmp = path.join(dirName, val.file).replace(/\\/g, '/');
+        subtitles.push({ file: tmp, label: val.label });
+      });
+      res.json({ subtitles: subtitles });
     });
   } catch (err) {
     logger.error('获取字幕文件失败', err);
@@ -481,7 +481,7 @@ function stopServer() {
     });
     serverInstance = null;
   }
-} 
+}
 
 // 如果直接运行 server.js，则启动服务器
 if (require.main === module) {

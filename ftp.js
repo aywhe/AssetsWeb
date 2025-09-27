@@ -5,6 +5,7 @@ const path = require('path');
 const config = require('./config');
 const logger = require('./logger');
 
+let ftpServer = null;
 // 读取配置文件信息
 function ftpConfig() {
   try {
@@ -17,6 +18,10 @@ function ftpConfig() {
 
 // ftp监听
 function startFtpServer() {
+  if (ftpServer) {
+    logger.warn('FTP服务器已在运行');
+    return ftpServer;
+  }
   const ftpconfig = ftpConfig();
   if (!ftpconfig || !ftpconfig.port) {
     logger.info('没有FTP配置，跳过FTP服务');
@@ -24,21 +29,25 @@ function startFtpServer() {
   }
 
   // 修改后:
-  const ftpServer = new FtpSrv(`ftp://localhost:${ftpconfig.port}`, {
-    anonymous: false
+  ftpServer = new FtpSrv(`ftp://localhost:${ftpconfig.port}`, {
+    anonymous: false,
+    greeting: ['欢迎使用FTP服务器'],
+    pasv_min: 0,
+    pasv_max: 8000,
+    whitelist: ['LIST', 'NLST', 'PWD', 'CWD', 'MKD', 'RMD', 'DELE', 'STOR', 'RETR', 'SIZE', 'MDTM', 'RNFR', 'RNTO']
   });
 
   // 添加服务器错误处理
-  ftpServer.on('error', (err) => {
-    logger.error('FTP服务器错误:', err.message);
-    if (err.code === 'ECONNRESET') {
-      logger.warn('连接被客户端重置，这是常见现象，服务器将继续运行');
-      return;
-    }
-    if (err.stack) {
-      logger.error('错误堆栈:', err.stack);
-    }
-  });
+  // ftpServer.on('error', (err) => {
+  //   logger.error('FTP服务器错误:', err.message);
+  //   if (err.code === 'ECONNRESET') {
+  //     logger.warn('连接被客户端重置，这是常见现象，服务器将继续运行');
+  //     return;
+  //   }
+  //   if (err.stack) {
+  //     logger.error('错误堆栈:', err.stack);
+  //   }
+  // });
 
   ftpServer.on('login', ({ connection, username, password }, resolve, reject) => {
     try {
@@ -69,7 +78,10 @@ function startFtpServer() {
       reject(new Error('服务器错误'));
       return;
     }
-    reject(new Error('无效的用户名或密码'));
+    const error = new Error('无效的用户名或密码');
+    error.stack = undefined; // 移除堆栈信息
+    reject(error);
+    //reject(new Error('无效的用户名或密码'));
   });
 
   // 检查用户是否有指定权限
@@ -78,6 +90,22 @@ function startFtpServer() {
     return permissions.includes(permission);
   }
 
+  // 文件列表前检查权限
+  ftpServer.on('LIST', (data, resolve, reject) => {
+    try {
+      const { connection, path } = data;
+      if (hasPermission(connection, 'l')) {
+        logger.info(`用户 ${connection.username} 列出目录: ${path}`);
+        resolve();
+      } else {
+        logger.warn(`用户 ${connection.username} 没有列出目录权限: ${path}`);
+        reject(new Error('权限不足，无法列出目录'));
+      }
+    } catch (err) {
+      logger.error('目录列表失败:', err);
+      reject(err);
+    }
+  });
   // 文件上传前检查权限
   ftpServer.on('STOR', (data, resolve, reject) => {
     try {
@@ -179,25 +207,47 @@ function startFtpServer() {
 
   return ftpServer;
 }
+// 停止FTP服务器
+function stopFtpServer() {
+  if (ftpServer) {
+    // 设置超时强制关闭
+    const timeout = setTimeout(() => {
+      logger.warn('FTP服务器关闭超时，强制退出');
+      process.exit(0);
+    }, 5000); // 5秒超时
 
-// 为整个进程添加错误处理，防止服务器因未处理的错误而退出
-process.on('uncaughtException', (err) => {
-    logger.error('未捕获的异常:', err.message);
-    if (err.code !== 'ECONNRESET') {
-        logger.error('错误堆栈:', err.stack);
-    } else {
-        logger.warn('忽略ECONNRESET错误，服务器继续运行');
-    }
-});
+    ftpServer.stop()
+      .then(() => {
+        clearTimeout(timeout);
+        logger.info('FTP服务器已停止');
+      })
+      .catch(err => {
+        clearTimeout(timeout);
+        logger.error('FTP服务器停止失败:', err);
+      });
+  } else {
+    logger.warn('FTP服务器未运行，无法停止');
+  }
+}
 
-process.on('unhandledRejection', (reason, promise) => {
-    logger.error('未处理的Promise拒绝:', reason);
-    // 不要因为Promise拒绝而退出进程
-});
+// // 为整个进程添加错误处理，防止服务器因未处理的错误而退出
+// process.on('uncaughtException', (err) => {
+//   logger.error('未捕获的异常:', err.message);
+//   if (err.code !== 'ECONNRESET') {
+//     logger.error('错误堆栈:', err.stack);
+//   } else {
+//     logger.warn('忽略ECONNRESET错误，服务器继续运行');
+//   }
+// });
+
+// process.on('unhandledRejection', (reason, promise) => {
+//   logger.error('未处理的Promise拒绝:', reason);
+//   // 不要因为Promise拒绝而退出进程
+// });
 
 // 如果直接运行 ftp.js，则启动FTP服务器
 if (require.main === module) {
   startFtpServer();
 }
 
-module.exports = { startFtpServer };
+module.exports = { startFtpServer, stopFtpServer };
