@@ -1,14 +1,14 @@
 // server.js
 const express = require('express');
-const fs = require('fs').promises;
+const fs = require('fs');
 const path = require('path');
-const app = express();
 const config = require('./config');
 const logger = require('./logger');
 const FileUtils = require('./fileUtils');
 
 //////////////////////// global datas ///////////////////////////////////
 
+const app = express();
 // 从配置中读取默认值
 let PORT = config.getPort();
 let VideoFilter = config.get('VideoFilter', ['.mp4', '.flv', '.mkv', '.rmvb']);
@@ -40,15 +40,13 @@ let AudioPathTagMap = config.get('AudioPathTagMap', {
 ////////////////////////// running functions //////////////////////////////////////
 
 // 初始化工作
-async function initDatas() {
+function initDatas() {
   try {
     // 删除无效的视频目录
     for (let [key, val] of VideoPathTagMap) {
-      try {
-        await fs.access(val.path);
-      } catch {
+      if(!fs.existsSync(val.path)){
         VideoPathTagMap.delete(key);
-        logger.warn(`视频目录不存在，已删除: ${key}`);
+        logger.warn(`视频目录不存在: ${key}`);
       }
     }
 
@@ -57,33 +55,39 @@ async function initDatas() {
 
     // 读取图片文件名
     logger.info('使用图片路径:');
+    PicturePathTagMap.images = []; // 清空旧数据
     for (const val of PicturePathTagMap.paths) {
-      try {
-        await fs.access(val.path);
+      if(fs.existsSync(val.path)){
         app.use(val.vpath, express.static(val.path));
         logger.info(val.path);
-        const indata = await FileUtils.readVpathFileFromDir(val.path, ImageExts, val.vpath, val.path);
-        PicturePathTagMap.images = indata;
-      } catch {
+        FileUtils.readVpathFileFromDir(val.path, ImageExts, val.vpath, val.path).then((indata) => {
+          PicturePathTagMap.images = indata;
+          logger.info(`找到 ${PicturePathTagMap.images.length} 张图片`);
+        }).catch((err) => {
+          logger.error(`读取图片目录失败: ${val.path}`, err);
+        });
+      } else {
         logger.warn(`图片目录不存在: ${val.path}`);
       }
     }
-    logger.info(`找到 ${PicturePathTagMap.images.length} 张图片`);
 
     // 读取音频文件名
     logger.info('使用音频路径:');
+    AudioPathTagMap.audios = []; // 清空旧数据
     for (const val of AudioPathTagMap.paths) {
-      try {
-        await fs.access(val.path);
+      if(fs.existsSync(val.path)){
         app.use(val.vpath, express.static(val.path));
         logger.info(val.path);
-        const indata = await FileUtils.readVpathFileFromDir(val.path, AudioExts, val.vpath, val.path);
-        AudioPathTagMap.audios = indata;
-      } catch {
+        FileUtils.readVpathFileFromDir(val.path, AudioExts, val.vpath, val.path).then((indata) => {
+          AudioPathTagMap.audios = indata;
+          logger.info(`找到 ${AudioPathTagMap.audios.length} 个音频文件`);
+        }).catch((err) => {
+          logger.error(`读取音频目录失败: ${val.path}`, err);
+        });
+      } else {
         logger.warn(`音频目录不存在: ${val.path}`);
       }
     }
-    logger.info(`找到 ${AudioPathTagMap.audios.length} 个音频文件`);
 
     // app use
     VideoPathTagMap.forEach((val, key) => {
@@ -93,12 +97,15 @@ async function initDatas() {
     // 调用函数读取指定目录
     logger.info('使用视频路径:');
     for (let [key, val] of VideoPathTagMap) {
-      try {
-        const videolist = await FileUtils.getFilesAndFoldersInDir(val.path, VideoFilter);
-        VideoNameList.set(key, videolist);
-        logger.info(`${key} => ${val.path}`);
-      } catch (err) {
-        logger.error(`读取视频目录失败: ${val.path}`, err);
+      if(fs.existsSync(val.path)){
+        FileUtils.getFilesAndFoldersInDir(val.path, VideoFilter).then((videolist) => {
+          VideoNameList.set(key, videolist);
+          logger.info(`${key} => ${val.path}`);
+        }).catch((err) => {
+          logger.error(`读取视频目录失败: ${val.path}`, err);
+        });
+      } else {
+        logger.warn(`视频目录不存在: ${val.path}`);
       }
     }
   } catch (err) {
@@ -111,7 +118,7 @@ async function initDatas() {
 app.get('/api/server-content', (req, res) => {
   try {
     let content = [];
-    if (PicturePathTagMap.images.length > 0) {
+    if (PicturePathTagMap.images && PicturePathTagMap.images.length > 0) {
       let PicContent = {
         uri: '/imageshow',
         imguri: '/images/' + PicturePathTagMap.vpic,
@@ -119,7 +126,7 @@ app.get('/api/server-content', (req, res) => {
       };
       content.push(PicContent);
     }
-    if (AudioPathTagMap.audios.length > 0) {
+    if (AudioPathTagMap.audios && AudioPathTagMap.audios.length > 0) {
       let PicContent = {
         uri: '/music',
         imguri: '/images/' + AudioPathTagMap.vpic,
@@ -143,7 +150,7 @@ app.get('/api/server-content', (req, res) => {
   }
 });
 
-app.get('/api/play-list', async (req, res) => {
+app.get('/api/play-list', (req, res) => {
   try {
     const fullPath = req.query.fullPath;
     if (!fullPath) {
@@ -232,7 +239,7 @@ app.get('/api/page-music', (req, res) => {
     const pageSize = parseInt(req.query.pageSize) || 10;
 
     let audios = [];
-    if (AudioPathTagMap.audios.length > 0) {
+    if (AudioPathTagMap.audios && AudioPathTagMap.audios.length > 0) {
       let filter = req.query.filter;
 
       if (!filter || !filter.trim()) {
@@ -261,7 +268,7 @@ app.get('/api/page-music', (req, res) => {
   }
 });
 
-app.get('/api/lookfor-subtitles', async (req, res) => {
+app.get('/api/lookfor-subtitles',  (req, res) => {
   try {
     const vitualPath = req.query.path;
     const subtitleExts = JSON.parse(req.query.subtitleExts);
@@ -275,7 +282,7 @@ app.get('/api/lookfor-subtitles', async (req, res) => {
 
     // 获取实际目录和文件名
     for (const [key, val] of VideoPathTagMap) {
-      if (val.vpath === vitualPath.substring(0, val.vpath.length)) {
+      if (vitualPath.startsWith(val.vpath)) {
         realdir = val.path;
         vpath = val.vpath;
         break;
@@ -288,18 +295,17 @@ app.get('/api/lookfor-subtitles', async (req, res) => {
 
     const realPath = path.join(realdir, vitualPath.substring(vpath.length));
 
-    // 寻找字幕文件
-    const subtitleFiles = await FileUtils.findOtherExtFiles(realPath, subtitleExts);
-
     // 修改字幕文件到虚拟目录
     const subtitles = [];
     const dirName = path.dirname(vitualPath);
-    subtitleFiles.forEach((val) => {
-      const tmp = path.join(dirName, val.file).replace(/\\/g, '/');
-      subtitles.push({ file: tmp, label: val.label });
+    // 寻找字幕文件
+    FileUtils.findOtherExtFiles(realPath, subtitleExts).then((subtitleFiles) => {
+        subtitleFiles.forEach((val) => {
+          const tmp = path.join(dirName, val.file).replace(/\\/g, '/');
+          subtitles.push({ file: tmp, label: val.label });
+        });
+        res.json({ subtitles: subtitles });
     });
-
-    res.json({ subtitles: subtitles });
   } catch (err) {
     logger.error('获取字幕文件失败', err);
     res.status(500).json({ error: '获取字幕文件失败' });
@@ -363,7 +369,7 @@ app.get('/api/all-images', (req, res) => {
 /////////////////////////////////////////////////////////////////////////
 // 页面路由
 app.get('/imageshow', (req, res) => {
-  if (PicturePathTagMap.images.length > 0) {
+  if (PicturePathTagMap.images && PicturePathTagMap.images.length > 0) {
     res.sendFile(path.join(__dirname, 'views', 'imageshow.html'));
   } else {
     res.send('没有图片可以显示');
@@ -375,7 +381,7 @@ app.get('/play', (req, res) => {
 });
 
 app.get('/music', (req, res) => {
-  if (AudioPathTagMap.audios.length > 0) {
+  if (AudioPathTagMap.audios && AudioPathTagMap.audios.length > 0) {
     res.sendFile(path.join(__dirname, 'views', 'music.html'));
   } else {
     res.send('没有音频可以播放');
@@ -400,7 +406,7 @@ app.get('/api/lookfor-danmaku', async (req, res) => {
 
     // 获取实际目录和文件名
     for (const [key, val] of VideoPathTagMap) {
-      if (val.vpath === vitualPath.substring(0, val.vpath.length)) {
+      if (vitualPath.startsWith(val.vpath)) {
         realdir = val.path;
         vpath = val.vpath;
         break;
@@ -414,7 +420,7 @@ app.get('/api/lookfor-danmaku', async (req, res) => {
     const realPath = path.join(realdir, vitualPath.substring(vpath.length));
     const realDanmakuFilePath = realPath.substring(0, realPath.lastIndexOf('.') + 1) + danmakuSuffix;
 
-    const data = await fs.readFile(realDanmakuFilePath, 'utf8');
+    const data = fs.readFileSync(realDanmakuFilePath, 'utf8');
     res.set('Content-Type', 'application/xml');
     res.send(data);
   } catch (err) {
@@ -426,7 +432,7 @@ app.get('/api/lookfor-danmaku', async (req, res) => {
 app.get('/gitlog', async (req, res) => {
   try {
     res.set('Content-Type', 'text/plain');
-    const data = await fs.readFile('./gitlog.txt', 'utf8');
+    const data = fs.readFileSync('./gitlog.txt', 'utf8');
     res.status(200).send(data);
   } catch (err) {
     logger.error('读取gitlog失败', err);
@@ -440,33 +446,42 @@ app.get('/', (req, res) => {
 
 ////////////////////////// 运行脚本 ////////////////////////////////////
 // 全局错误处理
-process.on('uncaughtException', (err) => {
-  logger.error('未捕获的异常:', err);
-  process.exit(1);
-});
+// process.on('uncaughtException', (err) => {
+//   logger.error('未捕获的异常:', err);
+//   process.exit(1);
+// });
 
-process.on('unhandledRejection', (reason, promise) => {
-  logger.error('未处理的 Promise 拒绝:', reason);
-  process.exit(1);
-});
+// process.on('unhandledRejection', (reason, promise) => {
+//   logger.error('未处理的 Promise 拒绝:', reason);
+//   process.exit(1);
+// });
 
-// 初始化工作
-function initialize() {
-  initDatas();
-}
 
+initDatas();
+let serverInstance = null;
 function startServer() {
   try {
-    initialize();
-    const server = app.listen(PORT, () => {
+    if (serverInstance) {
+      logger.warn('服务器已经在运行中');
+      return serverInstance;
+    }
+    serverInstance = app.listen(PORT, () => {
       logger.info(`服务器运行在 http://localhost:${PORT}`);
     });
-    return server; // 直接返回服务器实例
+    return serverInstance; // 直接返回服务器实例
   } catch (err) {
     logger.error('服务器启动失败', err);
     process.exit(1);
   }
 }
+function stopServer() {
+  if (serverInstance) {
+    serverInstance.close(() => {
+      logger.info('服务器已停止运行');
+    });
+    serverInstance = null;
+  }
+} 
 
 // 如果直接运行 server.js，则启动服务器
 if (require.main === module) {
@@ -474,4 +489,4 @@ if (require.main === module) {
 }
 
 
-module.exports = { startServer };
+module.exports = { startServer, stopServer };

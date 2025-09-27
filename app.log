@@ -1,82 +1,360 @@
-2025-09-27T03:58:33.445Z [INFO]: 服务器运行在 http://localhost:3000
-2025-09-27T03:58:35.566Z [INFO]: 使用图片路径:
-2025-09-27T03:58:35.580Z [INFO]: D:/Users/aywhe/Pictures/Pictures
-2025-09-27T03:58:36.105Z [WARN]: 图片目录不存在: D:/Users/aywhe/Pictures/Pictures
-2025-09-27T03:58:36.106Z [ERROR]: 初始化数据失败 Cannot read properties of undefined (reading 'length')
-2025-09-27T04:07:38.135Z [INFO]: 服务器运行在 http://localhost:3000
-2025-09-27T04:07:38.141Z [INFO]: 使用图片路径:
-2025-09-27T04:07:38.142Z [INFO]: D:/Users/aywhe/Pictures/Pictures
-2025-09-27T04:07:38.487Z [WARN]: 图片目录不存在: D:/Users/aywhe/Pictures/Pictures
-2025-09-27T04:07:38.488Z [ERROR]: 初始化数据失败 Cannot read properties of undefined (reading 'length')
-2025-09-27T04:08:01.535Z [INFO]: 服务器运行在 http://localhost:9228
-2025-09-27T04:08:01.541Z [INFO]: 使用图片路径:
-2025-09-27T04:08:01.542Z [INFO]: D:/Users/aywhe/Pictures/Pictures
-2025-09-27T04:14:31.250Z [INFO]: 服务器运行在 http://localhost:3000
-2025-09-27T04:14:31.256Z [INFO]: 使用图片路径:
-2025-09-27T04:14:31.257Z [INFO]: D:/Users/aywhe/Pictures/Pictures
-2025-09-27T04:14:31.587Z [INFO]: 找到 2908 张图片
-2025-09-27T04:14:31.588Z [INFO]: 使用音频路径:
-2025-09-27T04:14:31.588Z [INFO]: E:/音乐
-2025-09-27T04:14:34.092Z [INFO]: E:/Games/Audios/Deemo
-2025-09-27T04:14:34.107Z [INFO]: D:/users/aywhe/Music
-2025-09-27T04:14:34.154Z [INFO]: 找到 164 个音频文件
-2025-09-27T04:14:34.155Z [INFO]: 使用视频路径:
-2025-09-27T04:14:34.236Z [INFO]: ECommentary => E:/影视解说
-2025-09-27T04:14:34.278Z [INFO]: DVideos => D:/Users/aywhe/Videos
-2025-09-27T04:14:35.278Z [INFO]: EVideos => E:/电影
-2025-09-27T04:14:36.018Z [INFO]: ETelevision => E:/电视剧
-2025-09-27T04:14:36.128Z [INFO]: EAnime => E:/动漫
-2025-09-27T04:14:36.559Z [INFO]: EDocumentary => E:/纪录片
-2025-09-27T04:14:36.690Z [INFO]: ETutorialVideos => E:/视频教程
-2025-09-27T04:14:36.918Z [INFO]: EGameVideos => E:/Games/Videos
-2025-09-27T04:16:16.735Z [INFO]: 服务器运行在 http://localhost:3000
-2025-09-27T04:16:16.741Z [INFO]: 使用图片路径:
-2025-09-27T04:16:16.742Z [INFO]: D:/Users/aywhe/Pictures/Pictures
-2025-09-27T04:16:17.108Z [INFO]: 找到 2908 张图片
-2025-09-27T04:16:17.109Z [INFO]: 使用音频路径:
-2025-09-27T04:16:17.110Z [INFO]: E:/音乐
-2025-09-27T04:16:17.126Z [INFO]: E:/Games/Audios/Deemo
-2025-09-27T04:16:17.129Z [INFO]: D:/users/aywhe/Music
-2025-09-27T04:16:17.147Z [INFO]: 找到 164 个音频文件
-2025-09-27T04:16:17.148Z [INFO]: 使用视频路径:
-2025-09-27T04:16:17.149Z [INFO]: ECommentary => E:/影视解说
-2025-09-27T04:16:17.167Z [INFO]: DVideos => D:/Users/aywhe/Videos
-2025-09-27T04:16:17.195Z [INFO]: EVideos => E:/电影
-2025-09-27T04:16:17.250Z [INFO]: ETelevision => E:/电视剧
-2025-09-27T04:16:17.256Z [INFO]: EAnime => E:/动漫
-2025-09-27T04:16:17.271Z [INFO]: EDocumentary => E:/纪录片
-2025-09-27T04:16:17.279Z [INFO]: ETutorialVideos => E:/视频教程
-2025-09-27T04:16:17.285Z [INFO]: EGameVideos => E:/Games/Videos
-[2025-09-27T04:17:06.099Z] [INFO]: 服务器运行在 http://localhost:3000
-[2025-09-27T04:17:06.104Z] [INFO]: 使用图片路径:
-[2025-09-27T04:17:06.105Z] [INFO]: D:/Users/aywhe/Pictures/Pictures
-[2025-09-27T04:17:06.445Z] [INFO]: 找到 2908 张图片
-[2025-09-27T04:17:06.445Z] [INFO]: 使用音频路径:
-[2025-09-27T04:17:06.446Z] [INFO]: E:/音乐
-[2025-09-27T04:17:06.461Z] [INFO]: E:/Games/Audios/Deemo
-[2025-09-27T04:17:06.464Z] [INFO]: D:/users/aywhe/Music
-[2025-09-27T04:17:06.482Z] [INFO]: 找到 164 个音频文件
-[2025-09-27T04:17:06.484Z] [INFO]: 使用视频路径:
-[2025-09-27T04:17:06.485Z] [INFO]: ECommentary => E:/影视解说
-[2025-09-27T04:17:06.502Z] [INFO]: DVideos => D:/Users/aywhe/Videos
-[2025-09-27T04:17:06.530Z] [INFO]: EVideos => E:/电影
-[2025-09-27T04:17:06.584Z] [INFO]: ETelevision => E:/电视剧
-[2025-09-27T04:17:06.590Z] [INFO]: EAnime => E:/动漫
-[2025-09-27T04:17:06.604Z] [INFO]: EDocumentary => E:/纪录片
-[2025-09-27T04:17:06.611Z] [INFO]: ETutorialVideos => E:/视频教程
-[2025-09-27T04:17:06.617Z] [INFO]: EGameVideos => E:/Games/Videos
-[2025-09-27T04:18:53.282Z] [ERROR]: FTP服务未捕获的异常: The "url" argument must be of type string. Received an instance of Object
-[2025-09-27T04:20:20.419Z] [ERROR]: FTP服务未捕获的异常: The "url" argument must be of type string. Received an instance of Object
-[2025-09-27T04:20:27.423Z] [ERROR]: FTP服务未捕获的异常: The "url" argument must be of type string. Received an instance of Object
-[2025-09-27T04:21:21.288Z] [ERROR]: FTP服务未捕获的异常: The "url" argument must be of type string. Received an instance of Object
-[2025-09-27T04:25:46.814Z] [ERROR]: FTP服务未捕获的异常: read ECONNRESET
-[2025-09-27T04:28:01.198Z] [ERROR]: FTP服务未捕获的异常: read ECONNRESET
-[2025-09-27T04:29:26.975Z] [ERROR]: FTP服务未捕获的异常: write ECONNRESET
-[2025-09-27T04:31:27.585Z] [ERROR]: FTP服务未捕获的异常: read ECONNRESET
-[2025-09-27T04:33:16.030Z] [ERROR]: FTP服务未捕获的异常: read ECONNRESET
-[2025-09-27T04:34:47.363Z] [ERROR]: FTP服务未捕获的异常: read ECONNRESET
-[2025-09-27T04:34:47.365Z] [ERROR]: 错误堆栈:
-[2025-09-27T04:37:00.375Z] [ERROR]: FTP服务未捕获的异常: read ECONNRESET
-[2025-09-27T04:37:00.378Z] [ERROR]: 错误堆栈:
-[2025-09-27T04:40:07.760Z] [ERROR]: FTP服务未捕获的异常: read ECONNRESET
-[2025-09-27T04:40:07.763Z] [ERROR]: 错误堆栈:
+[2025-09-27T05:02:18.396Z] [INFO]: 服务器运行在 http://localhost:3000
+[2025-09-27T05:02:18.404Z] [INFO]: 使用图片路径:
+[2025-09-27T05:02:18.407Z] [INFO]: D:/Users/aywhe/Pictures/Pictures
+[2025-09-27T05:02:18.762Z] [INFO]: 找到 2908 张图片
+[2025-09-27T05:02:18.763Z] [INFO]: 使用音频路径:
+[2025-09-27T05:02:18.763Z] [INFO]: E:/音乐
+[2025-09-27T05:02:18.778Z] [INFO]: E:/Games/Audios/Deemo
+[2025-09-27T05:02:18.781Z] [INFO]: D:/users/aywhe/Music
+[2025-09-27T05:02:18.800Z] [INFO]: 找到 164 个音频文件
+[2025-09-27T05:02:18.801Z] [INFO]: 使用视频路径:
+[2025-09-27T05:02:18.802Z] [INFO]: ECommentary => E:/影视解说
+[2025-09-27T05:02:18.819Z] [INFO]: DVideos => D:/Users/aywhe/Videos
+[2025-09-27T05:02:18.846Z] [INFO]: EVideos => E:/电影
+[2025-09-27T05:02:18.898Z] [INFO]: ETelevision => E:/电视剧
+[2025-09-27T05:02:18.904Z] [INFO]: EAnime => E:/动漫
+[2025-09-27T05:02:18.919Z] [INFO]: EDocumentary => E:/纪录片
+[2025-09-27T05:02:18.926Z] [INFO]: ETutorialVideos => E:/视频教程
+[2025-09-27T05:02:18.931Z] [INFO]: EGameVideos => E:/Games/Videos
+[2025-09-27T05:02:19.673Z] [ERROR]: 未捕获的异常: read ECONNRESET
+[2025-09-27T05:02:56.255Z] [INFO]: 服务器运行在 http://localhost:3000
+[2025-09-27T05:02:56.266Z] [INFO]: 使用图片路径:
+[2025-09-27T05:02:56.267Z] [INFO]: D:/Users/aywhe/Pictures/Pictures
+[2025-09-27T05:02:56.610Z] [INFO]: 找到 2908 张图片
+[2025-09-27T05:02:56.610Z] [INFO]: 使用音频路径:
+[2025-09-27T05:02:56.611Z] [INFO]: E:/音乐
+[2025-09-27T05:02:56.626Z] [INFO]: E:/Games/Audios/Deemo
+[2025-09-27T05:02:56.629Z] [INFO]: D:/users/aywhe/Music
+[2025-09-27T05:02:56.710Z] [INFO]: 找到 164 个音频文件
+[2025-09-27T05:02:56.711Z] [INFO]: 使用视频路径:
+[2025-09-27T05:02:56.714Z] [INFO]: ECommentary => E:/影视解说
+[2025-09-27T05:02:56.735Z] [INFO]: DVideos => D:/Users/aywhe/Videos
+[2025-09-27T05:02:56.762Z] [INFO]: EVideos => E:/电影
+[2025-09-27T05:02:56.811Z] [INFO]: ETelevision => E:/电视剧
+[2025-09-27T05:02:56.817Z] [INFO]: EAnime => E:/动漫
+[2025-09-27T05:02:56.832Z] [INFO]: EDocumentary => E:/纪录片
+[2025-09-27T05:02:56.839Z] [INFO]: ETutorialVideos => E:/视频教程
+[2025-09-27T05:02:56.844Z] [INFO]: EGameVideos => E:/Games/Videos
+[2025-09-27T05:02:57.555Z] [ERROR]: 未捕获的异常: read ECONNRESET
+[2025-09-27T05:05:30.683Z] [INFO]: 服务器运行在 http://localhost:3000
+[2025-09-27T05:05:30.693Z] [INFO]: 使用图片路径:
+[2025-09-27T05:05:30.697Z] [INFO]: D:/Users/aywhe/Pictures/Pictures
+[2025-09-27T05:05:31.161Z] [INFO]: 找到 2908 张图片
+[2025-09-27T05:05:31.162Z] [INFO]: 使用音频路径:
+[2025-09-27T05:05:31.163Z] [INFO]: E:/音乐
+[2025-09-27T05:05:31.184Z] [INFO]: E:/Games/Audios/Deemo
+[2025-09-27T05:05:31.190Z] [INFO]: D:/users/aywhe/Music
+[2025-09-27T05:05:31.229Z] [INFO]: 找到 164 个音频文件
+[2025-09-27T05:05:31.231Z] [INFO]: 使用视频路径:
+[2025-09-27T05:05:31.233Z] [INFO]: ECommentary => E:/影视解说
+[2025-09-27T05:05:31.264Z] [INFO]: DVideos => D:/Users/aywhe/Videos
+[2025-09-27T05:05:31.309Z] [INFO]: EVideos => E:/电影
+[2025-09-27T05:05:31.394Z] [INFO]: ETelevision => E:/电视剧
+[2025-09-27T05:05:31.402Z] [INFO]: EAnime => E:/动漫
+[2025-09-27T05:05:31.431Z] [INFO]: EDocumentary => E:/纪录片
+[2025-09-27T05:05:31.444Z] [INFO]: ETutorialVideos => E:/视频教程
+[2025-09-27T05:05:31.454Z] [INFO]: EGameVideos => E:/Games/Videos
+[2025-09-27T05:08:10.334Z] [INFO]: 服务器运行在 http://localhost:3000
+[2025-09-27T05:08:10.341Z] [INFO]: 使用图片路径:
+[2025-09-27T05:08:10.344Z] [INFO]: D:/Users/aywhe/Pictures/Pictures
+[2025-09-27T05:08:10.705Z] [INFO]: 找到 2908 张图片
+[2025-09-27T05:08:10.706Z] [INFO]: 使用音频路径:
+[2025-09-27T05:08:10.706Z] [INFO]: E:/音乐
+[2025-09-27T05:08:10.721Z] [INFO]: E:/Games/Audios/Deemo
+[2025-09-27T05:08:10.725Z] [INFO]: D:/users/aywhe/Music
+[2025-09-27T05:08:10.743Z] [INFO]: 找到 164 个音频文件
+[2025-09-27T05:08:10.744Z] [INFO]: 使用视频路径:
+[2025-09-27T05:08:10.746Z] [INFO]: ECommentary => E:/影视解说
+[2025-09-27T05:08:10.764Z] [INFO]: DVideos => D:/Users/aywhe/Videos
+[2025-09-27T05:08:10.792Z] [INFO]: EVideos => E:/电影
+[2025-09-27T05:08:10.844Z] [INFO]: ETelevision => E:/电视剧
+[2025-09-27T05:08:10.850Z] [INFO]: EAnime => E:/动漫
+[2025-09-27T05:08:10.866Z] [INFO]: EDocumentary => E:/纪录片
+[2025-09-27T05:08:10.873Z] [INFO]: ETutorialVideos => E:/视频教程
+[2025-09-27T05:08:10.879Z] [INFO]: EGameVideos => E:/Games/Videos
+[2025-09-27T05:08:11.914Z] [INFO]: FTP服务器运行在 ftp://localhost:2121
+[2025-09-27T05:12:22.199Z] [INFO]: 用户 guest 登录成功，根目录: D:/书，权限: elr
+[2025-09-27T05:15:08.467Z] [INFO]: 正在关闭服务器...
+[2025-09-27T05:15:08.468Z] [INFO]: HTTP服务器已关闭
+[2025-09-27T05:15:14.284Z] [INFO]: 正在关闭服务器...
+[2025-09-27T05:15:14.286Z] [INFO]: HTTP服务器已关闭
+[2025-09-27T05:15:14.480Z] [INFO]: 强制退出
+[2025-09-27T05:16:01.863Z] [INFO]: 服务器运行在 http://localhost:3000
+[2025-09-27T05:16:01.874Z] [INFO]: 使用图片路径:
+[2025-09-27T05:16:01.875Z] [INFO]: D:/Users/aywhe/Pictures/Pictures
+[2025-09-27T05:16:02.226Z] [INFO]: 找到 2908 张图片
+[2025-09-27T05:16:02.226Z] [INFO]: 使用音频路径:
+[2025-09-27T05:16:02.227Z] [INFO]: E:/音乐
+[2025-09-27T05:16:02.242Z] [INFO]: E:/Games/Audios/Deemo
+[2025-09-27T05:16:02.245Z] [INFO]: D:/users/aywhe/Music
+[2025-09-27T05:16:02.265Z] [INFO]: 找到 164 个音频文件
+[2025-09-27T05:16:02.266Z] [INFO]: 使用视频路径:
+[2025-09-27T05:16:02.267Z] [INFO]: ECommentary => E:/影视解说
+[2025-09-27T05:16:02.285Z] [INFO]: DVideos => D:/Users/aywhe/Videos
+[2025-09-27T05:16:02.316Z] [INFO]: EVideos => E:/电影
+[2025-09-27T05:16:02.376Z] [INFO]: ETelevision => E:/电视剧
+[2025-09-27T05:16:02.382Z] [INFO]: EAnime => E:/动漫
+[2025-09-27T05:16:02.399Z] [INFO]: EDocumentary => E:/纪录片
+[2025-09-27T05:16:02.408Z] [INFO]: ETutorialVideos => E:/视频教程
+[2025-09-27T05:16:02.413Z] [INFO]: EGameVideos => E:/Games/Videos
+[2025-09-27T05:17:04.695Z] [INFO]: 服务器运行在 http://localhost:3000
+[2025-09-27T05:17:04.704Z] [INFO]: 使用图片路径:
+[2025-09-27T05:17:04.707Z] [INFO]: D:/Users/aywhe/Pictures/Pictures
+[2025-09-27T05:17:05.093Z] [INFO]: 找到 2908 张图片
+[2025-09-27T05:17:05.094Z] [INFO]: 使用音频路径:
+[2025-09-27T05:17:05.095Z] [INFO]: E:/音乐
+[2025-09-27T05:17:05.109Z] [INFO]: E:/Games/Audios/Deemo
+[2025-09-27T05:17:05.112Z] [INFO]: D:/users/aywhe/Music
+[2025-09-27T05:17:05.134Z] [INFO]: 找到 164 个音频文件
+[2025-09-27T05:17:05.135Z] [INFO]: 使用视频路径:
+[2025-09-27T05:17:05.137Z] [INFO]: ECommentary => E:/影视解说
+[2025-09-27T05:17:05.155Z] [INFO]: DVideos => D:/Users/aywhe/Videos
+[2025-09-27T05:17:05.182Z] [INFO]: EVideos => E:/电影
+[2025-09-27T05:17:05.237Z] [INFO]: ETelevision => E:/电视剧
+[2025-09-27T05:17:05.243Z] [INFO]: EAnime => E:/动漫
+[2025-09-27T05:17:05.260Z] [INFO]: EDocumentary => E:/纪录片
+[2025-09-27T05:17:05.268Z] [INFO]: ETutorialVideos => E:/视频教程
+[2025-09-27T05:17:05.274Z] [INFO]: EGameVideos => E:/Games/Videos
+[2025-09-27T05:17:41.395Z] [INFO]: 服务器运行在 http://localhost:3000
+[2025-09-27T05:17:41.406Z] [INFO]: 使用图片路径:
+[2025-09-27T05:17:41.407Z] [INFO]: D:/Users/aywhe/Pictures/Pictures
+[2025-09-27T05:17:41.768Z] [INFO]: 找到 2908 张图片
+[2025-09-27T05:17:41.768Z] [INFO]: 使用音频路径:
+[2025-09-27T05:17:41.769Z] [INFO]: E:/音乐
+[2025-09-27T05:17:41.783Z] [INFO]: E:/Games/Audios/Deemo
+[2025-09-27T05:17:41.787Z] [INFO]: D:/users/aywhe/Music
+[2025-09-27T05:17:41.807Z] [INFO]: 找到 164 个音频文件
+[2025-09-27T05:17:41.808Z] [INFO]: 使用视频路径:
+[2025-09-27T05:17:41.810Z] [INFO]: ECommentary => E:/影视解说
+[2025-09-27T05:17:41.827Z] [INFO]: DVideos => D:/Users/aywhe/Videos
+[2025-09-27T05:17:41.857Z] [INFO]: EVideos => E:/电影
+[2025-09-27T05:17:41.913Z] [INFO]: ETelevision => E:/电视剧
+[2025-09-27T05:17:41.919Z] [INFO]: EAnime => E:/动漫
+[2025-09-27T05:17:41.935Z] [INFO]: EDocumentary => E:/纪录片
+[2025-09-27T05:17:41.945Z] [INFO]: ETutorialVideos => E:/视频教程
+[2025-09-27T05:17:41.950Z] [INFO]: EGameVideos => E:/Games/Videos
+[2025-09-27T05:17:59.114Z] [INFO]: 服务器运行在 http://localhost:3000
+[2025-09-27T05:17:59.124Z] [INFO]: 使用图片路径:
+[2025-09-27T05:17:59.124Z] [INFO]: D:/Users/aywhe/Pictures/Pictures
+[2025-09-27T05:17:59.498Z] [INFO]: 找到 2908 张图片
+[2025-09-27T05:17:59.498Z] [INFO]: 使用音频路径:
+[2025-09-27T05:17:59.499Z] [INFO]: E:/音乐
+[2025-09-27T05:17:59.514Z] [INFO]: E:/Games/Audios/Deemo
+[2025-09-27T05:17:59.517Z] [INFO]: D:/users/aywhe/Music
+[2025-09-27T05:17:59.535Z] [INFO]: 找到 164 个音频文件
+[2025-09-27T05:17:59.536Z] [INFO]: 使用视频路径:
+[2025-09-27T05:17:59.538Z] [INFO]: ECommentary => E:/影视解说
+[2025-09-27T05:17:59.555Z] [INFO]: DVideos => D:/Users/aywhe/Videos
+[2025-09-27T05:17:59.582Z] [INFO]: EVideos => E:/电影
+[2025-09-27T05:17:59.634Z] [INFO]: ETelevision => E:/电视剧
+[2025-09-27T05:17:59.640Z] [INFO]: EAnime => E:/动漫
+[2025-09-27T05:17:59.655Z] [INFO]: EDocumentary => E:/纪录片
+[2025-09-27T05:17:59.662Z] [INFO]: ETutorialVideos => E:/视频教程
+[2025-09-27T05:17:59.667Z] [INFO]: EGameVideos => E:/Games/Videos
+[2025-09-27T05:18:30.640Z] [INFO]: 服务器运行在 http://localhost:3000
+[2025-09-27T05:18:30.650Z] [INFO]: 使用图片路径:
+[2025-09-27T05:18:30.651Z] [INFO]: D:/Users/aywhe/Pictures/Pictures
+[2025-09-27T05:18:31.001Z] [INFO]: 找到 2908 张图片
+[2025-09-27T05:18:31.002Z] [INFO]: 使用音频路径:
+[2025-09-27T05:18:31.002Z] [INFO]: E:/音乐
+[2025-09-27T05:18:31.017Z] [INFO]: E:/Games/Audios/Deemo
+[2025-09-27T05:18:31.021Z] [INFO]: D:/users/aywhe/Music
+[2025-09-27T05:18:31.044Z] [INFO]: 找到 164 个音频文件
+[2025-09-27T05:18:31.045Z] [INFO]: 使用视频路径:
+[2025-09-27T05:18:31.047Z] [INFO]: ECommentary => E:/影视解说
+[2025-09-27T05:18:31.065Z] [INFO]: DVideos => D:/Users/aywhe/Videos
+[2025-09-27T05:18:31.094Z] [INFO]: EVideos => E:/电影
+[2025-09-27T05:18:31.158Z] [INFO]: ETelevision => E:/电视剧
+[2025-09-27T05:18:31.164Z] [INFO]: EAnime => E:/动漫
+[2025-09-27T05:18:31.180Z] [INFO]: EDocumentary => E:/纪录片
+[2025-09-27T05:18:31.187Z] [INFO]: ETutorialVideos => E:/视频教程
+[2025-09-27T05:18:31.193Z] [INFO]: EGameVideos => E:/Games/Videos
+[2025-09-27T05:18:31.995Z] [ERROR]: 未捕获的异常:
+[2025-09-27T05:18:31.995Z] [WARN]: 忽略ECONNRESET错误，服务器继续运行
+[2025-09-27T05:24:30.776Z] [INFO]: 正在关闭服务器...
+[2025-09-27T05:24:39.390Z] [INFO]: 服务器运行在 http://localhost:3000
+[2025-09-27T05:24:39.398Z] [INFO]: 使用图片路径:
+[2025-09-27T05:24:39.401Z] [INFO]: D:/Users/aywhe/Pictures/Pictures
+[2025-09-27T05:24:39.771Z] [INFO]: 找到 2908 张图片
+[2025-09-27T05:24:39.771Z] [INFO]: 使用音频路径:
+[2025-09-27T05:24:39.771Z] [INFO]: E:/音乐
+[2025-09-27T05:24:39.787Z] [INFO]: E:/Games/Audios/Deemo
+[2025-09-27T05:24:39.789Z] [INFO]: D:/users/aywhe/Music
+[2025-09-27T05:24:39.808Z] [INFO]: 找到 164 个音频文件
+[2025-09-27T05:24:39.809Z] [INFO]: 使用视频路径:
+[2025-09-27T05:24:39.811Z] [INFO]: ECommentary => E:/影视解说
+[2025-09-27T05:24:39.828Z] [INFO]: DVideos => D:/Users/aywhe/Videos
+[2025-09-27T05:24:39.856Z] [INFO]: EVideos => E:/电影
+[2025-09-27T05:24:39.910Z] [INFO]: ETelevision => E:/电视剧
+[2025-09-27T05:24:39.915Z] [INFO]: EAnime => E:/动漫
+[2025-09-27T05:24:39.931Z] [INFO]: EDocumentary => E:/纪录片
+[2025-09-27T05:24:39.939Z] [INFO]: ETutorialVideos => E:/视频教程
+[2025-09-27T05:24:39.943Z] [INFO]: EGameVideos => E:/Games/Videos
+[2025-09-27T05:24:40.715Z] [ERROR]: 未捕获的异常:
+[2025-09-27T05:24:40.716Z] [WARN]: 忽略ECONNRESET错误，服务器继续运行
+[2025-09-27T05:25:31.557Z] [INFO]: 正在关闭服务器...
+[2025-09-27T05:52:56.421Z] [INFO]: 服务器运行在 http://localhost:3000
+[2025-09-27T05:52:56.430Z] [INFO]: FTP服务器运行在 ftp://localhost:2121
+[2025-09-27T05:52:56.434Z] [INFO]: 使用图片路径:
+[2025-09-27T05:52:56.435Z] [INFO]: D:/Users/aywhe/Pictures/Pictures
+[2025-09-27T05:52:56.773Z] [INFO]: 找到 2908 张图片
+[2025-09-27T05:52:56.773Z] [INFO]: 使用音频路径:
+[2025-09-27T05:52:56.774Z] [INFO]: E:/音乐
+[2025-09-27T05:52:56.789Z] [INFO]: E:/Games/Audios/Deemo
+[2025-09-27T05:52:56.792Z] [INFO]: D:/users/aywhe/Music
+[2025-09-27T05:52:56.813Z] [INFO]: 找到 164 个音频文件
+[2025-09-27T05:52:56.813Z] [INFO]: 使用视频路径:
+[2025-09-27T05:52:56.815Z] [INFO]: ECommentary => E:/影视解说
+[2025-09-27T05:52:56.833Z] [INFO]: DVideos => D:/Users/aywhe/Videos
+[2025-09-27T05:52:56.863Z] [INFO]: EVideos => E:/电影
+[2025-09-27T05:52:56.917Z] [INFO]: ETelevision => E:/电视剧
+[2025-09-27T05:52:56.923Z] [INFO]: EAnime => E:/动漫
+[2025-09-27T05:52:56.939Z] [INFO]: EDocumentary => E:/纪录片
+[2025-09-27T05:52:56.947Z] [INFO]: ETutorialVideos => E:/视频教程
+[2025-09-27T05:52:56.953Z] [INFO]: EGameVideos => E:/Games/Videos
+[2025-09-27T05:53:23.442Z] [INFO]: 正在关闭服务器...
+[2025-09-27T05:53:23.443Z] [INFO]: HTTP服务器已关闭
+[2025-09-27T05:53:28.612Z] [INFO]: 服务器运行在 http://localhost:3000
+[2025-09-27T05:53:28.619Z] [INFO]: FTP服务器运行在 ftp://localhost:2121
+[2025-09-27T05:53:28.623Z] [INFO]: 使用图片路径:
+[2025-09-27T05:53:28.624Z] [INFO]: D:/Users/aywhe/Pictures/Pictures
+[2025-09-27T05:53:28.974Z] [INFO]: 找到 2908 张图片
+[2025-09-27T05:53:28.975Z] [INFO]: 使用音频路径:
+[2025-09-27T05:53:28.975Z] [INFO]: E:/音乐
+[2025-09-27T05:53:28.991Z] [INFO]: E:/Games/Audios/Deemo
+[2025-09-27T05:53:28.994Z] [INFO]: D:/users/aywhe/Music
+[2025-09-27T05:53:29.013Z] [INFO]: 找到 164 个音频文件
+[2025-09-27T05:53:29.013Z] [INFO]: 使用视频路径:
+[2025-09-27T05:53:29.015Z] [INFO]: ECommentary => E:/影视解说
+[2025-09-27T05:53:29.032Z] [INFO]: DVideos => D:/Users/aywhe/Videos
+[2025-09-27T05:53:29.061Z] [INFO]: EVideos => E:/电影
+[2025-09-27T05:53:29.111Z] [INFO]: ETelevision => E:/电视剧
+[2025-09-27T05:53:29.117Z] [INFO]: EAnime => E:/动漫
+[2025-09-27T05:53:29.133Z] [INFO]: EDocumentary => E:/纪录片
+[2025-09-27T05:53:29.141Z] [INFO]: ETutorialVideos => E:/视频教程
+[2025-09-27T05:53:29.147Z] [INFO]: EGameVideos => E:/Games/Videos
+[2025-09-27T05:54:02.103Z] [INFO]: 用户 guest 登录成功，根目录: D:\书，权限: elr
+[2025-09-27T05:54:02.306Z] [INFO]: 用户 guest 登录成功，根目录: D:\书，权限: elr
+[2025-09-27T06:21:51.908Z] [INFO]: 正在关闭服务器...
+[2025-09-27T06:21:51.909Z] [INFO]: HTTP服务器已关闭
+[2025-09-27T06:21:55.103Z] [WARN]: 视频目录不存在，已删除: ECommentary
+[2025-09-27T06:21:55.106Z] [WARN]: 视频目录不存在，已删除: DVideos
+[2025-09-27T06:21:55.106Z] [WARN]: 视频目录不存在，已删除: EVideos
+[2025-09-27T06:21:55.107Z] [WARN]: 视频目录不存在，已删除: ETelevision
+[2025-09-27T06:21:55.107Z] [WARN]: 视频目录不存在，已删除: EAnime
+[2025-09-27T06:21:55.108Z] [WARN]: 视频目录不存在，已删除: EDocumentary
+[2025-09-27T06:21:55.108Z] [WARN]: 视频目录不存在，已删除: ETutorialVideos
+[2025-09-27T06:21:55.108Z] [WARN]: 视频目录不存在，已删除: EGameVideos
+[2025-09-27T06:21:55.109Z] [INFO]: 使用图片路径:
+[2025-09-27T06:21:55.110Z] [WARN]: 图片目录不存在: D:/Users/aywhe/Pictures/Pictures
+[2025-09-27T06:21:55.110Z] [ERROR]: 初始化数据失败 Cannot read properties of undefined (reading 'length')
+[2025-09-27T06:21:55.122Z] [INFO]: 服务器运行在 http://localhost:3000
+[2025-09-27T06:21:55.127Z] [INFO]: FTP服务器运行在 ftp://localhost:2121
+[2025-09-27T06:22:54.142Z] [INFO]: 正在关闭服务器...
+[2025-09-27T06:22:54.145Z] [INFO]: HTTP服务器已关闭
+[2025-09-27T06:23:00.812Z] [WARN]: 视频目录不存在: ECommentary
+[2025-09-27T06:23:00.814Z] [WARN]: 视频目录不存在: DVideos
+[2025-09-27T06:23:00.815Z] [WARN]: 视频目录不存在: EVideos
+[2025-09-27T06:23:00.815Z] [WARN]: 视频目录不存在: ETelevision
+[2025-09-27T06:23:00.816Z] [WARN]: 视频目录不存在: EAnime
+[2025-09-27T06:23:00.816Z] [WARN]: 视频目录不存在: EDocumentary
+[2025-09-27T06:23:00.817Z] [WARN]: 视频目录不存在: ETutorialVideos
+[2025-09-27T06:23:00.817Z] [WARN]: 视频目录不存在: EGameVideos
+[2025-09-27T06:23:00.817Z] [INFO]: 使用图片路径:
+[2025-09-27T06:23:00.818Z] [WARN]: 图片目录不存在: D:/Users/aywhe/Pictures/Pictures
+[2025-09-27T06:23:00.819Z] [ERROR]: 初始化数据失败 Cannot read properties of undefined (reading 'length')
+[2025-09-27T06:23:00.830Z] [INFO]: 服务器运行在 http://localhost:3000
+[2025-09-27T06:23:00.837Z] [INFO]: FTP服务器运行在 ftp://localhost:2121
+[2025-09-27T06:23:07.632Z] [INFO]: 正在关闭服务器...
+[2025-09-27T06:23:07.635Z] [INFO]: HTTP服务器已关闭
+[2025-09-27T06:26:06.165Z] [WARN]: 视频目录不存在: ECommentary
+[2025-09-27T06:26:06.167Z] [WARN]: 视频目录不存在: DVideos
+[2025-09-27T06:26:06.168Z] [WARN]: 视频目录不存在: EVideos
+[2025-09-27T06:26:06.168Z] [WARN]: 视频目录不存在: ETelevision
+[2025-09-27T06:26:06.169Z] [WARN]: 视频目录不存在: EAnime
+[2025-09-27T06:26:06.170Z] [WARN]: 视频目录不存在: EDocumentary
+[2025-09-27T06:26:06.170Z] [WARN]: 视频目录不存在: ETutorialVideos
+[2025-09-27T06:26:06.170Z] [WARN]: 视频目录不存在: EGameVideos
+[2025-09-27T06:26:06.171Z] [INFO]: 使用图片路径:
+[2025-09-27T06:26:06.172Z] [WARN]: 图片目录不存在: D:/Users/aywhe/Pictures/Pictures
+[2025-09-27T06:26:06.173Z] [ERROR]: 初始化数据失败 Cannot read properties of undefined (reading 'length')
+[2025-09-27T06:26:06.184Z] [INFO]: 服务器运行在 http://localhost:3000
+[2025-09-27T06:26:06.192Z] [INFO]: FTP服务器运行在 ftp://localhost:2121
+[2025-09-27T06:34:17.349Z] [INFO]: 正在关闭服务器...
+[2025-09-27T06:34:17.350Z] [INFO]: HTTP服务器已关闭
+[2025-09-27T06:34:21.902Z] [WARN]: 视频目录不存在: ECommentary
+[2025-09-27T06:34:21.905Z] [WARN]: 视频目录不存在: DVideos
+[2025-09-27T06:34:21.905Z] [WARN]: 视频目录不存在: EVideos
+[2025-09-27T06:34:21.906Z] [WARN]: 视频目录不存在: ETelevision
+[2025-09-27T06:34:21.906Z] [WARN]: 视频目录不存在: EAnime
+[2025-09-27T06:34:21.907Z] [WARN]: 视频目录不存在: EDocumentary
+[2025-09-27T06:34:21.907Z] [WARN]: 视频目录不存在: ETutorialVideos
+[2025-09-27T06:34:21.907Z] [WARN]: 视频目录不存在: EGameVideos
+[2025-09-27T06:34:21.908Z] [INFO]: 使用图片路径:
+[2025-09-27T06:34:21.908Z] [WARN]: 图片目录不存在: D:/Users/aywhe/Pictures/Pictures
+[2025-09-27T06:34:21.909Z] [ERROR]: 初始化数据失败 Cannot read properties of undefined (reading 'length')
+[2025-09-27T06:34:21.921Z] [INFO]: 服务器运行在 http://localhost:3000
+[2025-09-27T06:34:21.928Z] [INFO]: FTP服务器运行在 ftp://localhost:2121
+[2025-09-27T06:34:23.463Z] [INFO]: 正在关闭服务器...
+[2025-09-27T06:34:23.465Z] [INFO]: HTTP服务器已关闭
+[2025-09-27T06:34:30.381Z] [WARN]: 视频目录不存在: ECommentary
+[2025-09-27T06:34:30.384Z] [WARN]: 视频目录不存在: DVideos
+[2025-09-27T06:34:30.384Z] [WARN]: 视频目录不存在: EVideos
+[2025-09-27T06:34:30.385Z] [WARN]: 视频目录不存在: ETelevision
+[2025-09-27T06:34:30.385Z] [WARN]: 视频目录不存在: EAnime
+[2025-09-27T06:34:30.386Z] [WARN]: 视频目录不存在: EDocumentary
+[2025-09-27T06:34:30.386Z] [WARN]: 视频目录不存在: ETutorialVideos
+[2025-09-27T06:34:30.386Z] [WARN]: 视频目录不存在: EGameVideos
+[2025-09-27T06:34:30.387Z] [INFO]: 使用图片路径:
+[2025-09-27T06:34:30.388Z] [WARN]: 图片目录不存在: D:/Users/aywhe/Pictures/Pictures
+[2025-09-27T06:34:30.388Z] [ERROR]: 初始化数据失败 Cannot read properties of undefined (reading 'length')
+[2025-09-27T06:34:30.399Z] [INFO]: 服务器运行在 http://localhost:3000
+[2025-09-27T06:34:30.407Z] [INFO]: FTP服务器运行在 ftp://localhost:2121
+[2025-09-27T06:34:31.684Z] [INFO]: 正在关闭服务器...
+[2025-09-27T06:34:31.685Z] [INFO]: HTTP服务器已关闭
+[2025-09-27T08:11:47.300Z] [INFO]: 使用图片路径:
+[2025-09-27T08:11:47.303Z] [INFO]: D:/Users/aywhe/Pictures/Pictures
+[2025-09-27T08:11:47.304Z] [ERROR]: 初始化数据失败 Cannot read properties of undefined (reading 'length')
+[2025-09-27T08:11:47.307Z] [INFO]: 服务器运行在 http://localhost:3000
+[2025-09-27T08:15:48.193Z] [INFO]: 使用图片路径:
+[2025-09-27T08:15:48.196Z] [INFO]: D:/Users/aywhe/Pictures/Pictures
+[2025-09-27T08:15:48.197Z] [INFO]: 使用音频路径:
+[2025-09-27T08:15:48.197Z] [INFO]: E:/音乐
+[2025-09-27T08:15:48.198Z] [INFO]: E:/Games/Audios/Deemo
+[2025-09-27T08:15:48.198Z] [INFO]: D:/users/aywhe/Music
+[2025-09-27T08:15:48.199Z] [INFO]: 使用视频路径:
+[2025-09-27T08:15:48.203Z] [INFO]: 服务器运行在 http://localhost:3000
+[2025-09-27T08:15:48.216Z] [INFO]: ECommentary => E:/影视解说
+[2025-09-27T08:15:48.224Z] [INFO]: 找到 34 个音频文件
+[2025-09-27T08:15:48.238Z] [INFO]: EGameVideos => E:/Games/Videos
+[2025-09-27T08:15:48.241Z] [INFO]: EAnime => E:/动漫
+[2025-09-27T08:15:48.245Z] [INFO]: ETutorialVideos => E:/视频教程
+[2025-09-27T08:15:48.259Z] [INFO]: DVideos => D:/Users/aywhe/Videos
+[2025-09-27T08:15:48.260Z] [INFO]: 找到 164 个音频文件
+[2025-09-27T08:15:48.266Z] [INFO]: 找到 245 个音频文件
+[2025-09-27T08:15:48.267Z] [INFO]: EDocumentary => E:/纪录片
+[2025-09-27T08:15:48.285Z] [INFO]: EVideos => E:/电影
+[2025-09-27T08:15:48.315Z] [INFO]: ETelevision => E:/电视剧
+[2025-09-27T08:15:48.590Z] [INFO]: 找到 2908 张图片
+[2025-09-27T08:16:39.066Z] [ERROR]: 获取弹幕文件失败 The "cb" argument must be of type function. Received type string ('utf8')
+[2025-09-27T08:17:15.120Z] [ERROR]: 获取弹幕文件失败 The "cb" argument must be of type function. Received type string ('utf8')
+[2025-09-27T08:19:38.442Z] [INFO]: 使用图片路径:
+[2025-09-27T08:19:38.444Z] [INFO]: D:/Users/aywhe/Pictures/Pictures
+[2025-09-27T08:19:38.445Z] [INFO]: 使用音频路径:
+[2025-09-27T08:19:38.446Z] [INFO]: E:/音乐
+[2025-09-27T08:19:38.446Z] [INFO]: E:/Games/Audios/Deemo
+[2025-09-27T08:19:38.447Z] [INFO]: D:/users/aywhe/Music
+[2025-09-27T08:19:38.447Z] [INFO]: 使用视频路径:
+[2025-09-27T08:19:38.453Z] [INFO]: 服务器运行在 http://localhost:3000
+[2025-09-27T08:19:38.464Z] [INFO]: ECommentary => E:/影视解说
+[2025-09-27T08:19:38.470Z] [INFO]: 找到 34 个音频文件
+[2025-09-27T08:19:38.485Z] [INFO]: EGameVideos => E:/Games/Videos
+[2025-09-27T08:19:38.487Z] [INFO]: EAnime => E:/动漫
+[2025-09-27T08:19:38.492Z] [INFO]: ETutorialVideos => E:/视频教程
+[2025-09-27T08:19:38.506Z] [INFO]: DVideos => D:/Users/aywhe/Videos
+[2025-09-27T08:19:38.508Z] [INFO]: 找到 164 个音频文件
+[2025-09-27T08:19:38.512Z] [INFO]: EDocumentary => E:/纪录片
+[2025-09-27T08:19:38.513Z] [INFO]: 找到 245 个音频文件
+[2025-09-27T08:19:38.532Z] [INFO]: EVideos => E:/电影
+[2025-09-27T08:19:38.562Z] [INFO]: ETelevision => E:/电视剧
+[2025-09-27T08:19:38.829Z] [INFO]: 找到 2908 张图片
