@@ -22,13 +22,21 @@ function startFtpServer() {
     logger.info('没有FTP配置，跳过FTP服务');
     return null;
   }
-  
-  const ftpServer = new FtpSrv({
-    url: `ftp://0.0.0.0:${ftpconfig.port}`,
+
+  // 修改后:
+const ftpServer = new FtpSrv(`ftp://0.0.0.0:${ftpconfig.port}`, {
     anonymous: false,
-    pasv_url: '::',
-    pasv_min: 1024,
-    pasv_max: 65535
+    pasv_url: `127.0.0.1`,  // 使用本地回环地址
+    pasv_min: 8021,
+    pasv_max: 8030
+});
+
+  // 添加服务器错误处理
+  ftpServer.on('error', (err) => {
+      logger.error('FTP服务器错误:', err.message);
+      if (err.stack) {
+          logger.error('错误堆栈:', err.stack);
+      }
   });
 
   ftpServer.on('login', ({ connection, username, password }, resolve, reject) => {
@@ -171,14 +179,17 @@ function startFtpServer() {
   return ftpServer;
 }
 
-// 全局错误处理
-process.on('uncaughtException', (err) => {
-  logger.error('FTP服务未捕获的异常:', err);
-});
+// process.on('uncaughtException', (err) => {
+//   logger.error('FTP服务未捕获的异常:', err);
+//   logger.error('错误堆栈:', err.stack);
+// });
 
-process.on('unhandledRejection', (reason, promise) => {
-  logger.error('FTP服务未处理的 Promise 拒绝:', reason);
-});
+// process.on('unhandledRejection', (reason, promise) => {
+//   logger.error('FTP服务未处理的 Promise 拒绝:', reason);
+//   if (reason && reason.stack) {
+//     logger.error('拒绝原因堆栈:', reason.stack);
+//   }
+// });
 
 // 如果直接运行 ftp.js，则启动FTP服务器
 if (require.main === module) {

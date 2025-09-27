@@ -1,0 +1,82 @@
+2025-09-27T03:58:33.445Z [INFO]: 服务器运行在 http://localhost:3000
+2025-09-27T03:58:35.566Z [INFO]: 使用图片路径:
+2025-09-27T03:58:35.580Z [INFO]: D:/Users/aywhe/Pictures/Pictures
+2025-09-27T03:58:36.105Z [WARN]: 图片目录不存在: D:/Users/aywhe/Pictures/Pictures
+2025-09-27T03:58:36.106Z [ERROR]: 初始化数据失败 Cannot read properties of undefined (reading 'length')
+2025-09-27T04:07:38.135Z [INFO]: 服务器运行在 http://localhost:3000
+2025-09-27T04:07:38.141Z [INFO]: 使用图片路径:
+2025-09-27T04:07:38.142Z [INFO]: D:/Users/aywhe/Pictures/Pictures
+2025-09-27T04:07:38.487Z [WARN]: 图片目录不存在: D:/Users/aywhe/Pictures/Pictures
+2025-09-27T04:07:38.488Z [ERROR]: 初始化数据失败 Cannot read properties of undefined (reading 'length')
+2025-09-27T04:08:01.535Z [INFO]: 服务器运行在 http://localhost:9228
+2025-09-27T04:08:01.541Z [INFO]: 使用图片路径:
+2025-09-27T04:08:01.542Z [INFO]: D:/Users/aywhe/Pictures/Pictures
+2025-09-27T04:14:31.250Z [INFO]: 服务器运行在 http://localhost:3000
+2025-09-27T04:14:31.256Z [INFO]: 使用图片路径:
+2025-09-27T04:14:31.257Z [INFO]: D:/Users/aywhe/Pictures/Pictures
+2025-09-27T04:14:31.587Z [INFO]: 找到 2908 张图片
+2025-09-27T04:14:31.588Z [INFO]: 使用音频路径:
+2025-09-27T04:14:31.588Z [INFO]: E:/音乐
+2025-09-27T04:14:34.092Z [INFO]: E:/Games/Audios/Deemo
+2025-09-27T04:14:34.107Z [INFO]: D:/users/aywhe/Music
+2025-09-27T04:14:34.154Z [INFO]: 找到 164 个音频文件
+2025-09-27T04:14:34.155Z [INFO]: 使用视频路径:
+2025-09-27T04:14:34.236Z [INFO]: ECommentary => E:/影视解说
+2025-09-27T04:14:34.278Z [INFO]: DVideos => D:/Users/aywhe/Videos
+2025-09-27T04:14:35.278Z [INFO]: EVideos => E:/电影
+2025-09-27T04:14:36.018Z [INFO]: ETelevision => E:/电视剧
+2025-09-27T04:14:36.128Z [INFO]: EAnime => E:/动漫
+2025-09-27T04:14:36.559Z [INFO]: EDocumentary => E:/纪录片
+2025-09-27T04:14:36.690Z [INFO]: ETutorialVideos => E:/视频教程
+2025-09-27T04:14:36.918Z [INFO]: EGameVideos => E:/Games/Videos
+2025-09-27T04:16:16.735Z [INFO]: 服务器运行在 http://localhost:3000
+2025-09-27T04:16:16.741Z [INFO]: 使用图片路径:
+2025-09-27T04:16:16.742Z [INFO]: D:/Users/aywhe/Pictures/Pictures
+2025-09-27T04:16:17.108Z [INFO]: 找到 2908 张图片
+2025-09-27T04:16:17.109Z [INFO]: 使用音频路径:
+2025-09-27T04:16:17.110Z [INFO]: E:/音乐
+2025-09-27T04:16:17.126Z [INFO]: E:/Games/Audios/Deemo
+2025-09-27T04:16:17.129Z [INFO]: D:/users/aywhe/Music
+2025-09-27T04:16:17.147Z [INFO]: 找到 164 个音频文件
+2025-09-27T04:16:17.148Z [INFO]: 使用视频路径:
+2025-09-27T04:16:17.149Z [INFO]: ECommentary => E:/影视解说
+2025-09-27T04:16:17.167Z [INFO]: DVideos => D:/Users/aywhe/Videos
+2025-09-27T04:16:17.195Z [INFO]: EVideos => E:/电影
+2025-09-27T04:16:17.250Z [INFO]: ETelevision => E:/电视剧
+2025-09-27T04:16:17.256Z [INFO]: EAnime => E:/动漫
+2025-09-27T04:16:17.271Z [INFO]: EDocumentary => E:/纪录片
+2025-09-27T04:16:17.279Z [INFO]: ETutorialVideos => E:/视频教程
+2025-09-27T04:16:17.285Z [INFO]: EGameVideos => E:/Games/Videos
+[2025-09-27T04:17:06.099Z] [INFO]: 服务器运行在 http://localhost:3000
+[2025-09-27T04:17:06.104Z] [INFO]: 使用图片路径:
+[2025-09-27T04:17:06.105Z] [INFO]: D:/Users/aywhe/Pictures/Pictures
+[2025-09-27T04:17:06.445Z] [INFO]: 找到 2908 张图片
+[2025-09-27T04:17:06.445Z] [INFO]: 使用音频路径:
+[2025-09-27T04:17:06.446Z] [INFO]: E:/音乐
+[2025-09-27T04:17:06.461Z] [INFO]: E:/Games/Audios/Deemo
+[2025-09-27T04:17:06.464Z] [INFO]: D:/users/aywhe/Music
+[2025-09-27T04:17:06.482Z] [INFO]: 找到 164 个音频文件
+[2025-09-27T04:17:06.484Z] [INFO]: 使用视频路径:
+[2025-09-27T04:17:06.485Z] [INFO]: ECommentary => E:/影视解说
+[2025-09-27T04:17:06.502Z] [INFO]: DVideos => D:/Users/aywhe/Videos
+[2025-09-27T04:17:06.530Z] [INFO]: EVideos => E:/电影
+[2025-09-27T04:17:06.584Z] [INFO]: ETelevision => E:/电视剧
+[2025-09-27T04:17:06.590Z] [INFO]: EAnime => E:/动漫
+[2025-09-27T04:17:06.604Z] [INFO]: EDocumentary => E:/纪录片
+[2025-09-27T04:17:06.611Z] [INFO]: ETutorialVideos => E:/视频教程
+[2025-09-27T04:17:06.617Z] [INFO]: EGameVideos => E:/Games/Videos
+[2025-09-27T04:18:53.282Z] [ERROR]: FTP服务未捕获的异常: The "url" argument must be of type string. Received an instance of Object
+[2025-09-27T04:20:20.419Z] [ERROR]: FTP服务未捕获的异常: The "url" argument must be of type string. Received an instance of Object
+[2025-09-27T04:20:27.423Z] [ERROR]: FTP服务未捕获的异常: The "url" argument must be of type string. Received an instance of Object
+[2025-09-27T04:21:21.288Z] [ERROR]: FTP服务未捕获的异常: The "url" argument must be of type string. Received an instance of Object
+[2025-09-27T04:25:46.814Z] [ERROR]: FTP服务未捕获的异常: read ECONNRESET
+[2025-09-27T04:28:01.198Z] [ERROR]: FTP服务未捕获的异常: read ECONNRESET
+[2025-09-27T04:29:26.975Z] [ERROR]: FTP服务未捕获的异常: write ECONNRESET
+[2025-09-27T04:31:27.585Z] [ERROR]: FTP服务未捕获的异常: read ECONNRESET
+[2025-09-27T04:33:16.030Z] [ERROR]: FTP服务未捕获的异常: read ECONNRESET
+[2025-09-27T04:34:47.363Z] [ERROR]: FTP服务未捕获的异常: read ECONNRESET
+[2025-09-27T04:34:47.365Z] [ERROR]: 错误堆栈:
+[2025-09-27T04:37:00.375Z] [ERROR]: FTP服务未捕获的异常: read ECONNRESET
+[2025-09-27T04:37:00.378Z] [ERROR]: 错误堆栈:
+[2025-09-27T04:40:07.760Z] [ERROR]: FTP服务未捕获的异常: read ECONNRESET
+[2025-09-27T04:40:07.763Z] [ERROR]: 错误堆栈:

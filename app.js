@@ -1,14 +1,12 @@
 // app.js
-const server = require('./server');
+const { startServer } = require('./server');
 const { startFtpServer } = require('./ftp');
 const logger = require('./logger');
 
 async function startServers() {
   try {
     // 启动HTTP服务
-    const httpServer = server.listen(server.get('port'), () => {
-      logger.info(`HTTP服务器运行在 http://localhost:${server.get('port')}`);
-    });
+    const httpServer = startServer();
 
     // 启动FTP服务
     const ftpServer = startFtpServer();

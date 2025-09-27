@@ -8,57 +8,36 @@ const logger = require('./logger');
 const FileUtils = require('./fileUtils');
 
 //////////////////////// global datas ///////////////////////////////////
-const ConfigFilePath = 'assets_config.json';
 
 // 从配置中读取默认值
-var PORT = config.getPort();
-var VideoFilter = config.get('VideoFilter', ['.mp4', '.flv', '.mkv', '.rmvb']);
-var ImageExts = config.get('ImageExts', ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp']);
-var AudioExts = config.get('AudioExts', ['.mp3', '.wma', '.ogg', '.wav']);
+let PORT = config.getPort();
+let VideoFilter = config.get('VideoFilter', ['.mp4', '.flv', '.mkv', '.rmvb']);
+let ImageExts = config.get('ImageExts', ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp']);
+let AudioExts = config.get('AudioExts', ['.mp3', '.wma', '.ogg', '.wav']);
 
 // 图片
-var PicturePathTagMap = config.get('PicturePathTagMap', {
+let PicturePathTagMap = config.get('PicturePathTagMap', {
+  tag: "图片",
   images: [], // 存储所有图片路径
   vpic: 'imageshow.jpg', // 图片位置的虚拟目录中卡片图片位置
   paths: [{ path: 'D:/Users/aywhe/Pictures/Pictures', vpath: '/dimages' }] // 不同位置有不同的标记名称
 });
 
 // 视频
-var VideoNameList = new Map(); // 视频文件名列表
-var VideoPathTagMap = new Map(Object.entries(config.get('VideoPathTagMap', {
-  'DVideos': { path: 'D:/Users/aywhe/Videos', vpath: '/DVideos', vpic: 'DVideos.png' }
+let VideoNameList = new Map(); // 视频文件名列表
+let VideoPathTagMap = new Map(Object.entries(config.get('VideoPathTagMap', {
+  'DVideos': { path: 'D:/Users/aywhe/Videos', vpath: '/DVideos', vpic: 'DVideos.png', tag: '视频' }
 }))); // 不同视频位置有不同的标记名称
 
 // 音频
-var AudioPathTagMap = config.get('AudioPathTagMap', {
+let AudioPathTagMap = config.get('AudioPathTagMap', {
+  tag: "音乐",
   audios: [], // 存储所有路径
   vpic: 'playaudio.jpg', // 音频位置的虚拟目录中卡片图片位置
   paths: [{ path: 'D:/Users/aywhe/Music', vpath: '/daudios' }] // 不同位置有不同的标记名称
 });
 
 ////////////////////////// running functions //////////////////////////////////////
-
-// 读取配置文件信息
-async function initConfig() {
-  try {
-    const data = config.get(null, {});
-    
-    PORT = data.ServerPort || PORT;
-    VideoFilter = data.VideoFilter || VideoFilter;
-    ImageExts = data.ImageExts || ImageExts;
-    AudioExts = data.AudioExts || AudioExts;
-    
-    PicturePathTagMap = data.PicturePathTagMap || PicturePathTagMap;
-    PicturePathTagMap.images = [];
-    
-    AudioPathTagMap = data.AudioPathTagMap || AudioPathTagMap;
-    AudioPathTagMap.audios = [];
-    
-    VideoPathTagMap = new Map(Object.entries(data.VideoPathTagMap || Object.fromEntries(VideoPathTagMap)));
-  } catch (err) {
-    logger.error('读取配置信息失败，将使用默认配置', err);
-  }
-}
 
 // 初始化工作
 async function initDatas() {
@@ -84,7 +63,7 @@ async function initDatas() {
         app.use(val.vpath, express.static(val.path));
         logger.info(val.path);
         const indata = await FileUtils.readVpathFileFromDir(val.path, ImageExts, val.vpath, val.path);
-        PicturePathTagMap.images = PicturePathTagMap.images.concat(indata);
+        PicturePathTagMap.images = indata;
       } catch {
         logger.warn(`图片目录不存在: ${val.path}`);
       }
@@ -99,7 +78,7 @@ async function initDatas() {
         app.use(val.vpath, express.static(val.path));
         logger.info(val.path);
         const indata = await FileUtils.readVpathFileFromDir(val.path, AudioExts, val.vpath, val.path);
-        AudioPathTagMap.audios = AudioPathTagMap.audios.concat(indata);
+        AudioPathTagMap.audios = indata;
       } catch {
         logger.warn(`音频目录不存在: ${val.path}`);
       }
@@ -107,8 +86,8 @@ async function initDatas() {
     logger.info(`找到 ${AudioPathTagMap.audios.length} 个音频文件`);
 
     // app use
-    VideoPathTagMap.forEach((val, key) => { 
-      app.use(val.vpath, express.static(val.path)); 
+    VideoPathTagMap.forEach((val, key) => {
+      app.use(val.vpath, express.static(val.path));
     });
 
     // 调用函数读取指定目录
@@ -133,27 +112,27 @@ app.get('/api/server-content', (req, res) => {
   try {
     let content = [];
     if (PicturePathTagMap.images.length > 0) {
-      let PicContent = { 
-        uri: '/imageshow', 
-        imguri: '/images/' + PicturePathTagMap.vpic, 
-        til: PicturePathTagMap.tag 
+      let PicContent = {
+        uri: '/imageshow',
+        imguri: '/images/' + PicturePathTagMap.vpic,
+        til: PicturePathTagMap.tag
       };
       content.push(PicContent);
     }
     if (AudioPathTagMap.audios.length > 0) {
-      let PicContent = { 
-        uri: '/music', 
-        imguri: '/images/' + AudioPathTagMap.vpic, 
-        til: AudioPathTagMap.tag 
+      let PicContent = {
+        uri: '/music',
+        imguri: '/images/' + AudioPathTagMap.vpic,
+        til: AudioPathTagMap.tag
       };
       content.push(PicContent);
     }
 
     VideoPathTagMap.forEach((val, key) => {
-      const ele = { 
-        uri: '/videos?key=' + encodeURIComponent(key), 
-        imguri: '/images/' + val.vpic, 
-        til: val.tag 
+      const ele = {
+        uri: '/videos?key=' + encodeURIComponent(key),
+        imguri: '/images/' + val.vpic,
+        til: val.tag
       };
       content.push(ele);
     });
@@ -170,29 +149,29 @@ app.get('/api/play-list', async (req, res) => {
     if (!fullPath) {
       return res.status(400).json({ error: '缺少 fullPath 参数' });
     }
-    
+
     const dirs = fullPath.split(/[\\/]/);
     const vpath = '/' + dirs[1];
     let file_list = [];
-    
+
     // 获取key
     const entry = Array.from(VideoPathTagMap.entries()).find(([key, val]) => {
       return val.vpath == vpath;
     });
-    
+
     if (entry) {
       const [key, val] = entry;
       if (VideoPathTagMap.has(key)) {
         const videoInfo = VideoNameList.get(key);
         let subdir_files = videoInfo;
-        
+
         // 目录一层一层的匹配下去
         for (let i = 2; i < dirs.length - 1; i++) {
           const subdir = dirs[i];
           const folder = subdir_files.find((val) => {
             return val.type == 'folder' && val.name == subdir;
           });
-          
+
           if (folder && folder.children) {
             subdir_files = folder.children;
           } else {
@@ -200,7 +179,7 @@ app.get('/api/play-list', async (req, res) => {
             break;
           }
         }
-        
+
         // 找到了同一个目录中的文件
         file_list = subdir_files
           .filter((val) => val.type == 'file')
@@ -209,7 +188,7 @@ app.get('/api/play-list', async (req, res) => {
           });
       }
     }
-    
+
     res.json(file_list);
   } catch (err) {
     logger.error('获取播放列表失败', err);
@@ -222,12 +201,12 @@ app.get('/api/video-list', (req, res) => {
     const key = req.query.key;
     let videoInfo = {};
     let vpath = '';
-    
+
     if (key && VideoPathTagMap.has(key)) {
       videoInfo = VideoNameList.get(key);
       vpath = VideoPathTagMap.get(key).vpath;
     }
-    
+
     res.json({ videoInfo: videoInfo, key: key, vpath: vpath });
   } catch (err) {
     logger.error('获取视频列表失败', err);
@@ -251,11 +230,11 @@ app.get('/api/page-music', (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
-    
+
     let audios = [];
     if (AudioPathTagMap.audios.length > 0) {
       let filter = req.query.filter;
-      
+
       if (!filter || !filter.trim()) {
         audios = AudioPathTagMap.audios;
       } else {
@@ -265,16 +244,16 @@ app.get('/api/page-music', (req, res) => {
         });
       }
     }
-    
+
     const total = audios.length;
     let sendData = [];
-    
+
     if (total > 0) {
       const startId = Math.max(0, (page - 1) * pageSize);
       const endId = Math.min(total, startId + pageSize);
       sendData = audios.slice(startId, endId);
     }
-    
+
     res.json({ audios: sendData, total: total });
   } catch (err) {
     logger.error('获取音乐列表失败', err);
@@ -286,14 +265,14 @@ app.get('/api/lookfor-subtitles', async (req, res) => {
   try {
     const vitualPath = req.query.path;
     const subtitleExts = JSON.parse(req.query.subtitleExts);
-    
+
     if (!vitualPath || !subtitleExts) {
       return res.status(400).json({ error: '缺少必要参数' });
     }
-    
+
     let realdir = '';
     let vpath = '';
-    
+
     // 获取实际目录和文件名
     for (const [key, val] of VideoPathTagMap) {
       if (val.vpath === vitualPath.substring(0, val.vpath.length)) {
@@ -302,13 +281,13 @@ app.get('/api/lookfor-subtitles', async (req, res) => {
         break;
       }
     }
-    
+
     if (!realdir || !vpath) {
       return res.status(400).json({ error: '无效的路径' });
     }
-    
+
     const realPath = path.join(realdir, vitualPath.substring(vpath.length));
-    
+
     // 寻找字幕文件
     const subtitleFiles = await FileUtils.findOtherExtFiles(realPath, subtitleExts);
 
@@ -319,7 +298,7 @@ app.get('/api/lookfor-subtitles', async (req, res) => {
       const tmp = path.join(dirName, val.file).replace(/\\/g, '/');
       subtitles.push({ file: tmp, label: val.label });
     });
-    
+
     res.json({ subtitles: subtitles });
   } catch (err) {
     logger.error('获取字幕文件失败', err);
@@ -340,7 +319,7 @@ app.get('/api/all-images', (req, res) => {
         return dirs.trim().split(',');
       }
     };
-    
+
     // 整理后的子目录 
     const actSubDirs = [...parseSubDirs(subDirs), ...parseSubDirs(subDir)];
     // 排除的目录
@@ -365,7 +344,7 @@ app.get('/api/all-images', (req, res) => {
         return fullSubDirs.some((val) => item.includes(val));
       });
     }
-    
+
     // 构造前缀，筛选文件
     if (actExcludes.length > 0) {
       const fullExcludes = genFilterPath(actExcludes);
@@ -373,7 +352,7 @@ app.get('/api/all-images', (req, res) => {
         return !fullExcludes.some((val) => item.includes(val));
       });
     }
-    
+
     res.json({ images: images });
   } catch (err) {
     logger.error('获取图片列表失败', err);
@@ -411,14 +390,14 @@ app.get('/api/lookfor-danmaku', async (req, res) => {
   try {
     const danmakuSuffix = 'danmaku.xml';
     const vitualPath = req.query.path;
-    
+
     if (!vitualPath) {
       return res.status(400).send('缺少路径参数');
     }
-    
+
     let realdir = '';
     let vpath = '';
-    
+
     // 获取实际目录和文件名
     for (const [key, val] of VideoPathTagMap) {
       if (val.vpath === vitualPath.substring(0, val.vpath.length)) {
@@ -427,11 +406,11 @@ app.get('/api/lookfor-danmaku', async (req, res) => {
         break;
       }
     }
-    
+
     if (!realdir || !vpath) {
       return res.status(400).send('无效的路径');
     }
-    
+
     const realPath = path.join(realdir, vitualPath.substring(vpath.length));
     const realDanmakuFilePath = realPath.substring(0, realPath.lastIndexOf('.') + 1) + danmakuSuffix;
 
@@ -472,22 +451,27 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 // 初始化工作
-async function initialize() {
-  await initConfig();
-  await initDatas();
+function initialize() {
+  initDatas();
+}
+
+function startServer() {
+  try {
+    initialize();
+    const server = app.listen(PORT, () => {
+      logger.info(`服务器运行在 http://localhost:${PORT}`);
+    });
+    return server; // 直接返回服务器实例
+  } catch (err) {
+    logger.error('服务器启动失败', err);
+    process.exit(1);
+  }
 }
 
 // 如果直接运行 server.js，则启动服务器
 if (require.main === module) {
-  initialize().then(() => {
-    app.listen(PORT, () => {
-      logger.info(`服务器运行在 http://localhost:${PORT}`);
-    });
-  }).catch(err => {
-    logger.error('服务器启动失败', err);
-    process.exit(1);
-  });
+  startServer();
 }
 
-app.set('port', PORT);
-module.exports = app;
+
+module.exports = { startServer };
