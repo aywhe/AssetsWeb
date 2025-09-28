@@ -485,6 +485,19 @@ function stopServer() {
 // 如果直接运行 server.js，则启动服务器
 if (require.main === module) {
   startServer();
+
+  // 单独运行时处理信号
+  process.on('SIGINT', () => {
+    logger.info('HTTP服务器收到SIGINT信号，正在关闭...');
+    stopServer();
+    process.exit(0);
+  });
+  
+  process.on('SIGTERM', () => {
+    logger.info('HTTP服务器收到SIGTERM信号，正在关闭...');
+    stopServer();
+    process.exit(0);
+  });
 }
 
 

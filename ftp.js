@@ -212,7 +212,7 @@ function stopFtpServer() {
       process.exit(0);
     }, 5000); // 5秒超时
 
-    ftpServer.stop()
+    ftpServer.close()
       .then(() => {
         clearTimeout(timeout);
         logger.info('FTP服务器已停止');
@@ -226,24 +226,22 @@ function stopFtpServer() {
   }
 }
 
-// // 为整个进程添加错误处理，防止服务器因未处理的错误而退出
-// process.on('uncaughtException', (err) => {
-//   logger.error('未捕获的异常:', err.message);
-//   if (err.code !== 'ECONNRESET') {
-//     logger.error('错误堆栈:', err.stack);
-//   } else {
-//     logger.warn('忽略ECONNRESET错误，服务器继续运行');
-//   }
-// });
-
-// process.on('unhandledRejection', (reason, promise) => {
-//   logger.error('未处理的Promise拒绝:', reason);
-//   // 不要因为Promise拒绝而退出进程
-// });
 
 // 如果直接运行 ftp.js，则启动FTP服务器
 if (require.main === module) {
   startFtpServer();
+   // 单独运行时处理信号
+  process.on('SIGINT', async () => {
+    logger.info('FTP服务器收到SIGINT信号，正在关闭...');
+    stopFtpServer();
+    process.exit(0);
+  });
+  
+  process.on('SIGTERM', async () => {
+    logger.info('FTP服务器收到SIGTERM信号，正在关闭...');
+    stopFtpServer();
+    process.exit(0);
+  });
 }
 
 module.exports = { startFtpServer, stopFtpServer };
