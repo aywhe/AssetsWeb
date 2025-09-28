@@ -21,9 +21,15 @@
 
 # 运行
 
-命令行中运行：
+命令行中运行 server：
 
     node server.js
+命令行中运行 ftp：
+
+    node ftp.js
+命令行中运行 ：
+
+    node app.js
 
 # 打包发布
 
