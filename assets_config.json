@@ -98,5 +98,35 @@
         ".ogg",
         ".wav",
         ".flac"
-    ]
+    ],
+    "FtpConfig": {
+        "port": 2121,
+        "paths": [
+            {
+                "users": [
+                    {
+                        "username": "guest",
+                        "password": "guest",
+                        "permissions": "lr"
+                    },
+                    {
+                        "username": "admin",
+                        "password": "admin",
+                        "permissions": "lrwd"
+                    }
+                ],
+                "rootPath": "D:/书"
+            },
+            {
+                "users": [
+                    {
+                        "username": "user",
+                        "password": "user",
+                        "permissions": "lrwd"
+                    }
+                ],
+                "rootPath": "D:/users/aywhe/Downloads"
+            }
+        ]
+    }
 }

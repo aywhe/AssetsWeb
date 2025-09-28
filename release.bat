@@ -29,7 +29,7 @@ if not exist "%target_dir%" (
 
 
 :: 拷贝文件
-xcopy ".\server.js" "%target_dir%\" /D /Y
+xcopy ".\*.js" "%target_dir%\" /D /Y
 xcopy ".\assets_config.json" "%target_dir%\" /D /Y
 xcopy "views" "%target_dir%\views" /D /Y /E /I
 xcopy "public" "%target_dir%\public" /D /Y /E /I

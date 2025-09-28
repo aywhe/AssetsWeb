@@ -10,6 +10,10 @@
 
 * "express": "^5.1.0"
 * "readdir": "^1.0.2"
+* "ftp-srv": "^2.16.2",
+* "get-intrinsic": "^1.3.0",
+* "node-cache": "^5.1.2",
+* "winston": "^3.17.0"
 
 # 配置文件
 
