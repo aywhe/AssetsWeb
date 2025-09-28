@@ -597,10 +597,17 @@
                     add_container.style.visibility = 'visible';
                     hr.style.visibility = 'visible';
                     til.style.visibility = 'visible';
+                    video.classList.remove('hide-video-default-fullscreen-button');
                 } else if(document.fullscreenElement === video){
                     // 播放器全屏
                     // 失败，权限问题，需要按钮
                     //video_canvas.requestFullscreen();
+                } else if(document.fullscreenElement === video_canvas){
+                    document.body.style.backgroundColor = '#000000';
+                    add_container.style.visibility = 'hidden';
+                    hr.style.visibility = 'hidden';
+                    til.style.visibility = 'hidden';
+                    video.classList.add('hide-video-default-fullscreen-button');
                 } else {
                     // 其他全屏
                     document.body.style.backgroundColor = '#000000';

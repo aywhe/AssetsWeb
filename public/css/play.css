@@ -133,3 +133,7 @@ select option {
     color: #333;
     text-align: left;
 }
+
+.hide-video-default-fullscreen-button::-webkit-media-controls-fullscreen-button {
+    display: none !important;
+}
