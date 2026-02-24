@@ -4,16 +4,7 @@
 
 # 依赖
 
-需要安装 nodejs, npm 和 modules。
-
-## modules
-
-* "express": "^5.1.0"
-* "readdir": "^1.0.2"
-* "ftp-srv": "^2.16.2",
-* "get-intrinsic": "^1.3.0",
-* "node-cache": "^5.1.2",
-* "winston": "^3.17.0"
+需要安装 nodejs, 然后使用 npm 安装 package.json 中依赖的 modules。
 
 # 配置文件
 
@@ -30,7 +21,3 @@
 命令行中运行 ：
 
     node app.js
-
-# 打包发布
-
-未发布。
