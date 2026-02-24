@@ -197,7 +197,7 @@
         // 筛选歌曲
         function onFilterFiles() {
             var filter = prompt("输入要查找的文件信息", '');
-            if (filter === null) filter = '';
+            if (filter === null) return; // filter = '';
             fetchFilter = filter.trim();
             var musicNameEle = document.getElementById('musicName');
             if (fetchFilter.length > 0) {
