@@ -424,7 +424,7 @@ app.get('/api/lookfor-danmaku', async (req, res) => {
     res.set('Content-Type', 'application/xml');
     res.send(data);
   } catch (err) {
-    logger.error('获取弹幕文件失败', err);
+    //logger.error('获取弹幕文件失败', err);
     res.status(404).send('弹幕文件不存在');
   }
 });
