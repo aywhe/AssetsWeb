@@ -18,6 +18,10 @@
 命令行中运行 ftp：
 
     node ftp.js
-命令行中运行 ：
+命令行中运行 app：
 
     node app.js
+
+# 小白安装和运行：
+
+    双击 setup_and_run.bat
