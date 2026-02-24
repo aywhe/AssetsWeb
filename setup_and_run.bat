@@ -40,7 +40,7 @@ if exist "package-lock.json" (
     echo package-lock.json 已存在，跳过npm install
 ) else (
     echo 正在安装依赖包...
-    npm install
+    npm install --registry https://mirrors.cloud.tencent.com/npm/
     if %errorlevel% neq 0 (
         echo 安装依赖失败，请检查网络连接
         pause
