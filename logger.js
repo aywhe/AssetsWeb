@@ -18,7 +18,12 @@ const logger = winston.createLogger({
         })
       )
     }),
-    new winston.transports.File({ filename: 'app.log' })
+    new winston.transports.File({ 
+      filename: 'app.log',
+      maxsize: 5242880, // 5MB
+      maxFiles: 5,
+      tailable: true
+    })
   ]
 });
 
