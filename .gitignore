@@ -1,0 +1,8 @@
+/node_modules
+package-lock.json
+/views/test.html
+test.js
+/.vscode
+/build*
+/.VSCodeCounter
+*.log
