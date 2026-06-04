@@ -79,7 +79,7 @@ function initDatas() {
         app.use(val.vpath, express.static(val.path));
         logger.info(val.path);
         FileUtils.readVpathFileFromDir(val.path, AudioExts, val.vpath, val.path).then((indata) => {
-          AudioPathTagMap.audios = indata;
+          AudioPathTagMap.audios.push(...indata); // 累加不同目录的音频文件
           logger.info(`找到 ${AudioPathTagMap.audios.length} 个音频文件`);
         }).catch((err) => {
           logger.error(`读取音频目录失败: ${val.path}`, err);

@@ -14,6 +14,10 @@
             {
                 "path": "D:/users/aywhe/Music",
                 "vpath": "/daudios"
+            },
+            {
+                "path": "E:/听书",
+                "vpath": "/baudios"
             }
         ]
     },
@@ -97,6 +101,7 @@
         ".wma",
         ".ogg",
         ".wav",
+        ".m4a",
         ".flac"
     ],
     "FtpConfig": {
